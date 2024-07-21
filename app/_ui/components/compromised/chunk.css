@@ -1,0 +1,10 @@
+.more {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.more-clipboard {
+  white-space: wrap;
+  width: 20px;
+}
