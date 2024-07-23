@@ -26,58 +26,22 @@ import MarkChatUnreadIcon from "@mui/icons-material/MarkChatUnread";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { useState } from "react";
+import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
+import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 
 const links = [
   {
-    name: "Overview",
+    name: "Dashboard",
     href: "/credentials/dashboard",
-    icon: InsertChartOutlinedIcon,
+    icon: DashboardOutlinedIcon,
     breach: false,
   },
   {
-    name: "Compromised",
-    href: "/credentials/dashboard/compromised",
-    hrefDetail: "/credentials/dashboard/compromised/detail",
-    icon: ScreenSearchDesktopIcon,
+    name: "Users",
+    href: "/credentials/dashboard/users",
+    hrefDetail: "/credentials/dashboard/users/detail",
+    icon: AccountCircleOutlinedIcon,
     breach: false,
-  },
-  {
-    name: "Stealer",
-    href: "/credentials/dashboard/stealer",
-    hrefDetail: "/credentials/dashboard/stealer/detail",
-    icon: CoronavirusIcon,
-    breach: false,
-  },
-  {
-    name: "Executive protection",
-    href: "/credentials/dashboard/executive-protections",
-    hrefDetail: "/credentials/dashboard/executive-protections/detail",
-    icon: SecurityIcon,
-    breach: false,
-  },
-  {
-    name: "Search by keyword",
-    href: "/credentials/dashboard/search-by-keyword",
-    icon: ManageSearchOutlinedIcon,
-    breach: false,
-  },
-  {
-    name: "Ransom news",
-    href: "/credentials/dashboard/manage-accounts",
-    icon: MarkChatUnreadIcon,
-    breach: true,
-    dropdownItems: [
-      {
-        name: "All cyberattacks",
-        href: "/credentials/dashboard/ransom-news/all-cyberattacks",
-        hrefDetail: "/credentials/dashboard/ransom-news/all-cyberattacks",
-      },
-      {
-        name: "All country",
-        href: "/credentials/dashboard/ransom-news/all-country",
-        hrefDetail: "/credentials/dashboard/ransom-news/all-country",
-      },
-    ],
   },
   {
     name: "Activity Log",
@@ -86,7 +50,7 @@ const links = [
     breach: false,
   },
   {
-    name: "Settings",
+    name: "Manage account",
     href: "/credentials/dashboard/manage-accounts",
     icon: SettingsApplicationsOutlinedIcon,
     breach: false,
