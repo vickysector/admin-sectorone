@@ -889,8 +889,6 @@ export default function DashboardLayout({ children }) {
 
   // End of: Refresh Token
 
-  console.log("users role: ", getCookie("role"));
-
   useEffect(() => {
     if (
       !getCookie("email_credentials") ||
