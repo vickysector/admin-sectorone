@@ -904,7 +904,9 @@ export default function DashboardLayout({ children }) {
   useEffect(() => {
     if (getCookie("role") !== "superadmin") {
       DeleteCookies();
-      return redirect("/auth/login");
+      router.push("/auth/login");
+      window.location.reload();
+      DeleteCookies();
     }
   }, []);
 
