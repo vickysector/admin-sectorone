@@ -9,4 +9,5 @@ export function DeleteCookies() {
   deleteCookie("scanned_user");
   deleteCookie("scanned_email");
   deleteCookie("scanned_verified");
+  deleteCookie("role");
 }
