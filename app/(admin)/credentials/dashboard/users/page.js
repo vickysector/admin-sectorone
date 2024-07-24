@@ -267,6 +267,10 @@ export default function UsersDashboardPage() {
     router.push(`${pathname}?${params.toString()}`);
   };
 
+  const handleChangeToDetailPage = (id, type) => {
+    router.push(`${pathname}/detail/${id}/${type}`);
+  };
+
   //   End of: Handle Functions
 
   //   Start of: Table for Partner Data
@@ -331,20 +335,19 @@ export default function UsersDashboardPage() {
     {
       title: "Action",
       key: "action",
-      render: () => {
+      render: (param1) => {
         return (
           <div>
             <button
               className={clsx(
                 `py-2 px-4 rounded-md text-primary-base text-Base-normal border-[1px] border-input-border `
               )}
-              // onClick={() =>
-              //   handleMigrateContent(
-              //     param1.title,
-              //     param1.summary,
-              //     LAST_100_CYBERATTACKS
-              //   )
-              // }
+              onClick={() =>
+                handleChangeToDetailPage(
+                  param1.id,
+                  PARTNER_SECTION_ROLE_SECTION
+                )
+              }
             >
               Details
             </button>
@@ -418,20 +421,19 @@ export default function UsersDashboardPage() {
     {
       title: "Action",
       key: "action",
-      render: () => {
+      render: (param1) => {
         return (
           <div>
             <button
               className={clsx(
                 `py-2 px-4 rounded-md text-primary-base text-Base-normal border-[1px] border-input-border `
               )}
-              // onClick={() =>
-              //   handleMigrateContent(
-              //     param1.title,
-              //     param1.summary,
-              //     LAST_100_CYBERATTACKS
-              //   )
-              // }
+              onClick={() =>
+                handleChangeToDetailPage(
+                  param1.id,
+                  MARKETING_SECTION_ROLE_SECTION
+                )
+              }
             >
               Details
             </button>
@@ -505,20 +507,16 @@ export default function UsersDashboardPage() {
     {
       title: "Action",
       key: "action",
-      render: () => {
+      render: (param1) => {
         return (
           <div>
             <button
               className={clsx(
                 `py-2 px-4 rounded-md text-primary-base text-Base-normal border-[1px] border-input-border `
               )}
-              // onClick={() =>
-              //   handleMigrateContent(
-              //     param1.title,
-              //     param1.summary,
-              //     LAST_100_CYBERATTACKS
-              //   )
-              // }
+              onClick={() =>
+                handleChangeToDetailPage(param1.id, USERS_SECTION_ROLE_SECTION)
+              }
             >
               Details
             </button>
@@ -592,20 +590,16 @@ export default function UsersDashboardPage() {
     {
       title: "Action",
       key: "action",
-      render: () => {
+      render: (param1) => {
         return (
           <div>
             <button
               className={clsx(
                 `py-2 px-4 rounded-md text-primary-base text-Base-normal border-[1px] border-input-border `
               )}
-              // onClick={() =>
-              //   handleMigrateContent(
-              //     param1.title,
-              //     param1.summary,
-              //     LAST_100_CYBERATTACKS
-              //   )
-              // }
+              onClick={() =>
+                handleChangeToDetailPage(param1.id, ADMIN_SECTION_ROLE_SECTION)
+              }
             >
               Details
             </button>
@@ -679,20 +673,19 @@ export default function UsersDashboardPage() {
     {
       title: "Action",
       key: "action",
-      render: () => {
+      render: (param1) => {
         return (
           <div>
             <button
               className={clsx(
                 `py-2 px-4 rounded-md text-primary-base text-Base-normal border-[1px] border-input-border `
               )}
-              // onClick={() =>
-              //   handleMigrateContent(
-              //     param1.title,
-              //     param1.summary,
-              //     LAST_100_CYBERATTACKS
-              //   )
-              // }
+              onClick={() =>
+                handleChangeToDetailPage(
+                  param1.id,
+                  SUPERADMIN_SECTION_ROLE_SECTION
+                )
+              }
             >
               Details
             </button>
@@ -705,8 +698,6 @@ export default function UsersDashboardPage() {
   // End of: Table for Partner Data
 
   //   console.log("all table data: ", allTableData);
-  console.log("page: ", page);
-
   return (
     <main>
       <section>
