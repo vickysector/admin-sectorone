@@ -306,7 +306,372 @@ export default function UsersDashboardPage() {
       render: (param1) => {
         return (
           <div>
-            <p> {param1.verified} </p>
+            <p
+              className={clsx(
+                param1.verified ? "visible" : "hidden",
+                "px-4 py-1 rounded-md bg-[#F6FFED] text-success inline text-Base-strong"
+              )}
+            >
+              {" "}
+              Active{" "}
+            </p>
+            <p
+              className={clsx(
+                !param1.verified ? "visible" : "hidden",
+                "px-4 py-1 rounded-md bg-[#F5F5F5] text-text-description inline text-Base-strong"
+              )}
+            >
+              {" "}
+              Inactive{" "}
+            </p>
+          </div>
+        );
+      },
+    },
+    {
+      title: "Action",
+      key: "action",
+      render: () => {
+        return (
+          <div>
+            <button
+              className={clsx(
+                `py-2 px-4 rounded-md text-primary-base text-Base-normal border-[1px] border-input-border `
+              )}
+              // onClick={() =>
+              //   handleMigrateContent(
+              //     param1.title,
+              //     param1.summary,
+              //     LAST_100_CYBERATTACKS
+              //   )
+              // }
+            >
+              Details
+            </button>
+          </div>
+        );
+      },
+    },
+  ];
+
+  // End of: Table for Partner Data
+
+  //   Start of: Table for Partner Data
+
+  const columnMarketingTableData = [
+    {
+      title: "No",
+      key: "no",
+      render: (param1, record, index) => {
+        return <p> {index + 1} </p>;
+      },
+    },
+    {
+      title: "Date added",
+      key: "added",
+      render: (param1) => {
+        return <p> {convertDateFormat(param1.created_at)} </p>;
+      },
+    },
+    {
+      title: "ID User",
+      key: "id_user",
+      render: (param1) => {
+        return <p> {param1.id} </p>;
+      },
+    },
+    {
+      title: "Login",
+      key: "login",
+      render: (param1) => {
+        return <p> {param1.email} </p>;
+      },
+    },
+    {
+      title: "Status",
+      key: "status",
+      render: (param1) => {
+        return (
+          <div>
+            <p
+              className={clsx(
+                param1.verified ? "visible" : "hidden",
+                "px-4 py-1 rounded-md bg-[#F6FFED] text-success inline text-Base-strong"
+              )}
+            >
+              {" "}
+              Active{" "}
+            </p>
+            <p
+              className={clsx(
+                !param1.verified ? "visible" : "hidden",
+                "px-4 py-1 rounded-md bg-[#F5F5F5] text-text-description inline text-Base-strong"
+              )}
+            >
+              {" "}
+              Inactive{" "}
+            </p>
+          </div>
+        );
+      },
+    },
+    {
+      title: "Action",
+      key: "action",
+      render: () => {
+        return (
+          <div>
+            <button
+              className={clsx(
+                `py-2 px-4 rounded-md text-primary-base text-Base-normal border-[1px] border-input-border `
+              )}
+              // onClick={() =>
+              //   handleMigrateContent(
+              //     param1.title,
+              //     param1.summary,
+              //     LAST_100_CYBERATTACKS
+              //   )
+              // }
+            >
+              Details
+            </button>
+          </div>
+        );
+      },
+    },
+  ];
+
+  // End of: Table for Partner Data
+
+  //   Start of: Table for Partner Data
+
+  const columnUsersTableData = [
+    {
+      title: "No",
+      key: "no",
+      render: (param1, record, index) => {
+        return <p> {index + 1} </p>;
+      },
+    },
+    {
+      title: "Date added",
+      key: "added",
+      render: (param1) => {
+        return <p> {convertDateFormat(param1.created_at)} </p>;
+      },
+    },
+    {
+      title: "ID User",
+      key: "id_user",
+      render: (param1) => {
+        return <p> {param1.id} </p>;
+      },
+    },
+    {
+      title: "Login",
+      key: "login",
+      render: (param1) => {
+        return <p> {param1.email} </p>;
+      },
+    },
+    {
+      title: "Status",
+      key: "status",
+      render: (param1) => {
+        return (
+          <div>
+            <p
+              className={clsx(
+                param1.verified ? "visible" : "hidden",
+                "px-4 py-1 rounded-md bg-[#F6FFED] text-success inline text-Base-strong"
+              )}
+            >
+              {" "}
+              Active{" "}
+            </p>
+            <p
+              className={clsx(
+                !param1.verified ? "visible" : "hidden",
+                "px-4 py-1 rounded-md bg-[#F5F5F5] text-text-description inline text-Base-strong"
+              )}
+            >
+              {" "}
+              Inactive{" "}
+            </p>
+          </div>
+        );
+      },
+    },
+    {
+      title: "Action",
+      key: "action",
+      render: () => {
+        return (
+          <div>
+            <button
+              className={clsx(
+                `py-2 px-4 rounded-md text-primary-base text-Base-normal border-[1px] border-input-border `
+              )}
+              // onClick={() =>
+              //   handleMigrateContent(
+              //     param1.title,
+              //     param1.summary,
+              //     LAST_100_CYBERATTACKS
+              //   )
+              // }
+            >
+              Details
+            </button>
+          </div>
+        );
+      },
+    },
+  ];
+
+  // End of: Table for Partner Data
+
+  //   Start of: Table for Partner Data
+
+  const columnAdminTableData = [
+    {
+      title: "No",
+      key: "no",
+      render: (param1, record, index) => {
+        return <p> {index + 1} </p>;
+      },
+    },
+    {
+      title: "Date added",
+      key: "added",
+      render: (param1) => {
+        return <p> {convertDateFormat(param1.created_at)} </p>;
+      },
+    },
+    {
+      title: "ID User",
+      key: "id_user",
+      render: (param1) => {
+        return <p> {param1.id} </p>;
+      },
+    },
+    {
+      title: "Login",
+      key: "login",
+      render: (param1) => {
+        return <p> {param1.email} </p>;
+      },
+    },
+    {
+      title: "Status",
+      key: "status",
+      render: (param1) => {
+        return (
+          <div>
+            <p
+              className={clsx(
+                param1.verified ? "visible" : "hidden",
+                "px-4 py-1 rounded-md bg-[#F6FFED] text-success inline text-Base-strong"
+              )}
+            >
+              {" "}
+              Active{" "}
+            </p>
+            <p
+              className={clsx(
+                !param1.verified ? "visible" : "hidden",
+                "px-4 py-1 rounded-md bg-[#F5F5F5] text-text-description inline text-Base-strong"
+              )}
+            >
+              {" "}
+              Inactive{" "}
+            </p>
+          </div>
+        );
+      },
+    },
+    {
+      title: "Action",
+      key: "action",
+      render: () => {
+        return (
+          <div>
+            <button
+              className={clsx(
+                `py-2 px-4 rounded-md text-primary-base text-Base-normal border-[1px] border-input-border `
+              )}
+              // onClick={() =>
+              //   handleMigrateContent(
+              //     param1.title,
+              //     param1.summary,
+              //     LAST_100_CYBERATTACKS
+              //   )
+              // }
+            >
+              Details
+            </button>
+          </div>
+        );
+      },
+    },
+  ];
+
+  // End of: Table for Partner Data
+
+  //   Start of: Table for Partner Data
+
+  const columnSuperadminTableData = [
+    {
+      title: "No",
+      key: "no",
+      render: (param1, record, index) => {
+        return <p> {index + 1} </p>;
+      },
+    },
+    {
+      title: "Date added",
+      key: "added",
+      render: (param1) => {
+        return <p> {convertDateFormat(param1.created_at)} </p>;
+      },
+    },
+    {
+      title: "ID User",
+      key: "id_user",
+      render: (param1) => {
+        return <p> {param1.id} </p>;
+      },
+    },
+    {
+      title: "Login",
+      key: "login",
+      render: (param1) => {
+        return <p> {param1.email} </p>;
+      },
+    },
+    {
+      title: "Status",
+      key: "status",
+      render: (param1) => {
+        return (
+          <div>
+            <p
+              className={clsx(
+                param1.verified ? "visible" : "hidden",
+                "px-4 py-1 rounded-md bg-[#F6FFED] text-success inline text-Base-strong"
+              )}
+            >
+              {" "}
+              Active{" "}
+            </p>
+            <p
+              className={clsx(
+                !param1.verified ? "visible" : "hidden",
+                "px-4 py-1 rounded-md bg-[#F5F5F5] text-text-description inline text-Base-strong"
+              )}
+            >
+              {" "}
+              Inactive{" "}
+            </p>
           </div>
         );
       },
@@ -556,7 +921,7 @@ export default function UsersDashboardPage() {
               {selectedButton === MARKETING_SECTION_ROLE_SECTION && (
                 <div className="border-[1px] rounded-lg border-input-border">
                   <Table
-                    columns={columnPartnerTableData}
+                    columns={columnMarketingTableData}
                     dataSource={allTableData}
                     pagination={false}
                   />
@@ -587,7 +952,7 @@ export default function UsersDashboardPage() {
               {selectedButton === USERS_SECTION_ROLE_SECTION && (
                 <div className="border-[1px] rounded-lg border-input-border">
                   <Table
-                    columns={columnPartnerTableData}
+                    columns={columnUsersTableData}
                     dataSource={allTableData}
                     pagination={false}
                   />
@@ -618,7 +983,7 @@ export default function UsersDashboardPage() {
               {selectedButton === ADMIN_SECTION_ROLE_SECTION && (
                 <div className="border-[1px] rounded-lg border-input-border">
                   <Table
-                    columns={columnPartnerTableData}
+                    columns={columnAdminTableData}
                     dataSource={allTableData}
                     pagination={false}
                   />
@@ -649,7 +1014,7 @@ export default function UsersDashboardPage() {
               {selectedButton === SUPERADMIN_SECTION_ROLE_SECTION && (
                 <div className="border-[1px] rounded-lg border-input-border">
                   <Table
-                    columns={columnPartnerTableData}
+                    columns={columnSuperadminTableData}
                     dataSource={allTableData}
                     pagination={false}
                   />
