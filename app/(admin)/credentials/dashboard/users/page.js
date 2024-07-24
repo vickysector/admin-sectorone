@@ -7,7 +7,12 @@ import { PrimaryButton } from "@/app/_ui/components/buttons/PrimaryButton";
 import OverviewCard from "@/app/_ui/dashboard/OverviewCard";
 import { getCookie } from "cookies-next";
 import Image from "next/image";
-import { useRouter, redirect, useSearchParams } from "next/navigation";
+import {
+  useRouter,
+  redirect,
+  useSearchParams,
+  usePathname,
+} from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -29,10 +34,19 @@ import {
   USERS_SECTION_ROLE_SECTION,
 } from "@/app/_lib/variables/Variables";
 import clsx from "clsx";
+import { convertDateFormat } from "@/app/_lib/CalculatePassword";
 
 const { RangePicker } = DatePicker;
 
 export default function UsersDashboardPage() {
+  // Start of: Route Params
+
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const params = new URLSearchParams(searchParams);
+
+  // End of: Route Params
+
   // Start of: Redux
 
   const dispatch = useDispatch();
@@ -41,13 +55,19 @@ export default function UsersDashboardPage() {
   // End of: Redux
 
   //   Start of: State
+  const [selectedButton, setSelectedButton] = useState(
+    searchParams.get("type") || PARTNER_SECTION_ROLE_SECTION
+  );
+  const [page, setPage] = useState(searchParams.get("page") || 1);
+  const [limit, setLimit] = useState(searchParams.get("limit") || 10);
+  const [allTableData, setAllTableData] = useState();
+  const [totalData, setTotalData] = useState();
+  const [sizeDataPerPage, setSizeDataPerPage] = useState();
 
   const [totalUsers, setTotalUsers] = useState();
   const [activeUsers, setActiveUsers] = useState();
   const [inactiveUsers, setInactiveUser] = useState();
-  const [selectedButton, setSelectedButton] = useState(
-    PARTNER_SECTION_ROLE_SECTION
-  );
+
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
@@ -106,13 +126,221 @@ export default function UsersDashboardPage() {
 
   // End of: Get Data Users
 
+  //   Start of: Get Table data by Partner
+
+  const FetchGetAllTableData = async (type) => {
+    try {
+      dispatch(setLoadingState(true));
+
+      const res = await fetch(
+        `${APIDATAV1}admin/user?page=${page}&limit=${limit}&search=&type=${type}`,
+        {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            Authorization: `Bearer ${getCookie("access_token")}`,
+          },
+        }
+      );
+
+      if (res.status === 401 || res.status === 403) {
+        return res;
+      }
+
+      const data = await res.json();
+
+      console.log("all partner data: ", data);
+
+      setAllTableData(data.data);
+
+      setTotalData(data.count_data);
+      setSizeDataPerPage(data.size);
+
+      return res;
+    } catch (error) {
+      console.log("error partner Data: ", error);
+      return error;
+    } finally {
+      dispatch(setLoadingState(false));
+    }
+  };
+
+  const FetchGetAllTableDataWithRefreshToken = async (type) => {
+    await fetchWithRefreshToken(FetchGetAllTableData, router, dispatch, type);
+  };
+
+  useEffect(() => {
+    switch (selectedButton) {
+      case PARTNER_SECTION_ROLE_SECTION:
+        FetchGetAllTableDataWithRefreshToken(PARTNER_SECTION_ROLE_SECTION);
+
+        if (
+          !searchParams.has("type") ||
+          !searchParams.has("limit") ||
+          !searchParams.has("page")
+        ) {
+          params.set("type", PARTNER_SECTION_ROLE_SECTION);
+          params.set("page", 1);
+          params.set("limit", 10);
+          router.push(`${pathname}?${params.toString()}`);
+        }
+        break;
+      case MARKETING_SECTION_ROLE_SECTION:
+        FetchGetAllTableDataWithRefreshToken(MARKETING_SECTION_ROLE_SECTION);
+
+        if (
+          !searchParams.has("type") ||
+          !searchParams.has("limit") ||
+          !searchParams.has("page")
+        ) {
+          params.set("type", MARKETING_SECTION_ROLE_SECTION);
+          params.set("page", 1);
+          params.set("limit", 10);
+          router.push(`${pathname}?${params.toString()}`);
+        }
+        break;
+      case USERS_SECTION_ROLE_SECTION:
+        FetchGetAllTableDataWithRefreshToken(USERS_SECTION_ROLE_SECTION);
+
+        if (
+          !searchParams.has("type") ||
+          !searchParams.has("limit") ||
+          !searchParams.has("page")
+        ) {
+          params.set("type", USERS_SECTION_ROLE_SECTION);
+          params.set("page", 1);
+          params.set("limit", 10);
+          router.push(`${pathname}?${params.toString()}`);
+        }
+        break;
+      case ADMIN_SECTION_ROLE_SECTION:
+        FetchGetAllTableDataWithRefreshToken(ADMIN_SECTION_ROLE_SECTION);
+
+        if (
+          !searchParams.has("type") ||
+          !searchParams.has("limit") ||
+          !searchParams.has("page")
+        ) {
+          params.set("type", ADMIN_SECTION_ROLE_SECTION);
+          params.set("page", 1);
+          params.set("limit", 10);
+          router.push(`${pathname}?${params.toString()}`);
+        }
+        break;
+      case SUPERADMIN_SECTION_ROLE_SECTION:
+        FetchGetAllTableDataWithRefreshToken(SUPERADMIN_SECTION_ROLE_SECTION);
+
+        if (
+          !searchParams.has("type") ||
+          !searchParams.has("limit") ||
+          !searchParams.has("page")
+        ) {
+          params.set("type", SUPERADMIN_SECTION_ROLE_SECTION);
+          params.set("page", 1);
+          params.set("limit", 10);
+          router.push(`${pathname}?${params.toString()}`);
+        }
+        break;
+      default:
+        break;
+    }
+  }, [selectedButton, page]);
+
+  //   End of: Get Table data by Partner
+
   //   Start of: Handle Functions
 
   const handleButtonClick = (value) => {
     setSelectedButton(value.target.name);
+    setPage(1);
+    setLimit(10);
+
+    params.set("type", value.target.name);
+    params.set("page", 1);
+    params.set("limit", 10);
+    router.push(`${pathname}?${params.toString()}`);
+  };
+
+  const handleChangePages = (paging) => {
+    setPage(paging);
+    params.set("page", paging);
+    router.push(`${pathname}?${params.toString()}`);
   };
 
   //   End of: Handle Functions
+
+  //   Start of: Table for Partner Data
+
+  const columnPartnerTableData = [
+    {
+      title: "No",
+      key: "no",
+      render: (param1, record, index) => {
+        return <p> {index + 1} </p>;
+      },
+    },
+    {
+      title: "Date added",
+      key: "added",
+      render: (param1) => {
+        return <p> {convertDateFormat(param1.created_at)} </p>;
+      },
+    },
+    {
+      title: "ID User",
+      key: "id_user",
+      render: (param1) => {
+        return <p> {param1.id} </p>;
+      },
+    },
+    {
+      title: "Login",
+      key: "login",
+      render: (param1) => {
+        return <p> {param1.email} </p>;
+      },
+    },
+    {
+      title: "Status",
+      key: "status",
+      render: (param1) => {
+        return (
+          <div>
+            <p> {param1.verified} </p>
+          </div>
+        );
+      },
+    },
+    {
+      title: "Action",
+      key: "action",
+      render: () => {
+        return (
+          <div>
+            <button
+              className={clsx(
+                `py-2 px-4 rounded-md text-primary-base text-Base-normal border-[1px] border-input-border `
+              )}
+              // onClick={() =>
+              //   handleMigrateContent(
+              //     param1.title,
+              //     param1.summary,
+              //     LAST_100_CYBERATTACKS
+              //   )
+              // }
+            >
+              Details
+            </button>
+          </div>
+        );
+      },
+    },
+  ];
+
+  // End of: Table for Partner Data
+
+  //   console.log("all table data: ", allTableData);
+  console.log("page: ", page);
 
   return (
     <main>
@@ -278,6 +506,178 @@ export default function UsersDashboardPage() {
                 </div>
               </div>
             </div>
+          </section>
+          <section className="p-8 pt-0">
+            <ConfigProvider
+              theme={{
+                components: {
+                  Pagination: {
+                    itemActiveBg: "#FF6F1E",
+                    itemLinkBg: "#fff",
+                    itemInputBg: "#fff",
+                  },
+                },
+                token: {
+                  colorPrimary: "white",
+                },
+              }}
+            >
+              {selectedButton === PARTNER_SECTION_ROLE_SECTION && (
+                <div className="border-[1px] rounded-lg border-input-border">
+                  <Table
+                    columns={columnPartnerTableData}
+                    dataSource={allTableData}
+                    pagination={false}
+                  />
+                  <div
+                    className={clsx(
+                      "flex items-center justify-between my-[19px] mx-[16px]",
+                      allTableData === null ? "hidden" : "visible"
+                    )}
+                  >
+                    <p className="text-Base-normal text-[#676767]">
+                      {" "}
+                      Showing {sizeDataPerPage && sizeDataPerPage} to{" "}
+                      {totalData && totalData} entries
+                    </p>
+                    <Pagination
+                      type="primary"
+                      defaultCurrent={1}
+                      total={totalData && totalData}
+                      showSizeChanger={false}
+                      style={{ color: "#FF6F1E" }}
+                      hideOnSinglePage={true}
+                      onChange={handleChangePages}
+                      current={page}
+                    />
+                  </div>
+                </div>
+              )}
+              {selectedButton === MARKETING_SECTION_ROLE_SECTION && (
+                <div className="border-[1px] rounded-lg border-input-border">
+                  <Table
+                    columns={columnPartnerTableData}
+                    dataSource={allTableData}
+                    pagination={false}
+                  />
+                  <div
+                    className={clsx(
+                      "flex items-center justify-between my-[19px] mx-[16px]",
+                      allTableData === null ? "hidden" : "visible"
+                    )}
+                  >
+                    <p className="text-Base-normal text-[#676767]">
+                      {" "}
+                      Showing {sizeDataPerPage && sizeDataPerPage} to{" "}
+                      {totalData && totalData} entries
+                    </p>
+                    <Pagination
+                      type="primary"
+                      defaultCurrent={1}
+                      total={totalData && totalData}
+                      showSizeChanger={false}
+                      style={{ color: "#FF6F1E" }}
+                      hideOnSinglePage={true}
+                      onChange={handleChangePages}
+                      current={page}
+                    />
+                  </div>
+                </div>
+              )}
+              {selectedButton === USERS_SECTION_ROLE_SECTION && (
+                <div className="border-[1px] rounded-lg border-input-border">
+                  <Table
+                    columns={columnPartnerTableData}
+                    dataSource={allTableData}
+                    pagination={false}
+                  />
+                  <div
+                    className={clsx(
+                      "flex items-center justify-between my-[19px] mx-[16px]",
+                      allTableData === null ? "hidden" : "visible"
+                    )}
+                  >
+                    <p className="text-Base-normal text-[#676767]">
+                      {" "}
+                      Showing {sizeDataPerPage && sizeDataPerPage} to{" "}
+                      {totalData && totalData} entries
+                    </p>
+                    <Pagination
+                      type="primary"
+                      defaultCurrent={1}
+                      total={totalData && totalData}
+                      showSizeChanger={false}
+                      style={{ color: "#FF6F1E" }}
+                      hideOnSinglePage={true}
+                      onChange={handleChangePages}
+                      current={page}
+                    />
+                  </div>
+                </div>
+              )}
+              {selectedButton === ADMIN_SECTION_ROLE_SECTION && (
+                <div className="border-[1px] rounded-lg border-input-border">
+                  <Table
+                    columns={columnPartnerTableData}
+                    dataSource={allTableData}
+                    pagination={false}
+                  />
+                  <div
+                    className={clsx(
+                      "flex items-center justify-between my-[19px] mx-[16px]",
+                      allTableData === null ? "hidden" : "visible"
+                    )}
+                  >
+                    <p className="text-Base-normal text-[#676767]">
+                      {" "}
+                      Showing {sizeDataPerPage && sizeDataPerPage} to{" "}
+                      {totalData && totalData} entries
+                    </p>
+                    <Pagination
+                      type="primary"
+                      defaultCurrent={1}
+                      total={totalData && totalData}
+                      showSizeChanger={false}
+                      style={{ color: "#FF6F1E" }}
+                      hideOnSinglePage={true}
+                      onChange={handleChangePages}
+                      current={page}
+                    />
+                  </div>
+                </div>
+              )}
+              {selectedButton === SUPERADMIN_SECTION_ROLE_SECTION && (
+                <div className="border-[1px] rounded-lg border-input-border">
+                  <Table
+                    columns={columnPartnerTableData}
+                    dataSource={allTableData}
+                    pagination={false}
+                  />
+                  <div
+                    className={clsx(
+                      "flex items-center justify-between my-[19px] mx-[16px]",
+                      allTableData === null ? "hidden" : "visible"
+                    )}
+                  >
+                    <p className="text-Base-normal text-[#676767]">
+                      {" "}
+                      Showing {sizeDataPerPage && sizeDataPerPage} to{" "}
+                      {totalData && totalData} entries
+                    </p>
+                    <Pagination
+                      type="primary"
+                      defaultCurrent={1}
+                      total={totalData && totalData}
+                      showSizeChanger={false}
+                      style={{ color: "#FF6F1E" }}
+                      hideOnSinglePage={true}
+                      onChange={handleChangePages}
+                      current={page}
+                    />
+                  </div>
+                </div>
+              )}
+            </ConfigProvider>
           </section>
         </div>
       </section>
