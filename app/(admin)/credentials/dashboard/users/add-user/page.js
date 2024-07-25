@@ -14,6 +14,8 @@ import { useEffect, useState } from "react";
 import { APIDATAV1 } from "@/app/_lib/helpers/APIKEYS";
 import { setLoadingState } from "@/app/_lib/store/features/Compromised/LoadingSlices";
 import { getCookie } from "cookies-next";
+import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
+import { v4 as uuidv4 } from "uuid";
 
 export default function DetailRoleUsers({ params }) {
   // Start of: Redux
@@ -26,6 +28,7 @@ export default function DetailRoleUsers({ params }) {
   //   Start of: All State
 
   const [selectOptions, setSelecOptions] = useState([]);
+  const [allInput, setAllInput] = useState([]);
 
   //   End of: All State
 
@@ -33,6 +36,23 @@ export default function DetailRoleUsers({ params }) {
 
   const handleBackToAllcyberattacks = () => {
     router.back();
+  };
+
+  const handleAddInputField = () => {
+    console.log("input field clicked");
+    setAllInput([...allInput, { id: uuidv4(), value: "" }]);
+  };
+
+  const handleDeleteField = (id) => {
+    const newInputs = allInput.filter((input, i) => input.id !== id);
+    setAllInput(newInputs);
+  };
+
+  const handleInputChange = (id, event) => {
+    const newInputs = allInput.map((input, i) =>
+      input.id === id ? { ...input, value: event.target.value } : input
+    );
+    setAllInput(newInputs);
   };
 
   //   End of: Functions Handler
@@ -97,6 +117,8 @@ export default function DetailRoleUsers({ params }) {
   }, []);
 
   // End of: API Intregations
+
+  console.log("allinputs: ", allInput);
 
   return (
     <main>
@@ -200,6 +222,59 @@ export default function DetailRoleUsers({ params }) {
                 size="large"
               />
             </Form.Item>
+          </section>
+        </div>
+        <div className="mt-8">
+          <section className="flex items-center justify-between">
+            <div>
+              <h2 className="text-heading-4 text-black">URL list</h2>
+            </div>
+            <div>
+              <button
+                className="text-LG-normal text-primary-base rounded-md py-2 px-4 bg-white border-[1px] border-input-border "
+                onClick={handleAddInputField}
+              >
+                Add URL
+              </button>
+            </div>
+          </section>
+          <section className="bg-white rounded-md p-8 mt-4">
+            <Form.Item
+              label={"Url"}
+              name={"url"}
+              layout="vertical"
+              rules={[
+                {
+                  required: true,
+                },
+              ]}
+            >
+              <Input placeholder="gmail.com" variant="filled" size="large" />
+            </Form.Item>
+            {allInput.map((item, index) => (
+              <div
+                key={item.id}
+                className={clsx(" flex items-center justify-between ")}
+              >
+                <div className="flex-grow mr-4">
+                  <Form.Item label={`Url `} name={"url"} layout="vertical">
+                    <Input
+                      value={item}
+                      placeholder="gmail.com"
+                      variant="filled"
+                      size="large"
+                      onChange={(e) => handleInputChange(item.id, e)}
+                    />
+                  </Form.Item>
+                </div>
+                <div
+                  className="cursor-pointer"
+                  onClick={() => handleDeleteField(item.id)}
+                >
+                  <DeleteOutlineOutlinedIcon />
+                </div>
+              </div>
+            ))}
           </section>
         </div>
       </section>
