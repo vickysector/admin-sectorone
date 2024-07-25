@@ -36,6 +36,7 @@ export default function DetailRoleUsers({ params }) {
   const [email, setEmail] = useState("");
   const [requiredUrl, setRequiredUrl] = useState("");
   const [isValidSave, setIsValidSave] = useState(null);
+  const [allUrlListFinal, setAllUrlListFinal] = useState([]);
 
   //   End of: All State
 
@@ -85,11 +86,18 @@ export default function DetailRoleUsers({ params }) {
     setAllInput(newInputs);
   };
 
-  const isSaveValid = name && phone && email && requiredUrl;
+  const isSaveValid =
+    name &&
+    phone &&
+    email &&
+    requiredUrl &&
+    allInput.every((data) => data.value.length !== 0);
 
   const handleSaveButton = () => {
     if (isSaveValid) {
       console.log("clicked save button");
+      const allinputsUrls = allInput.map((item) => item.value);
+      setAllUrlListFinal([requiredUrl, ...allinputsUrls]);
     } else {
       setIsValidSave(false);
     }
@@ -161,6 +169,7 @@ export default function DetailRoleUsers({ params }) {
   console.log("email change ", email);
   console.log("required url change ", requiredUrl);
   console.log("role change: ", role);
+  console.log("all url list final: ", allUrlListFinal);
 
   //   Start of: Alert handle
 
