@@ -40,6 +40,8 @@ export default function DetailRoleUsers({ params }) {
   const [email, setEmail] = useState("");
   const [requiredUrl, setRequiredUrl] = useState("");
   const [isValidSave, setIsValidSave] = useState(null);
+  const [isErrorWhileAddData, setIsErrorWhileAddData] = useState(null);
+  const [messageErrorWhileAddData, setMessageErrorWhileAddData] = useState("");
   const [allUrlListFinal, setAllUrlListFinal] = useState([]);
 
   //   End of: All State
@@ -199,14 +201,24 @@ export default function DetailRoleUsers({ params }) {
 
       const data = await res.json();
 
+      if (data.data === null) {
+        setMessageErrorWhileAddData(data.message);
+        throw res;
+      }
+
       console.log("status adding user: ", data);
 
       return res;
     } catch (error) {
       console.log("error while adding user data: ", error);
+      setIsErrorWhileAddData(true);
+      //   setMessageErrorWhileAddData(error.message);
       return error;
     } finally {
       dispatch(setLoadingState(false));
+      setTimeout(() => {
+        setIsErrorWhileAddData(false);
+      }, 5000);
     }
   };
 
@@ -254,6 +266,21 @@ export default function DetailRoleUsers({ params }) {
           )}
         >
           <Alert message="Required Field must be filled" banner closable />
+        </div>
+        <div
+          className={clsx(
+            isErrorWhileAddData && "visible",
+            !isErrorWhileAddData === null ? "hidden" : "visible",
+            !isErrorWhileAddData && "hidden",
+            "absolute left-[50%] translate-x-[-50%]"
+          )}
+        >
+          <Alert
+            message={messageErrorWhileAddData}
+            banner
+            closable
+            type="error"
+          />
         </div>
         <div className={clsx("flex items-center justify-between mb-4")}>
           <div className="flex items-center">
