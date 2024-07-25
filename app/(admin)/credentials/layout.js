@@ -68,6 +68,7 @@ import {
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 import { Button, Popover, ConfigProvider } from "antd";
 import { setIsConfirmDeleteHistory } from "@/app/_lib/store/features/ExecutiveProtections/SearchHistorySlices";
+import { setConfirmAddUsersRole } from "@/app/_lib/store/features/Users/AddUserSlice";
 
 export default function DashboardLayout({ children }) {
   const [hide, setHide] = useState(false);
@@ -138,6 +139,20 @@ export default function DashboardLayout({ children }) {
   const sessionExpiredRefreshToken = useSelector(
     (state) => state.refreshTokenExpired.status
   );
+
+  const confirmAddUserRole = useSelector((state) => state.addUserRole.confirm);
+  const callAddUserRole = useSelector(
+    (state) => state.addUserRole.PostFunctionAddUser
+  );
+
+  const handleCancelAddUserRole = () => {
+    dispatch(setConfirmAddUsersRole(false));
+  };
+
+  const handleYesAddUserRole = () => {
+    callAddUserRole();
+    dispatch(setConfirmAddUsersRole(false));
+  };
 
   const isScanEmailNow = useSelector((state) => state.scanEmail.isScanNow);
   const scannedEmail = useSelector((state) => state.scanEmail.scannedEmail);
@@ -927,6 +942,38 @@ export default function DashboardLayout({ children }) {
       {/* End = Overview */}
 
       {/* End of: Loading State Cards */}
+
+      <div
+        className={clsx(
+          "fixed top-0 bottom-0 left-0 right-0 bg-black w-full z-50 flex items-center justify-center",
+          confirmAddUserRole ? "visible" : "hidden"
+        )}
+      >
+        <div className="bg-white p-[32px] rounded-lg w-[30%]">
+          <h1 className="text-LG-strong ">Are you sure to Add this Users?</h1>
+          <p className="text-Base-normal text-text-description mt-[12px]">
+            this action cannot be undone
+          </p>
+          <div className="mt-8 flex justify-end ">
+            <div>
+              <button
+                className="py-2 px-4 rounded-md text-Base-normal border-[1px] border-input-border hover:opacity-80 cursor-pointer  "
+                onClick={handleCancelAddUserRole}
+              >
+                Cancel
+              </button>
+            </div>
+            <div className="ml-4">
+              <button
+                onClick={handleYesAddUserRole}
+                className="py-2 px-4 rounded-md text-Base-normal border-[1px]  hover:opacity-80 cursor-pointer text-white bg-primary-base border-primary-base"
+              >
+                Yes
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div
         className={clsx(

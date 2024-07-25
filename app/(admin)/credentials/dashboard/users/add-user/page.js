@@ -16,6 +16,10 @@ import { setLoadingState } from "@/app/_lib/store/features/Compromised/LoadingSl
 import { getCookie } from "cookies-next";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import { v4 as uuidv4 } from "uuid";
+import {
+  setAddUsersRoleFunction,
+  setConfirmAddUsersRole,
+} from "@/app/_lib/store/features/Users/AddUserSlice";
 
 export default function DetailRoleUsers({ params }) {
   // Start of: Redux
@@ -31,7 +35,7 @@ export default function DetailRoleUsers({ params }) {
   const [allInput, setAllInput] = useState([]);
   const [demo, setDemo] = useState(false);
   const [name, setName] = useState("");
-  const [role, setRole] = useState(3);
+  const [role, setRole] = useState("user");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [requiredUrl, setRequiredUrl] = useState("");
@@ -98,6 +102,14 @@ export default function DetailRoleUsers({ params }) {
       console.log("clicked save button");
       const allinputsUrls = allInput.map((item) => item.value);
       setAllUrlListFinal([requiredUrl, ...allinputsUrls]);
+
+      console.log(
+        "all url list final (inside handle button) : ",
+        allUrlListFinal
+      );
+
+      dispatch(setConfirmAddUsersRole(true));
+      dispatch(setAddUsersRoleFunction(callPostAddUserWithRefreshToken));
     } else {
       setIsValidSave(false);
     }
@@ -132,7 +144,7 @@ export default function DetailRoleUsers({ params }) {
       if (data.data) {
         const updatedData = data.data.map((item) => {
           return {
-            value: item.id,
+            value: item.name_role,
             label:
               item.name_role.charAt(0).toUpperCase() + item.name_role.slice(1),
           };
@@ -159,6 +171,52 @@ export default function DetailRoleUsers({ params }) {
   useEffect(() => {
     FetchAllRolesWithRefreshToken();
   }, []);
+
+  const PostAddUser = async () => {
+    try {
+      dispatch(setLoadingState(true));
+
+      const res = await fetch(`${APIDATAV1}admin/user`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          Authorization: `Bearer ${getCookie("access_token")}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: name,
+          phone: phone,
+          email: email,
+          role: role,
+          is_demo: demo,
+          domain: allUrlListFinal,
+        }),
+      });
+
+      if (res.status === 401 || res.status === 403) {
+        return res;
+      }
+
+      const data = await res.json();
+
+      console.log("status adding user: ", data);
+
+      return res;
+    } catch (error) {
+      console.log("error while adding user data: ", error);
+      return error;
+    } finally {
+      dispatch(setLoadingState(false));
+    }
+  };
+
+  const PostAddUserWithRefreshToken = async () => {
+    await fetchWithRefreshToken(PostAddUser, router, dispatch);
+  };
+
+  const callPostAddUserWithRefreshToken = () => {
+    PostAddUserWithRefreshToken();
+  };
 
   // End of: API Intregations
 
@@ -258,7 +316,7 @@ export default function DetailRoleUsers({ params }) {
             >
               <ConfigProvider theme={{ token: { colorPrimary: "FF6F1E" } }}>
                 <Select
-                  defaultValue={3}
+                  defaultValue={"user"}
                   options={selectOptions}
                   size="large"
                   value={role}
