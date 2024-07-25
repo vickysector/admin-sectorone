@@ -9,6 +9,11 @@ import {
   USERS_SECTION_ROLE_SECTION,
 } from "@/app/_lib/variables/Variables";
 import { ConfigProvider, Switch, Select, Input, Form } from "antd";
+import { fetchWithRefreshToken } from "@/app/_lib/token/fetchWithRefreshToken";
+import { useEffect, useState } from "react";
+import { APIDATAV1 } from "@/app/_lib/helpers/APIKEYS";
+import { setLoadingState } from "@/app/_lib/store/features/Compromised/LoadingSlices";
+import { getCookie } from "cookies-next";
 
 export default function DetailRoleUsers({ params }) {
   // Start of: Redux
@@ -17,6 +22,12 @@ export default function DetailRoleUsers({ params }) {
   const router = useRouter();
 
   // End of: Redux
+
+  //   Start of: All State
+
+  const [selectOptions, setSelecOptions] = useState([]);
+
+  //   End of: All State
 
   //   Start of: Functions Handler
 
@@ -27,6 +38,63 @@ export default function DetailRoleUsers({ params }) {
   //   End of: Functions Handler
 
   // Start of: API Intregations
+
+  const FetchAllRoles = async () => {
+    try {
+      dispatch(setLoadingState(true));
+
+      const res = await fetch(`${APIDATAV1}admin/all/role`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          Authorization: `Bearer ${getCookie("access_token")}`,
+        },
+      });
+
+      if (res.status === 401 || res.status === 403) {
+        return res;
+      }
+
+      const data = await res.json();
+
+      console.log("all role: ", data);
+
+      if (data.data === null) {
+        throw res;
+      }
+
+      if (data.data) {
+        const updatedData = data.data.map((item) => {
+          return {
+            value: item.id,
+            label:
+              item.name_role.charAt(0).toUpperCase() + item.name_role.slice(1),
+          };
+        });
+
+        setSelecOptions(updatedData);
+
+        console.log("all role (selectoptions): ", updatedData);
+
+        return res;
+      }
+
+      //   return res;
+    } catch (error) {
+      console.log("error user status: ", error);
+      return error;
+    } finally {
+      dispatch(setLoadingState(false));
+    }
+  };
+
+  const FetchAllRolesWithRefreshToken = async () => {
+    await fetchWithRefreshToken(FetchAllRoles, router, dispatch);
+  };
+
+  useEffect(() => {
+    FetchAllRolesWithRefreshToken();
+  }, []);
 
   // End of: API Intregations
 
@@ -88,16 +156,9 @@ export default function DetailRoleUsers({ params }) {
                 },
               ]}
             >
-              <Select
-                defaultValue="lucy"
-                options={[
-                  {
-                    value: "lucy",
-                    label: "Lucy",
-                  },
-                ]}
-                size="large"
-              />
+              <ConfigProvider theme={{ token: { colorPrimary: "FF6F1E" } }}>
+                <Select defaultValue={3} options={selectOptions} size="large" />
+              </ConfigProvider>
             </Form.Item>
             <Form.Item
               label={"Name"}
