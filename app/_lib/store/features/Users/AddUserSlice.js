@@ -5,6 +5,7 @@ const AddUsersSlices = createSlice({
   initialState: {
     confirm: false,
     PostFunctionAddUser: null,
+    successState: false,
   },
   reducers: {
     setConfirmAddUsersRole(state, action) {
@@ -13,10 +14,16 @@ const AddUsersSlices = createSlice({
     setAddUsersRoleFunction(state, action) {
       state.PostFunctionAddUser = action.payload;
     },
+    setSuccessState(state, action) {
+      state.successState = action.payload;
+    },
   },
 });
 
-export const { setConfirmAddUsersRole, setAddUsersRoleFunction } =
-  AddUsersSlices.actions;
+export const {
+  setConfirmAddUsersRole,
+  setAddUsersRoleFunction,
+  setSuccessState,
+} = AddUsersSlices.actions;
 
 export default AddUsersSlices.reducer;

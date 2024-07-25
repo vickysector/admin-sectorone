@@ -68,7 +68,10 @@ import {
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 import { Button, Popover, ConfigProvider } from "antd";
 import { setIsConfirmDeleteHistory } from "@/app/_lib/store/features/ExecutiveProtections/SearchHistorySlices";
-import { setConfirmAddUsersRole } from "@/app/_lib/store/features/Users/AddUserSlice";
+import {
+  setConfirmAddUsersRole,
+  setSuccessState,
+} from "@/app/_lib/store/features/Users/AddUserSlice";
 
 export default function DashboardLayout({ children }) {
   const [hide, setHide] = useState(false);
@@ -140,6 +143,8 @@ export default function DashboardLayout({ children }) {
     (state) => state.refreshTokenExpired.status
   );
 
+  //   Start of: Add role user (superadmin)
+
   const confirmAddUserRole = useSelector((state) => state.addUserRole.confirm);
   const callAddUserRole = useSelector(
     (state) => state.addUserRole.PostFunctionAddUser
@@ -153,6 +158,17 @@ export default function DashboardLayout({ children }) {
     callAddUserRole();
     dispatch(setConfirmAddUsersRole(false));
   };
+
+  const isSuccessAddUserRole = useSelector(
+    (state) => state.addUserRole.successState
+  );
+
+  const handleDoneSuccessAddUserRole = () => {
+    dispatch(setSuccessState(false));
+    router.push("/credentials/dashboard/users");
+  };
+
+  //   End of: Add role user (superadmin)
 
   const isScanEmailNow = useSelector((state) => state.scanEmail.isScanNow);
   const scannedEmail = useSelector((state) => state.scanEmail.scannedEmail);
@@ -969,6 +985,39 @@ export default function DashboardLayout({ children }) {
                 className="py-2 px-4 rounded-md text-Base-normal border-[1px]  hover:opacity-80 cursor-pointer text-white bg-primary-base border-primary-base"
               >
                 Yes
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        className={clsx(
+          "fixed top-0 bottom-0 left-0 right-0 bg-black w-full z-50 flex items-center justify-center",
+          isSuccessAddUserRole ? "visible" : "hidden"
+        )}
+      >
+        <div className="bg-white p-[32px] rounded-lg w-[25%]">
+          <div className="mx-auto">
+            <Image
+              src={"/images/sector_image_auth_lock.svg"}
+              alt="image logo"
+              width={150}
+              height={150}
+              className="mx-auto"
+            />
+          </div>
+          <h1 className="text-LG-strong text-center ">Account created</h1>
+          <p className="text-Base-normal text-text-description mt-2 text-center">
+            Create account has been created successfully!
+          </p>
+          <div className="mt-8 flex justify-end ">
+            <div className="ml-4">
+              <button
+                onClick={handleDoneSuccessAddUserRole}
+                className="py-1 px-4 rounded-md text-Base-normal border-[1px]  hover:opacity-80 cursor-pointer text-white bg-primary-base border-primary-base"
+              >
+                Done
               </button>
             </div>
           </div>

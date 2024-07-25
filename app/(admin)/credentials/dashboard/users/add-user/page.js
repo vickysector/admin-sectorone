@@ -19,6 +19,7 @@ import { v4 as uuidv4 } from "uuid";
 import {
   setAddUsersRoleFunction,
   setConfirmAddUsersRole,
+  setSuccessState,
 } from "@/app/_lib/store/features/Users/AddUserSlice";
 
 export default function DetailRoleUsers({ params }) {
@@ -208,7 +209,10 @@ export default function DetailRoleUsers({ params }) {
 
       console.log("status adding user: ", data);
 
-      return res;
+      if (data.data) {
+        dispatch(setSuccessState(true));
+        return res;
+      }
     } catch (error) {
       console.log("error while adding user data: ", error);
       setIsErrorWhileAddData(true);
