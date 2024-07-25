@@ -704,7 +704,11 @@ export default function UsersDashboardPage() {
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-heading-2 text-black mb-4">Users</h1>
           <div>
-            <PrimaryButton href={"#"} value={"Add user"} key={"add_user"} />
+            <PrimaryButton
+              href={"/credentials/dashboard/users/add-user"}
+              value={"Add user"}
+              key={"add_user"}
+            />
           </div>
         </div>
         <div className="bg-white  p-12 rounded-xl shadow-md">
