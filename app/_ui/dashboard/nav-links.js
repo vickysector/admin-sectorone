@@ -39,7 +39,7 @@ const links = [
   {
     name: "Users",
     href: "/credentials/dashboard/users",
-    hrefDetail: "/credentials/dashboard/users/detail",
+    hrefDetail: "/credentials/dashboard/users",
     icon: AccountCircleOutlinedIcon,
     breach: false,
   },
