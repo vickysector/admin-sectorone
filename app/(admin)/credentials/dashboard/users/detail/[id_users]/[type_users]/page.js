@@ -25,7 +25,9 @@ export default function DetailRoleUsers({ params }) {
 
   //   End of: Functions Handler
 
-  console.log("route detail: ", params);
+  // Start of: API Intregations
+
+  // End of: API Intregations
 
   return (
     <main>
@@ -49,6 +51,13 @@ export default function DetailRoleUsers({ params }) {
                 )}
               >
                 Deactivate accounts
+              </button>
+              <button
+                className={clsx(
+                  `py-2 px-4 rounded-md text-primary-base text-Base-normal border-[1px] border-input-border hover:opacity-80 cursor-pointer ml-4 `
+                )}
+              >
+                Save
               </button>
             </div>
           </div>
