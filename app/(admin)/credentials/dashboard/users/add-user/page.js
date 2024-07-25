@@ -8,7 +8,7 @@ import {
   MARKETING_SECTION_ROLE_SECTION,
   USERS_SECTION_ROLE_SECTION,
 } from "@/app/_lib/variables/Variables";
-import { ConfigProvider, Switch, Select, Input, Form } from "antd";
+import { ConfigProvider, Switch, Select, Input, Form, Alert } from "antd";
 import { fetchWithRefreshToken } from "@/app/_lib/token/fetchWithRefreshToken";
 import { useEffect, useState } from "react";
 import { APIDATAV1 } from "@/app/_lib/helpers/APIKEYS";
@@ -35,6 +35,7 @@ export default function DetailRoleUsers({ params }) {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [requiredUrl, setRequiredUrl] = useState("");
+  const [isValidSave, setIsValidSave] = useState(null);
 
   //   End of: All State
 
@@ -82,6 +83,16 @@ export default function DetailRoleUsers({ params }) {
       input.id === id ? { ...input, value: event.target.value } : input
     );
     setAllInput(newInputs);
+  };
+
+  const isSaveValid = name && phone && email && requiredUrl;
+
+  const handleSaveButton = () => {
+    if (isSaveValid) {
+      console.log("clicked save button");
+    } else {
+      setIsValidSave(false);
+    }
   };
 
   //   End of: Functions Handler
@@ -151,10 +162,32 @@ export default function DetailRoleUsers({ params }) {
   console.log("required url change ", requiredUrl);
   console.log("role change: ", role);
 
+  //   Start of: Alert handle
+
+  useEffect(() => {
+    if (!isValidSave) {
+      setTimeout(() => {
+        setIsValidSave(true);
+      }, 3000);
+    }
+  }, [isValidSave]);
+
+  // End of: Alert Handle
+
   return (
     <main>
       {/* Section Users */}
-      <section>
+      <section className="relative">
+        <div
+          className={clsx(
+            !isValidSave && "visible",
+            isValidSave === null ? "hidden" : "visible",
+            isValidSave && "hidden",
+            "absolute left-[50%] translate-x-[-50%]"
+          )}
+        >
+          <Alert message="Required Field must be filled" banner closable />
+        </div>
         <div className={clsx("flex items-center justify-between mb-4")}>
           <div className="flex items-center">
             <div
@@ -168,8 +201,13 @@ export default function DetailRoleUsers({ params }) {
           <div>
             <button
               className={clsx(
-                `py-2 px-4 rounded-md text-primary-base text-Base-normal border-[1px] border-input-border hover:opacity-80 cursor-pointer ml-4 `
+                `py-2 px-4 rounded-md text-Base-normal border-[1px] border-input-border hover:opacity-80 cursor-pointer ml-4 `,
+                !isSaveValid
+                  ? "text-[#00000040] "
+                  : "text-white bg-primary-base border-primary-base"
               )}
+              //   disabled={!isSaveValid}
+              onClick={handleSaveButton}
             >
               Save
             </button>
