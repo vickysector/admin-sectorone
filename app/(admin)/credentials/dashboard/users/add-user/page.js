@@ -32,6 +32,9 @@ export default function DetailRoleUsers({ params }) {
   const [demo, setDemo] = useState(false);
   const [name, setName] = useState("");
   const [role, setRole] = useState(3);
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [requiredUrl, setRequiredUrl] = useState("");
 
   //   End of: All State
 
@@ -51,6 +54,17 @@ export default function DetailRoleUsers({ params }) {
 
   const handleRoleChange = (value) => {
     setRole(value);
+  };
+
+  const handlePhoneChange = (event) => {
+    setPhone(event.target.value);
+  };
+
+  const handleEmailChange = (event) => {
+    setEmail(event.target.value);
+  };
+  const handleRequiredUrlChange = (event) => {
+    setRequiredUrl(event.target.value);
   };
 
   const handleAddInputField = () => {
@@ -132,6 +146,9 @@ export default function DetailRoleUsers({ params }) {
   console.log("allinputs: ", allInput);
   console.log("demo checked", demo);
   console.log("name change ", name);
+  console.log("phone change ", phone);
+  console.log("email change ", email);
+  console.log("required url change ", requiredUrl);
   console.log("role change: ", role);
 
   return (
@@ -230,7 +247,13 @@ export default function DetailRoleUsers({ params }) {
                 },
               ]}
             >
-              <Input placeholder="08123456789" variant="filled" size="large" />
+              <Input
+                placeholder="08123456789"
+                variant="filled"
+                size="large"
+                value={phone}
+                onChange={(e) => handlePhoneChange(e)}
+              />
             </Form.Item>
             <Form.Item
               label={"Email"}
@@ -246,6 +269,8 @@ export default function DetailRoleUsers({ params }) {
                 placeholder="john@gmail.com"
                 variant="filled"
                 size="large"
+                value={email}
+                onChange={(e) => handleEmailChange(e)}
               />
             </Form.Item>
           </section>
@@ -275,7 +300,13 @@ export default function DetailRoleUsers({ params }) {
                 },
               ]}
             >
-              <Input placeholder="gmail.com" variant="filled" size="large" />
+              <Input
+                placeholder="gmail.com"
+                variant="filled"
+                size="large"
+                onChange={handleRequiredUrlChange}
+                value={requiredUrl}
+              />
             </Form.Item>
             {allInput.map((item, index) => (
               <div
