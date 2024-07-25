@@ -29,6 +29,9 @@ export default function DetailRoleUsers({ params }) {
 
   const [selectOptions, setSelecOptions] = useState([]);
   const [allInput, setAllInput] = useState([]);
+  const [demo, setDemo] = useState(false);
+  const [name, setName] = useState("");
+  const [role, setRole] = useState(3);
 
   //   End of: All State
 
@@ -36,6 +39,18 @@ export default function DetailRoleUsers({ params }) {
 
   const handleBackToAllcyberattacks = () => {
     router.back();
+  };
+
+  const handleDemoChange = (checked) => {
+    setDemo(checked);
+  };
+
+  const handleNameChange = (event) => {
+    setName(event.target.value);
+  };
+
+  const handleRoleChange = (value) => {
+    setRole(value);
   };
 
   const handleAddInputField = () => {
@@ -77,8 +92,6 @@ export default function DetailRoleUsers({ params }) {
 
       const data = await res.json();
 
-      console.log("all role: ", data);
-
       if (data.data === null) {
         throw res;
       }
@@ -93,8 +106,6 @@ export default function DetailRoleUsers({ params }) {
         });
 
         setSelecOptions(updatedData);
-
-        console.log("all role (selectoptions): ", updatedData);
 
         return res;
       }
@@ -119,6 +130,9 @@ export default function DetailRoleUsers({ params }) {
   // End of: API Intregations
 
   console.log("allinputs: ", allInput);
+  console.log("demo checked", demo);
+  console.log("name change ", name);
+  console.log("role change: ", role);
 
   return (
     <main>
@@ -163,7 +177,7 @@ export default function DetailRoleUsers({ params }) {
                   },
                 }}
               >
-                <Switch />
+                <Switch onChange={handleDemoChange} value={demo} />
               </ConfigProvider>
             </div>
           </section>
@@ -179,7 +193,13 @@ export default function DetailRoleUsers({ params }) {
               ]}
             >
               <ConfigProvider theme={{ token: { colorPrimary: "FF6F1E" } }}>
-                <Select defaultValue={3} options={selectOptions} size="large" />
+                <Select
+                  defaultValue={3}
+                  options={selectOptions}
+                  size="large"
+                  value={role}
+                  onChange={handleRoleChange}
+                />
               </ConfigProvider>
             </Form.Item>
             <Form.Item
@@ -192,7 +212,13 @@ export default function DetailRoleUsers({ params }) {
                 },
               ]}
             >
-              <Input placeholder="John Smith" variant="filled" size="large" />
+              <Input
+                placeholder="John Smith"
+                variant="filled"
+                size="large"
+                onChange={(e) => handleNameChange(e)}
+                value={name}
+              />
             </Form.Item>
             <Form.Item
               label={"Phone number"}
@@ -257,7 +283,16 @@ export default function DetailRoleUsers({ params }) {
                 className={clsx(" flex items-center justify-between ")}
               >
                 <div className="flex-grow mr-4">
-                  <Form.Item label={`Url `} name={"url"} layout="vertical">
+                  <Form.Item
+                    label={`Url `}
+                    name={"url"}
+                    layout="vertical"
+                    rules={[
+                      {
+                        required: true,
+                      },
+                    ]}
+                  >
                     <Input
                       value={item}
                       placeholder="gmail.com"
