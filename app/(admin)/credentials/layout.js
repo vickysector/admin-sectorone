@@ -96,6 +96,8 @@ export default function DashboardLayout({ children }) {
   //   (superadmin)
   const [isUploadTxt, setIsUploadTxt] = useState(false);
   const [fileList, setFileList] = useState(null);
+  const [successMessageUploadTxt, setSuccessMessageUploadTxt] = useState("");
+  const [successUploadTxt, setSuccessUploadTxt] = useState(false);
 
   //   (superadmin)
 
@@ -187,6 +189,15 @@ export default function DashboardLayout({ children }) {
     setIsUploadTxt(false);
   };
 
+  const handleCloseSuccessPopupUploadTxt = () => {
+    setSuccessUploadTxt(false);
+  };
+
+  const handleCloseSuccessPopupUploadTxtAndRedirectToUsers = () => {
+    setSuccessUploadTxt(false);
+    router.push("/credentials/dashboard/users");
+  };
+
   //   const uploadTxtProps = {
   //     name: "Upload_Txt",
   //     multiple: false,
@@ -228,9 +239,7 @@ export default function DashboardLayout({ children }) {
 
     try {
       dispatch(setLoadingState(true));
-
-      // console.log("formdata: ", formData);
-      // console.log("formdata: ", fileList.file);
+      setIsUploadTxt(false);
 
       const res = await fetch(`${APIDATAV1}root/admin/upload/telegram`, {
         method: "POST",
@@ -253,6 +262,13 @@ export default function DashboardLayout({ children }) {
       if (data.data === null) {
         message.error("Opps.. there's something wrong when Upload TXT file ");
         throw res;
+      }
+
+      if (data.data) {
+        setIsUploadTxt(false);
+        setSuccessMessageUploadTxt(data.data);
+        setSuccessUploadTxt(true);
+        setFileList(null);
       }
 
       return res;
@@ -1089,6 +1105,49 @@ export default function DashboardLayout({ children }) {
                 Yes
               </button>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        className={clsx(
+          "fixed top-0 bottom-0 left-0 right-0 bg-[#000000B2] w-full z-50 flex items-center justify-center",
+          successUploadTxt ? "visible" : "hidden"
+        )}
+      >
+        <div className="bg-white p-[32px] rounded-lg w-[35%]">
+          <div className="flex justify-between items-center">
+            <h1 className="text-LG-strong  ">Upload TXT</h1>
+            <div
+              onClick={handleCloseSuccessPopupUploadTxt}
+              className="cursor-pointer"
+            >
+              <CloseOutlinedIcon />
+            </div>
+          </div>
+          <div className="mt-4 text-center">
+            <div className="mb-4">
+              <Image
+                alt="Success upload txt"
+                src={"/images/Success_upload_txt.svg"}
+                width={73}
+                height={73}
+                className="mx-auto"
+              />
+            </div>
+            <h2 className="text-LG-strong text-black">Upload successful!</h2>
+            <p className="text-Base-normal text-text-description mt-1">
+              {" "}
+              {successMessageUploadTxt}{" "}
+            </p>
+          </div>
+          <div className="mt-4 flex justify-end ">
+            <button
+              onClick={handleCloseSuccessPopupUploadTxtAndRedirectToUsers}
+              className="py-2 px-4 rounded-md text-Base-normal border-[1px]  hover:opacity-80 cursor-pointer text-white bg-primary-base border-primary-base"
+            >
+              Done
+            </button>
           </div>
         </div>
       </div>
