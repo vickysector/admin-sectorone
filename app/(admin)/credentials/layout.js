@@ -11,6 +11,7 @@ import {
   CopyOutlined,
   UnlockTwoTone,
   LockTwoTone,
+  InboxOutlined,
 } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import clsx from "clsx";
@@ -66,12 +67,16 @@ import {
   setIsDetailActive,
 } from "@/app/_lib/store/features/KeywordSearch/KeywordSearchSlices";
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
-import { Button, Popover, ConfigProvider } from "antd";
+import { Button, Popover, ConfigProvider, message, Upload } from "antd";
 import { setIsConfirmDeleteHistory } from "@/app/_lib/store/features/ExecutiveProtections/SearchHistorySlices";
 import {
   setConfirmAddUsersRole,
   setSuccessState,
 } from "@/app/_lib/store/features/Users/AddUserSlice";
+import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
+import { setLoadingState } from "@/app/_lib/store/features/Compromised/LoadingSlices";
+
+const { Dragger } = Upload;
 
 export default function DashboardLayout({ children }) {
   const [hide, setHide] = useState(false);
@@ -87,6 +92,12 @@ export default function DashboardLayout({ children }) {
   const [isChangeDomainTokenExpired, setIsChangeDomainTokenExpired] =
     useState();
   const [copied, setCopied] = useState(false);
+
+  //   (superadmin)
+  const [isUploadTxt, setIsUploadTxt] = useState(false);
+  const [fileList, setFileList] = useState(null);
+
+  //   (superadmin)
 
   // Start of: Tooptips in notifications
 
@@ -167,6 +178,97 @@ export default function DashboardLayout({ children }) {
     dispatch(setSuccessState(false));
     router.push("/credentials/dashboard/users");
   };
+
+  const handleIsUploadToTxt = () => {
+    setIsUploadTxt(true);
+  };
+
+  const handleCloseUploadTxt = () => {
+    setIsUploadTxt(false);
+  };
+
+  //   const uploadTxtProps = {
+  //     name: "Upload_Txt",
+  //     multiple: false,
+  //     action: `'https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload'`,
+  //     onChange(info) {
+  //       const { status } = info.file;
+  //       if (status !== "uploading") {
+  //         console.log("file info: ", info.file, info.fileList);
+  //       }
+  //       if (status === "done") {
+  //         message.success(`${info.file.name} file uploaded successfully.`);
+  //       } else if (status === "error") {
+  //         message.error(`${info.file.name} file upload failed.`);
+  //       }
+  //     },
+  //     onDrop(e) {
+  //       console.log("Dropped files", e.dataTransfer.files);
+  //     },
+  //   };
+
+  const handleSubmitUploadTxt = async (data) => {
+    if (fileList === null) {
+      message.error("You must Upload File First");
+    } else {
+      PostUploadTelegramTXTWithRefreshToken();
+    }
+
+    // console.log("file format formdata: ", typeof fileList.file);
+  };
+
+  const handleUploadFile = (data) => {
+    console.log("uploaded file: ", data);
+    setFileList(data);
+  };
+
+  const PostUploadTelegramTXT = async () => {
+    const formData = new FormData();
+    formData.append("file", fileList.file.originFileObj);
+
+    try {
+      dispatch(setLoadingState(true));
+
+      // console.log("formdata: ", formData);
+      // console.log("formdata: ", fileList.file);
+
+      const res = await fetch(`${APIDATAV1}root/admin/upload/telegram`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          Authorization: `Bearer ${getCookie("access_token")}`,
+          //   "content-type": "multipart/form-data",
+        },
+        body: formData,
+      });
+
+      if (res.status === 401 || res.status === 403) {
+        return res;
+      }
+
+      const data = await res.json();
+
+      console.log("upload TXT status: ", data);
+
+      if (data.data === null) {
+        message.error("Opps.. there's something wrong when Upload TXT file ");
+        throw res;
+      }
+
+      return res;
+    } catch (error) {
+      console.log("error upload txt: ", error);
+      return error;
+    } finally {
+      dispatch(setLoadingState(false));
+    }
+  };
+
+  const PostUploadTelegramTXTWithRefreshToken = async () => {
+    await fetchWithRefreshToken(PostUploadTelegramTXT, router, dispatch);
+  };
+
+  console.log("file list: ", fileList);
 
   //   End of: Add role user (superadmin)
 
@@ -993,6 +1095,50 @@ export default function DashboardLayout({ children }) {
 
       <div
         className={clsx(
+          "fixed top-0 bottom-0 left-0 right-0 bg-[#000000B2] w-full z-50 flex items-center justify-center",
+          isUploadTxt ? "visible" : "hidden"
+        )}
+      >
+        <div className="bg-white p-[32px] rounded-lg w-[35%]">
+          <div className="flex justify-between items-center">
+            <h1 className="text-LG-strong  ">Upload TXT</h1>
+            <div onClick={handleCloseUploadTxt} className="cursor-pointer">
+              <CloseOutlinedIcon />
+            </div>
+          </div>
+          <div className="mt-4">
+            <Dragger
+              //   {...uploadTxtProps}
+              accept=".txt"
+              multiple={false}
+              maxCount={1}
+              name="upload_txt"
+              //   customRequest={handleSubmitUploadTxt}
+              onChange={handleUploadFile}
+            >
+              <p className="ant-upload-drag-icon">
+                <InboxOutlined style={{ color: "#FF6F1E" }} />
+              </p>
+              <p className="ant-upload-text">
+                Click or drag file to this area to upload
+              </p>
+              <p className="ant-upload-hint">
+                Support for a single file with TXT Format upload. (Max. 1 MB)
+              </p>
+            </Dragger>
+            <button
+              className=" mt-6 bg-[#1677FF] rounded-md  text-white text-Base-normal py-1.5 px-3 text-center w-full "
+              onClick={handleSubmitUploadTxt}
+            >
+              Upload TXT
+            </button>
+          </div>
+          <div className="mt-8 flex justify-end "></div>
+        </div>
+      </div>
+
+      <div
+        className={clsx(
           "fixed top-0 bottom-0 left-0 right-0 bg-black w-full z-50 flex items-center justify-center",
           isSuccessAddUserRole ? "visible" : "hidden"
         )}
@@ -1062,27 +1208,15 @@ export default function DashboardLayout({ children }) {
           {getCookie("user_status") === "true" && (
             <div
               className={clsx(
-                "cursor-pointer rounded-[100px] bg-[#FFEBD4] py-1 px-2.5 mr-4 flex items-center"
+                "cursor-pointer rounded-[6px] bg-[#1677FF] py-1.5 px-4 mr-4 flex items-center"
                 // getCookie("user_status") === "true" ? "visible" : "hidden"
               )}
-              onClick={() => dispatch(setFreeTrialStatusToTrue())}
+              onClick={handleIsUploadToTxt}
             >
-              <LockTwoTone twoToneColor={"#FF6F1E"} />
-              <p className="text-SM-normal text-[#FF6F1E] ml-3 ">Free trial</p>
+              <p className="text-Base-normal text-white ">Upload TXT</p>
             </div>
           )}
-          {/* <div className="cursor-pointer">
-            <Image
-              src={"/images/sector_notification.svg"}
-              alt="Notif"
-              width={22}
-              height={22}
-              className="mr-5"
-              onMouseEnter={handleMouseEnter}
-              onMouseLeave={handleMouseLeave}
-            />
-            <Tooltip isActive={isHovered} right={0} top={"10px"} />
-          </div> */}
+
           <div className="cursor-pointer" onClick={toggleAccount}>
             <AccountCircleOutlinedIcon
               style={{ fontSize: "28px", color: "#676767" }}
