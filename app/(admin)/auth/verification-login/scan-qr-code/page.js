@@ -83,7 +83,7 @@ export default function VerificaitonLogin() {
         setCookie("refresh_token", data.data.refresh_token);
         setCookie("access_token", data.data.access_token);
         setCookie("email_credentials", data.data.email);
-        router.push("/credentials/dashboard");
+        router.push("/credentials/dashboard/users");
       } catch (error) {
         setErrorOtpMessage("Inccorrect OTP. Please try again");
         setErrorOtp(true);

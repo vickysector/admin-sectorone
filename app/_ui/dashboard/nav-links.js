@@ -31,12 +31,6 @@ import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined
 
 const links = [
   {
-    name: "Dashboard",
-    href: "/credentials/dashboard",
-    icon: DashboardOutlinedIcon,
-    breach: false,
-  },
-  {
     name: "Users",
     href: "/credentials/dashboard/users",
     hrefDetail: "/credentials/dashboard/users",
@@ -44,15 +38,21 @@ const links = [
     breach: false,
   },
   {
-    name: "Activity Log",
-    href: "/credentials/dashboard/activity-log",
-    icon: HistoryOutlinedIcon,
+    name: "Domain Search",
+    href: "/credentials/dashboard/domain-search",
+    icon: DashboardOutlinedIcon,
     breach: false,
   },
   {
-    name: "Manage account",
-    href: "/credentials/dashboard/manage-accounts",
-    icon: SettingsApplicationsOutlinedIcon,
+    name: "Executive protection",
+    href: "/credentials/dashboard/executive-protections",
+    icon: SecurityIcon,
+    breach: false,
+  },
+  {
+    name: "Activity Log",
+    href: "/credentials/dashboard/activity-log",
+    icon: HistoryOutlinedIcon,
     breach: false,
   },
 ];

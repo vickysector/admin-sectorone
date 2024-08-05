@@ -75,6 +75,7 @@ import {
 } from "@/app/_lib/store/features/Users/AddUserSlice";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import { setLoadingState } from "@/app/_lib/store/features/Compromised/LoadingSlices";
+import { setDetailsIsOpen } from "@/app/_lib/store/features/ExecutiveProtections/LeakedDataSlices";
 
 const { Dragger } = Upload;
 
@@ -98,6 +99,20 @@ export default function DashboardLayout({ children }) {
   const [fileList, setFileList] = useState(null);
   const [successMessageUploadTxt, setSuccessMessageUploadTxt] = useState("");
   const [successUploadTxt, setSuccessUploadTxt] = useState(false);
+
+  const dataLeakedDetails = useSelector(
+    (state) => state.executiveProtections.detailsLeakedData.info_2
+  );
+
+  console.log("data leaked details: ", dataLeakedDetails);
+
+  const isDetailsLeakedDataOpen = useSelector(
+    (state) => state.executiveProtections.detailsIsOpen
+  );
+
+  const handleCloseDetailExecutivePopup = () => {
+    dispatch(setDetailsIsOpen(false));
+  };
 
   //   (superadmin)
 
@@ -1076,6 +1091,48 @@ export default function DashboardLayout({ children }) {
       {/* End = Overview */}
 
       {/* End of: Loading State Cards */}
+
+      <div
+        className={clsx(
+          "fixed top-0 bottom-0 left-0 right-0 bg-[#000000B2] w-full z-40 flex items-center justify-center text-black ",
+          isDetailsLeakedDataOpen ? "visible" : "hidden"
+        )}
+      >
+        <div className="w-[30%] bg-white rounded-lg p-[32px]  overflow-y-scroll h-[650px] relative">
+          <div
+            className={clsx(
+              "fixed right-[50%] translate-x-[50%] top-[50%]  bg-white p-2 border-2 border-input-border rounded-lg ",
+              copied ? "visible" : "hidden"
+            )}
+          >
+            <p className="text-Base-normal text-text-description">Copied!</p>
+          </div>
+          <div className="flex justify-between border-b-[1px] pb-6 border-[#D5D5D5] ">
+            <h1 className="text-LG-strong">Details</h1>
+            <CloseOutlined
+              style={{ color: "#676767" }}
+              onClick={handleCloseDetailExecutivePopup}
+            />
+          </div>
+          <div className="mt-6">
+            {dataLeakedDetails &&
+              Object.entries(dataLeakedDetails).map(([key, values]) => (
+                <div className="mt-8" key={key}>
+                  <h1 className="text-LG-strong">{key}</h1>
+                  <h2
+                    className="text-text-description text-LG-normal mt-1"
+                    style={{
+                      maxWidth: "450px",
+                      wordWrap: "break-word",
+                    }}
+                  >
+                    {values}
+                  </h2>
+                </div>
+              ))}
+          </div>
+        </div>
+      </div>
 
       <div
         className={clsx(

@@ -98,7 +98,7 @@ export default function LoginPage() {
   useEffect(() => {
     if (getCookie("access_token") || getCookie("refresh_token")) {
       // router.push("/credentials/dashboard");
-      return redirect("/credentials/dashboard");
+      return redirect("/credentials/dashboard/users");
     }
   }, []);
 
