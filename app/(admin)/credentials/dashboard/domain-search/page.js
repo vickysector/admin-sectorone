@@ -233,6 +233,19 @@ export default function DomainSearchPage() {
     router.push(`${pathname}?${params.toString()}`);
   };
 
+  const handleReturnValueOfSafeState = () => {
+    switch (selectedButton) {
+      case DOMAIN_SEARCH_EMPLOYEE:
+        return "Employee";
+      case DOMAIN_SEARCH_USERS:
+        return "Users";
+      case DOMAIN_SEARCH_THIRDPARTY:
+        return "Third-Party";
+      default:
+        return "";
+    }
+  };
+
   const callGetDetailLeakedDataWithRefeshToken = async (type) => {
     await fetchWithRefreshToken(
       fetchGetDetailLeakedData,
@@ -264,8 +277,8 @@ export default function DomainSearchPage() {
       const data = await res.json();
 
       if (data.data === null) {
-        setIsErrorEmail(true);
-        setErrorMessage(data.message);
+        dispatch(setDomainSearchData(null));
+        setCookie("scanned_domain", email);
         throw res;
       }
 
@@ -433,17 +446,7 @@ export default function DomainSearchPage() {
         </div>
         {/* End: Email not been search */}
 
-        {/* Start: Email Searched */}
-        <div
-          className={clsx(
-            "flex flex-col justify-center items-center bg-white rounded-lg  text-center mt-8 overflow-scroll ",
-            // hasCookie("scanned_verified") &&
-            //   getCookie("scanned_verified") === "true"
-            //   ? "visible"
-            //   : "hidden"
-            dataLeakedDomain && dataLeakedDomain !== null ? "visible" : "hidden"
-          )}
-        >
+        <div>
           <section className={clsx("flex mb-[24px] mr-auto")}>
             <CompromiseButton
               isActive={selectedButton === DOMAIN_SEARCH_EMPLOYEE}
@@ -470,79 +473,96 @@ export default function DomainSearchPage() {
             />
           </section>
 
-          <div className="border-[1px] rounded-lg border-input-border w-auto ">
-            <Table
-              columns={columnDomainSearch}
-              dataSource={dataLeakedDomain}
-              pagination={false}
-            />
-            <div
-              className={clsx(
-                "flex items-center justify-between my-[19px] mx-[16px]",
-                dataLeakedDomain === null ? "hidden" : "visible"
-              )}
-            >
-              <p className="text-Base-normal text-[#676767]">
-                {" "}
-                Showing {totalPerPageDomainSearch &&
-                  totalPerPageDomainSearch}{" "}
-                to {totalExposuresDomain && totalExposuresDomain} entries
-              </p>
-              <ConfigProvider
-                theme={{
-                  components: {
-                    Pagination: {
-                      itemActiveBg: "#FF6F1E",
-                      itemLinkBg: "#fff",
-                      itemInputBg: "#fff",
-                    },
-                  },
-                  token: {
-                    colorPrimary: "white",
-                  },
-                }}
+          {/* Start: Email Searched */}
+          <div
+            className={clsx(
+              "flex flex-col justify-center items-center bg-white rounded-lg  text-center mt-8 overflow-scroll ",
+              // hasCookie("scanned_verified") &&
+              //   getCookie("scanned_verified") === "true"
+              //   ? "visible"
+              //   : "hidden"
+              dataLeakedDomain && dataLeakedDomain !== null
+                ? "visible"
+                : "hidden"
+            )}
+          >
+            <div className="border-[1px] rounded-lg border-input-border w-auto ">
+              <Table
+                columns={columnDomainSearch}
+                dataSource={dataLeakedDomain}
+                pagination={false}
+              />
+              <div
+                className={clsx(
+                  "flex items-center justify-between my-[19px] mx-[16px]",
+                  dataLeakedDomain === null ? "hidden" : "visible"
+                )}
               >
-                <Pagination
-                  type="primary"
-                  defaultCurrent={1}
-                  total={totalExposuresDomain && totalExposuresDomain}
-                  showSizeChanger={false}
-                  style={{ color: "#FF6F1E" }}
-                  hideOnSinglePage={true}
-                  onChange={handleChangePage}
-                  current={page}
-                />
-              </ConfigProvider>
+                <p className="text-Base-normal text-[#676767]">
+                  {" "}
+                  Showing {totalPerPageDomainSearch &&
+                    totalPerPageDomainSearch}{" "}
+                  to {totalExposuresDomain && totalExposuresDomain} entries
+                </p>
+                <ConfigProvider
+                  theme={{
+                    components: {
+                      Pagination: {
+                        itemActiveBg: "#FF6F1E",
+                        itemLinkBg: "#fff",
+                        itemInputBg: "#fff",
+                      },
+                    },
+                    token: {
+                      colorPrimary: "white",
+                    },
+                  }}
+                >
+                  <Pagination
+                    type="primary"
+                    defaultCurrent={1}
+                    total={totalExposuresDomain && totalExposuresDomain}
+                    showSizeChanger={false}
+                    style={{ color: "#FF6F1E" }}
+                    hideOnSinglePage={true}
+                    onChange={handleChangePage}
+                    current={page}
+                  />
+                </ConfigProvider>
+              </div>
             </div>
           </div>
-        </div>
-        {/* End: Email Searched */}
+          {/* End: Email Searched */}
 
-        {/* Start: Email is safe */}
-        <div
-          className={clsx(
-            "flex flex-col justify-center items-center bg-white rounded-lg  text-center mt-8 ",
-            // hasCookie("scanned_verified") &&
-            //   getCookie("scanned_verified") === "true"
-            //   ? "visible"
-            //   : "hidden"
-            dataLeakedDomain === null ? "visible" : "hidden"
-          )}
-        >
-          <div>
-            <Image
-              src={"/images/sector_confirmation_created_password_success.svg"}
-              alt="search icon"
-              width={129}
-              height={121}
-            />
+          {/* Start: Email is safe */}
+          <div
+            className={clsx(
+              "flex flex-col justify-center items-center bg-white rounded-lg  text-center mt-8 ",
+              // hasCookie("scanned_verified") &&
+              //   getCookie("scanned_verified") === "true"
+              //   ? "visible"
+              //   : "hidden"
+              dataLeakedDomain === null ? "visible" : "hidden"
+            )}
+          >
+            <div>
+              <Image
+                src={"/images/sector_confirmation_created_password_success.svg"}
+                alt="search icon"
+                width={129}
+                height={121}
+              />
+            </div>
+            <h1 className="text-heading-4 text-black">
+              Your {handleReturnValueOfSafeState()} data websites is safe!
+            </h1>
+            <h2 className="text-LG-normal text-text-description mt-3 max-w-[450px]">
+              Nothing was found after scanning {handleReturnValueOfSafeState()}{" "}
+              data from your websites.
+            </h2>
           </div>
-          <h1 className="text-heading-4 text-black">Your websites is safe!</h1>
-          <h2 className="text-LG-normal text-text-description mt-3 max-w-[450px]">
-            Nothing was found after scanning your websites.
-          </h2>
+          {/* End: Email is safe */}
         </div>
-        {/* End: Email is safe */}
       </section>
     </main>
   );
