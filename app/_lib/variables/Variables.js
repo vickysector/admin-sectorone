@@ -16,3 +16,11 @@ export const ADMIN_SECTION_ROLE_SECTION = "admin";
 export const SUPERADMIN_SECTION_ROLE_SECTION = "superadmin";
 
 // End of: Page Users - Role Users
+
+// Start of: Domain Search
+
+export const DOMAIN_SEARCH_EMPLOYEE = "employee";
+export const DOMAIN_SEARCH_USERS = "users";
+export const DOMAIN_SEARCH_THIRDPARTY = "thirdparty";
+
+// End of: Domain Search
