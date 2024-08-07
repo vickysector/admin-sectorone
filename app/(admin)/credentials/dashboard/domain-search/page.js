@@ -25,14 +25,23 @@ import { Alert, ConfigProvider, Pagination, Table } from "antd";
 import clsx from "clsx";
 import { deleteCookie, getCookie, hasCookie, setCookie } from "cookies-next";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 export default function DomainSearchPage() {
+  // Start : Route Params
+
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const params = new URLSearchParams(searchParams);
+
+  // End : Route Params
+
   const [email, setEmail] = useState(getCookie("scanned_domain") || "");
   const [isErrorEmail, setIsErrorEmail] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [page, setPage] = useState(searchParams.get("page") || 1);
 
   const canSend = email;
   const dispatch = useDispatch();
@@ -200,6 +209,12 @@ export default function DomainSearchPage() {
     router.push(`/credentials/dashboard/domain-search/details/${id}`);
   };
 
+  const handleChangePage = (paging) => {
+    setPage(paging);
+    params.set("page", paging);
+    router.push(`${pathname}?${params.toString()}`);
+  };
+
   const callGetDetailLeakedDataWithRefeshToken = async () => {
     await fetchWithRefreshToken(fetchGetDetailLeakedData, router, dispatch);
   };
@@ -208,13 +223,16 @@ export default function DomainSearchPage() {
     try {
       dispatch(setLoadingState(true));
 
-      const res = await fetch(`${APIDATAV1}search?q=${email}.com&page=1`, {
-        method: "GET",
-        credentials: "include",
-        headers: {
-          Authorization: `Bearer ${getCookie("access_token")}`,
-        },
-      });
+      const res = await fetch(
+        `${APIDATAV1}search?q=${email}.com&page=${page}`,
+        {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            Authorization: `Bearer ${getCookie("access_token")}`,
+          },
+        }
+      );
 
       if (res.status === 401 || res.status === 403) {
         return res;
@@ -231,11 +249,14 @@ export default function DomainSearchPage() {
       //   return res;
 
       if (data.data) {
-        console.log("data executive admin: ", data);
+        // console.log("data executive admin: ", data);
         dispatch(setDomainSearchData(data.data));
         dispatch(setTotalExposuresDomainSearch(data.count_data));
         dispatch(setTotalPerPageDomainSearch(data.size));
         dispatch(setTotalAllPageDomainSearch(data.count_page));
+        params.set("query", getCookie("scanned_domain"));
+        params.set("page", page);
+        router.push(`${pathname}?${params.toString()}`);
         return res;
       }
     } catch (error) {
@@ -255,10 +276,19 @@ export default function DomainSearchPage() {
   useEffect(() => {
     if (hasCookie("scanned_domain") && email) {
       callGetDetailLeakedDataWithRefeshToken();
+
+      if (!searchParams.has("query") || !searchParams.has("page")) {
+        params.set("query", getCookie("scanned_domain"));
+        params.set("page", page);
+        router.push(`${pathname}?${params.toString()}`);
+      }
     } else {
       deleteCookie("scanned_domain");
+      params.delete("query");
+      params.delete("page");
+      router.push(`${pathname}`);
     }
-  }, []);
+  }, [page]);
 
   return (
     <main>
@@ -389,16 +419,31 @@ export default function DomainSearchPage() {
                   totalPerPageDomainSearch}{" "}
                 to {totalExposuresDomain && totalExposuresDomain} entries
               </p>
-              <Pagination
-                type="primary"
-                defaultCurrent={1}
-                total={totalExposuresDomain && totalExposuresDomain}
-                showSizeChanger={false}
-                style={{ color: "#FF6F1E" }}
-                hideOnSinglePage={true}
-                // onChange={handleChangePages}
-                // current={page}
-              />
+              <ConfigProvider
+                theme={{
+                  components: {
+                    Pagination: {
+                      itemActiveBg: "#FF6F1E",
+                      itemLinkBg: "#fff",
+                      itemInputBg: "#fff",
+                    },
+                  },
+                  token: {
+                    colorPrimary: "white",
+                  },
+                }}
+              >
+                <Pagination
+                  type="primary"
+                  defaultCurrent={1}
+                  total={totalExposuresDomain && totalExposuresDomain}
+                  showSizeChanger={false}
+                  style={{ color: "#FF6F1E" }}
+                  hideOnSinglePage={true}
+                  onChange={handleChangePage}
+                  current={page}
+                />
+              </ConfigProvider>
             </div>
           </div>
         </div>
