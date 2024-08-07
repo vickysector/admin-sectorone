@@ -336,7 +336,7 @@ export default function ExecutiveProtectionPage() {
               <p className="text-Base-normal text-[#676767] ">
                 Showing {totalExposures} to {totalExposures} entries
               </p>
-              <div>
+              {/* <div>
                 <ConfigProvider
                   theme={{
                     components: {
@@ -361,7 +361,7 @@ export default function ExecutiveProtectionPage() {
                     // onChange={handleSetBookmarkPage}
                   />
                 </ConfigProvider>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
