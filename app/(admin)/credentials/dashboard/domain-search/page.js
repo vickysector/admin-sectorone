@@ -7,6 +7,7 @@ import {
 import { APIDATAV1 } from "@/app/_lib/helpers/APIKEYS";
 import { setLoadingState } from "@/app/_lib/store/features/Compromised/LoadingSlices";
 import {
+  setDetailsDomainSearch,
   setDomainSearchData,
   setTotalAllPageDomainSearch,
   setTotalExposuresDomainSearch,
@@ -169,12 +170,12 @@ export default function DomainSearchPage() {
               className={clsx(
                 `py-2 px-4 rounded-md text-primary-base text-Base-normal border-[1px] border-input-border `
               )}
-              //   onClick={() =>
-              //     handleChangeToDetailPage(
-              //       param1.id,
-              //       PARTNER_SECTION_ROLE_SECTION
-              //     )
-              //   }
+              onClick={() =>
+                handleDetails(
+                  param1.id,
+                  dispatch(setDetailsDomainSearch(param1))
+                )
+              }
             >
               Details
             </button>
@@ -194,10 +195,9 @@ export default function DomainSearchPage() {
     callGetDetailLeakedDataWithRefeshToken();
   };
 
-  const handleDetails = (item) => {
-    dispatch(setDetailsLeakedData(item));
-    dispatch(setDetailsIsOpen(true));
-    // console.log("item leaked details: ", item);
+  const handleDetails = (id, item) => {
+    console.log("details page: ", item);
+    router.push(`/credentials/dashboard/domain-search/details/${id}`);
   };
 
   const callGetDetailLeakedDataWithRefeshToken = async () => {

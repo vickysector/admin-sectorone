@@ -40,6 +40,7 @@ const links = [
   {
     name: "Domain Search",
     href: "/credentials/dashboard/domain-search",
+    hrefDetail: "/credentials/dashboard/domain-search",
     icon: DashboardOutlinedIcon,
     breach: false,
   },

@@ -7,7 +7,7 @@ const DomainSearchSlices = createSlice({
     totalExposures: "",
     totalPerPageDomainSearch: 0,
     totalAllPageDomainSearch: 0,
-    detailsLeakedData: {},
+    detailsDomainSearch: {},
     detailsIsOpen: false,
   },
   reducers: {
@@ -23,6 +23,9 @@ const DomainSearchSlices = createSlice({
     setTotalAllPageDomainSearch(state, action) {
       state.totalAllPageDomainSearch = action.payload;
     },
+    setDetailsDomainSearch(state, action) {
+      state.detailsDomainSearch = action.payload;
+    },
   },
 });
 
@@ -31,6 +34,7 @@ export const {
   setTotalExposuresDomainSearch,
   setTotalPerPageDomainSearch,
   setTotalAllPageDomainSearch,
+  setDetailsDomainSearch,
 } = DomainSearchSlices.actions;
 
 export default DomainSearchSlices.reducer;
