@@ -413,13 +413,44 @@ export default function DomainSearchPage() {
 
       <section
         className={clsx(
-          "mt-10 bg-white min-h-[470px] rounded-lg shadow-md flex items-center justify-center p-8 "
+          "mt-10 bg-white min-h-[470px] rounded-lg shadow-md p-8 flex flex-col "
         )}
       >
+        <section
+          className={clsx(
+            "flex mb-[24px] mr-auto",
+            typeof dataLeakedDomain === "string" ? "hidden" : "visible"
+          )}
+        >
+          <CompromiseButton
+            isActive={selectedButton === DOMAIN_SEARCH_EMPLOYEE}
+            // total={employeeData && employeeData.count}
+            value={"Employee"}
+            onClick={handleButtonClick}
+            nameData={DOMAIN_SEARCH_EMPLOYEE}
+          />
+
+          <CompromiseButton
+            isActive={selectedButton === DOMAIN_SEARCH_USERS}
+            // total={usersData && usersData.count}
+            value={"Users"}
+            onClick={handleButtonClick}
+            nameData={DOMAIN_SEARCH_USERS}
+          />
+
+          <CompromiseButton
+            isActive={selectedButton === DOMAIN_SEARCH_THIRDPARTY}
+            // totalt={totalThirdParty && totalThirdParty}
+            value={"Third-party"}
+            onClick={handleButtonClick}
+            nameData={DOMAIN_SEARCH_THIRDPARTY}
+          />
+        </section>
+
         {/* Start: Email not been search */}
         <div
           className={clsx(
-            "flex items-center justify-center",
+            "flex items-center justify-center my-auto",
             // dataLeaked.length === 0 ? "visible" : "hidden",
             typeof dataLeakedDomain === "string" ? "visible" : "hidden"
           )}
@@ -446,33 +477,7 @@ export default function DomainSearchPage() {
         </div>
         {/* End: Email not been search */}
 
-        <div>
-          <section className={clsx("flex mb-[24px] mr-auto")}>
-            <CompromiseButton
-              isActive={selectedButton === DOMAIN_SEARCH_EMPLOYEE}
-              // total={employeeData && employeeData.count}
-              value={"Employee"}
-              onClick={handleButtonClick}
-              nameData={DOMAIN_SEARCH_EMPLOYEE}
-            />
-
-            <CompromiseButton
-              isActive={selectedButton === DOMAIN_SEARCH_USERS}
-              // total={usersData && usersData.count}
-              value={"Users"}
-              onClick={handleButtonClick}
-              nameData={DOMAIN_SEARCH_USERS}
-            />
-
-            <CompromiseButton
-              isActive={selectedButton === DOMAIN_SEARCH_THIRDPARTY}
-              // totalt={totalThirdParty && totalThirdParty}
-              value={"Third-party"}
-              onClick={handleButtonClick}
-              nameData={DOMAIN_SEARCH_THIRDPARTY}
-            />
-          </section>
-
+        <div className={clsx()}>
           {/* Start: Email Searched */}
           <div
             className={clsx(
@@ -537,7 +542,7 @@ export default function DomainSearchPage() {
           {/* Start: Email is safe */}
           <div
             className={clsx(
-              "flex flex-col justify-center items-center bg-white rounded-lg  text-center mt-8 ",
+              "flex flex-col justify-center items-center bg-white rounded-lg  text-center mt-8 relative top-[50%] ",
               // hasCookie("scanned_verified") &&
               //   getCookie("scanned_verified") === "true"
               //   ? "visible"
