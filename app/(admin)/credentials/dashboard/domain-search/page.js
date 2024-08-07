@@ -1,7 +1,17 @@
 "use client";
 
+import {
+  CalculatePasswordStrengthWithReturnPlainString,
+  convertDateFormat,
+} from "@/app/_lib/CalculatePassword";
 import { APIDATAV1 } from "@/app/_lib/helpers/APIKEYS";
 import { setLoadingState } from "@/app/_lib/store/features/Compromised/LoadingSlices";
+import {
+  setDomainSearchData,
+  setTotalAllPageDomainSearch,
+  setTotalExposuresDomainSearch,
+  setTotalPerPageDomainSearch,
+} from "@/app/_lib/store/features/DomainSearch/DomainSearchSlices";
 import {
   setDetailsIsOpen,
   setDetailsLeakedData,
@@ -10,9 +20,9 @@ import {
 } from "@/app/_lib/store/features/ExecutiveProtections/LeakedDataSlices";
 import { fetchWithRefreshToken } from "@/app/_lib/token/fetchWithRefreshToken";
 import { AuthButton } from "@/app/_ui/components/buttons/AuthButton";
-import { Alert, ConfigProvider, Pagination } from "antd";
+import { Alert, ConfigProvider, Pagination, Table } from "antd";
 import clsx from "clsx";
-import { getCookie, hasCookie, setCookie } from "cookies-next";
+import { deleteCookie, getCookie, hasCookie, setCookie } from "cookies-next";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -27,29 +37,152 @@ export default function DomainSearchPage() {
   const dispatch = useDispatch();
   const router = useRouter();
 
-  const dataLeaked = useSelector(
-    (state) => state.executiveProtections.leakedData
+  const dataLeakedDomain = useSelector(
+    (state) => state.domainSearch.domainSearchData
   );
 
-  //   const errorDataLeaked = useSelector(
-  //     (state) => state.executiveProtections.errorLeakedData
-  //   );
+  console.log("data leaked domain: ", dataLeakedDomain);
 
-  const totalExposures = useSelector(
-    (state) => state.executiveProtections.totalExposures
+  const totalExposuresDomain = useSelector(
+    (state) => state.domainSearch.totalExposures
   );
 
-  function sliceObject(obj, chunkSize = 3) {
-    const entries = Object.entries(obj);
-    if (entries.length <= chunkSize) return [obj];
+  const totalPerPageDomainSearch = useSelector(
+    (state) => state.domainSearch.totalPerPageDomainSearch
+  );
 
-    const result = [];
-    for (let i = 0; i < entries.length; i += chunkSize) {
-      const chunk = entries.slice(i, i + chunkSize);
-      result.push(Object.fromEntries(chunk));
-    }
-    return result;
-  }
+  const totalAllPageDomainSearch = useSelector(
+    (state) => state.domainSearch.totalAllPageDomainSearch
+  );
+
+  const columnDomainSearch = [
+    {
+      title: "No",
+      key: "no",
+      render: (param1, record, index) => {
+        return (
+          <p className={clsx("text-Base-normal text-[#000000E0]")}>
+            {" "}
+            {index + 1}{" "}
+          </p>
+        );
+      },
+    },
+    {
+      title: "Date Compromised",
+      key: "compromised",
+      render: (param1) => {
+        return (
+          <p className={clsx("text-Base-normal text-[#000000E0]")}>
+            {" "}
+            {convertDateFormat(param1.date_time_compromised)}{" "}
+          </p>
+        );
+      },
+    },
+    {
+      title: "URL",
+      key: "url",
+      render: (param1) => {
+        return (
+          <p
+            className={clsx("text-Base-normal text-[#000000E0 max-w-[200px] ")}
+          >
+            {" "}
+            {param1.url}{" "}
+          </p>
+        );
+      },
+    },
+    {
+      title: "Login",
+      key: "login",
+      render: (param1) => {
+        return (
+          <p className={clsx("text-Base-normal text-[#000000E0]")}>
+            {" "}
+            {param1.login}{" "}
+          </p>
+        );
+      },
+    },
+    {
+      title: "Password",
+      key: "password",
+      render: (param1) => {
+        return (
+          <p className={clsx("text-Base-normal text-[#000000E0]")}>
+            {" "}
+            {param1.password}{" "}
+          </p>
+        );
+      },
+    },
+    {
+      title: "Password Strength",
+      key: "status",
+      render: (param1) => {
+        return (
+          <div>
+            <p
+              className={clsx(
+                param1.password.includes("***") ? "visible" : "hidden",
+                "px-4 py-1 rounded-md  text-[#000000E0] inline text-Base-strong"
+              )}
+            >
+              Unknown
+            </p>
+
+            <p
+              className={clsx(
+                !param1.password.includes("***") ? "visible" : "hidden",
+                CalculatePasswordStrengthWithReturnPlainString(
+                  param1.password
+                ) === "Bad" && "text-error",
+                CalculatePasswordStrengthWithReturnPlainString(
+                  param1.password
+                ) === "Weak" && "text-pink",
+                CalculatePasswordStrengthWithReturnPlainString(
+                  param1.password
+                ) === "Medium" && "text-text-orange",
+                CalculatePasswordStrengthWithReturnPlainString(
+                  param1.password
+                ) === "Good" && "text-blue-600",
+                CalculatePasswordStrengthWithReturnPlainString(
+                  param1.password
+                ) === "Strong" && "text-text-green"
+              )}
+            >
+              {CalculatePasswordStrengthWithReturnPlainString(param1.password)}
+            </p>
+          </div>
+        );
+      },
+    },
+    {
+      title: "Action",
+      key: "action",
+      render: (param1) => {
+        return (
+          <div>
+            <button
+              className={clsx(
+                `py-2 px-4 rounded-md text-primary-base text-Base-normal border-[1px] border-input-border `
+              )}
+              //   onClick={() =>
+              //     handleChangeToDetailPage(
+              //       param1.id,
+              //       PARTNER_SECTION_ROLE_SECTION
+              //     )
+              //   }
+            >
+              Details
+            </button>
+          </div>
+        );
+      },
+    },
+  ];
 
   const handleChangeEmail = (e) => {
     setEmail(e.target.value.trim());
@@ -75,29 +208,19 @@ export default function DomainSearchPage() {
     try {
       dispatch(setLoadingState(true));
 
-      const res = await fetch(
-        `${APIDATAV1}protection?search=${email}&type_search=superadmin`,
-        {
-          method: "GET",
-          credentials: "include",
-          headers: {
-            Authorization: `Bearer ${getCookie("access_token")}`,
-          },
-        }
-      );
+      const res = await fetch(`${APIDATAV1}search?q=${email}.com&page=1`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          Authorization: `Bearer ${getCookie("access_token")}`,
+        },
+      });
 
       if (res.status === 401 || res.status === 403) {
         return res;
       }
 
       const data = await res.json();
-
-      console.log("data executive admin: ", data);
-
-      if (data.error) {
-        dispatch(setErrorLeakedData(true));
-        return res;
-      }
 
       if (data.data === null) {
         setIsErrorEmail(true);
@@ -107,13 +230,12 @@ export default function DomainSearchPage() {
 
       //   return res;
 
-      if ("No results found" in data.List) {
-        dispatch(setLeakedData(null));
-        return res;
-      } else {
-        let totalItems = Object.keys(data.List).length;
-        dispatch(setLeakedData(data));
-        dispatch(setTotalExposures(totalItems));
+      if (data.data) {
+        console.log("data executive admin: ", data);
+        dispatch(setDomainSearchData(data.data));
+        dispatch(setTotalExposuresDomainSearch(data.count_data));
+        dispatch(setTotalPerPageDomainSearch(data.size));
+        dispatch(setTotalAllPageDomainSearch(data.count_page));
         return res;
       }
     } catch (error) {
@@ -124,18 +246,6 @@ export default function DomainSearchPage() {
     }
   };
 
-  const MapLeakedData =
-    dataLeaked &&
-    Object.entries(dataLeaked.List).map(([website, data]) => {
-      let leakedKeys = [];
-      if (data.Data && data.Data.length > 0) {
-        leakedKeys = Object.keys(data.Data[0]);
-      }
-
-      let idDetailData = dataLeaked.id;
-      return { website, leakedKeys, idDetailData };
-    });
-
   useEffect(() => {
     setTimeout(() => {
       setIsErrorEmail(false);
@@ -143,8 +253,10 @@ export default function DomainSearchPage() {
   }, [isErrorEmail]);
 
   useEffect(() => {
-    if (hasCookie("scanned_domain")) {
+    if (hasCookie("scanned_domain") && email) {
       callGetDetailLeakedDataWithRefeshToken();
+    } else {
+      deleteCookie("scanned_domain");
     }
   }, []);
 
@@ -167,10 +279,10 @@ export default function DomainSearchPage() {
         />
         <div>
           <h1 className="text-heading-3 text-black">
-            Has your personal data been exposed?
+            Has your data been exposed?
           </h1>
           <h2 className="text-Base-normal text-text-description mt-[12px]">
-            Scan your primary email to see your digital footprint.
+            Scan your domain to see your digital footprint.
           </h2>
         </div>
         <div className="mt-[32px] w-full">
@@ -178,7 +290,7 @@ export default function DomainSearchPage() {
             <input
               type="text"
               className="rounded-md px-3 py-[5px] border-input-border border-2 w-[50%] text-LG-normal text-black"
-              placeholder="name@mail.com"
+              placeholder="Enter domain"
               value={email}
               onChange={handleChangeEmail}
             />
@@ -203,7 +315,7 @@ export default function DomainSearchPage() {
           className={clsx(
             "flex items-center justify-center",
             // dataLeaked.length === 0 ? "visible" : "hidden",
-            typeof dataLeaked === "string" ? "visible" : "hidden"
+            typeof dataLeakedDomain === "string" ? "visible" : "hidden"
           )}
         >
           <div className={clsx("text-center mx-auto")}>
@@ -215,7 +327,7 @@ export default function DomainSearchPage() {
               className={clsx("mx-auto")}
             />
             <h3 className={clsx("text-heading-3 mt-4 mb-2")}>
-              Start scanning your email
+              Start scanning your domain
             </h3>
             <p
               className={clsx(
@@ -231,12 +343,12 @@ export default function DomainSearchPage() {
         {/* Start: Email Searched */}
         <div
           className={clsx(
-            "flex flex-col justify-center items-center bg-white rounded-lg  text-center mt-8 ",
+            "flex flex-col justify-center items-center bg-white rounded-lg  text-center mt-8 overflow-scroll ",
             // hasCookie("scanned_verified") &&
             //   getCookie("scanned_verified") === "true"
             //   ? "visible"
             //   : "hidden"
-            dataLeaked && dataLeaked !== null ? "visible" : "hidden"
+            dataLeakedDomain && dataLeakedDomain !== null ? "visible" : "hidden"
           )}
         >
           <h1 className="text-heading-4 text-black">
@@ -249,7 +361,7 @@ export default function DomainSearchPage() {
 
           <div className="my-6 w-full">
             <Alert
-              message={`We found ${totalExposures} exposures of your data.`}
+              message={`We found ${totalExposuresDomain} exposures of your data.`}
               type="warning"
               showIcon
               closable
@@ -259,107 +371,34 @@ export default function DomainSearchPage() {
             />
           </div>
 
-          <div className="border-2 rounded-xl border-input-border w-full">
-            <table className="bg-white  w-full rounded-xl text-left">
-              <thead className="text-black text-Base-strong bg-[#00000005]">
-                <tr className="border-b-[1px] border-[#D5D5D5]">
-                  <td className="py-[19px] px-[16px]  border-r-[1px] border-input-border border-dashed ">
-                    No
-                  </td>
-                  <td className="py-[19px] px-[16px] border-r-[1px] border-input-border border-dashed">
-                    Website Name
-                  </td>
-                  <td className="py-[19px] px-[16px] border-r-[1px] border-input-border border-dashed">
-                    Leaked Data
-                  </td>
-                  <td className="py-[19px] px-[16px] border-r-[1px] border-input-border border-dashed">
-                    Actions
-                  </td>
-                </tr>
-              </thead>
-              <tbody className="text-Base-normal text-text-description">
-                {MapLeakedData &&
-                  MapLeakedData.map((data, index) => {
-                    console.log("data leaked keys ", data.leakedKeys);
-                    console.log(
-                      "data leaked value ",
-                      dataLeaked.List[data.website].Data[0]
-                    );
-
-                    console.log("data semua: ", data);
-
-                    const formattedData = sliceObject(
-                      dataLeaked.List[data.website].Data[0]
-                    );
-
-                    let allData = {
-                      info_1: data,
-                      info_2: dataLeaked.List[data.website].Data[0],
-                      info_3: formattedData,
-                    };
-
-                    return (
-                      <tr
-                        className="border-b-[2px] border-[#D5D5D5]"
-                        key={index}
-                      >
-                        <td className="py-[19px] px-[16px]"> {index + 1} </td>
-                        <td className="py-[19px] px-[16px]">{data.website}</td>
-                        <td className="py-[19px] px-[16px] w-[45%]">
-                          {data.leakedKeys.map((key) => (
-                            <>
-                              <span
-                                className="inline-block bg-white text-text-description rounded-[100px] border-[1px] border-[#D5D5D5] text-SM-normal py-1 px-4 mr-2 mt-2"
-                                key={key}
-                              >
-                                {key}
-                              </span>
-                            </>
-                          ))}
-                        </td>
-                        <td className="py-[19px] px-[16px]">
-                          <button
-                            className="rounded-md border-[1px] border-input-border text-primary-base text-Base-normal py-1.5 px-4"
-                            onClick={() => handleDetails(allData)}
-                          >
-                            Details
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-              </tbody>
-            </table>
-            <div className="flex items-center justify-between my-[19px] mx-[16px]">
-              <p className="text-Base-normal text-[#676767] ">
-                Showing {totalExposures} to {totalExposures} entries
+          <div className="border-[1px] rounded-lg border-input-border w-auto ">
+            <Table
+              columns={columnDomainSearch}
+              dataSource={dataLeakedDomain}
+              pagination={false}
+            />
+            <div
+              className={clsx(
+                "flex items-center justify-between my-[19px] mx-[16px]",
+                dataLeakedDomain === null ? "hidden" : "visible"
+              )}
+            >
+              <p className="text-Base-normal text-[#676767]">
+                {" "}
+                Showing {totalPerPageDomainSearch &&
+                  totalPerPageDomainSearch}{" "}
+                to {totalExposuresDomain && totalExposuresDomain} entries
               </p>
-              <div>
-                <ConfigProvider
-                  theme={{
-                    components: {
-                      Pagination: {
-                        itemActiveBg: "#FF6F1E",
-                        itemLinkBg: "#fff",
-                        itemInputBg: "#fff",
-                      },
-                    },
-                    token: {
-                      colorPrimary: "white",
-                    },
-                  }}
-                >
-                  <Pagination
-                    type="primary"
-                    defaultCurrent={1}
-                    total={totalExposures}
-                    showSizeChanger={false}
-                    style={{ color: "#FF6F1E" }}
-                    // current={bookmarkPage}
-                    // onChange={handleSetBookmarkPage}
-                  />
-                </ConfigProvider>
-              </div>
+              <Pagination
+                type="primary"
+                defaultCurrent={1}
+                total={totalExposuresDomain && totalExposuresDomain}
+                showSizeChanger={false}
+                style={{ color: "#FF6F1E" }}
+                hideOnSinglePage={true}
+                // onChange={handleChangePages}
+                // current={page}
+              />
             </div>
           </div>
         </div>
@@ -373,7 +412,7 @@ export default function DomainSearchPage() {
             //   getCookie("scanned_verified") === "true"
             //   ? "visible"
             //   : "hidden"
-            dataLeaked === null ? "visible" : "hidden"
+            dataLeakedDomain === null ? "visible" : "hidden"
           )}
         >
           <div>
@@ -384,11 +423,9 @@ export default function DomainSearchPage() {
               height={121}
             />
           </div>
-          <h1 className="text-heading-4 text-black">
-            Your email account is safe!
-          </h1>
+          <h1 className="text-heading-4 text-black">Your websites is safe!</h1>
           <h2 className="text-LG-normal text-text-description mt-3 max-w-[450px]">
-            Nothing was found after scanning your email address.
+            Nothing was found after scanning your websites.
           </h2>
         </div>
         {/* End: Email is safe */}

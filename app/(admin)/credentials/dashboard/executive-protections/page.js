@@ -12,7 +12,7 @@ import { fetchWithRefreshToken } from "@/app/_lib/token/fetchWithRefreshToken";
 import { AuthButton } from "@/app/_ui/components/buttons/AuthButton";
 import { Alert, ConfigProvider, Pagination } from "antd";
 import clsx from "clsx";
-import { getCookie, hasCookie, setCookie } from "cookies-next";
+import { deleteCookie, getCookie, hasCookie, setCookie } from "cookies-next";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -95,7 +95,7 @@ export default function ExecutiveProtectionPage() {
       console.log("data executive admin: ", data);
 
       if (data.error) {
-        dispatch(setErrorLeakedData(true));
+        // dispatch(setErrorLeakedData(true));
         return res;
       }
 
@@ -143,8 +143,10 @@ export default function ExecutiveProtectionPage() {
   }, [isErrorEmail]);
 
   useEffect(() => {
-    if (hasCookie("scanned_email")) {
+    if (hasCookie("scanned_email") && email) {
       callGetDetailLeakedDataWithRefeshToken();
+    } else {
+      deleteCookie("scanned_email");
     }
   }, []);
 
