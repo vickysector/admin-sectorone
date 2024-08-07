@@ -20,7 +20,13 @@ import {
   setTotalExposures,
 } from "@/app/_lib/store/features/ExecutiveProtections/LeakedDataSlices";
 import { fetchWithRefreshToken } from "@/app/_lib/token/fetchWithRefreshToken";
+import {
+  DOMAIN_SEARCH_EMPLOYEE,
+  DOMAIN_SEARCH_THIRDPARTY,
+  DOMAIN_SEARCH_USERS,
+} from "@/app/_lib/variables/Variables";
 import { AuthButton } from "@/app/_ui/components/buttons/AuthButton";
+import CompromiseButton from "@/app/_ui/components/buttons/CompromiseButton";
 import { Alert, ConfigProvider, Pagination, Table } from "antd";
 import clsx from "clsx";
 import { deleteCookie, getCookie, hasCookie, setCookie } from "cookies-next";
@@ -42,6 +48,9 @@ export default function DomainSearchPage() {
   const [isErrorEmail, setIsErrorEmail] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [page, setPage] = useState(searchParams.get("page") || 1);
+  const [selectedButton, setSelectedButton] = useState(
+    searchParams.get("type") || DOMAIN_SEARCH_EMPLOYEE
+  );
 
   const canSend = email;
   const dispatch = useDispatch();
@@ -85,7 +94,7 @@ export default function DomainSearchPage() {
         return (
           <p className={clsx("text-Base-normal text-[#000000E0]")}>
             {" "}
-            {convertDateFormat(param1.date_time_compromised)}{" "}
+            {convertDateFormat(param1.datetime_compromised)}{" "}
           </p>
         );
       },
@@ -196,12 +205,12 @@ export default function DomainSearchPage() {
 
   const handleChangeEmail = (e) => {
     setEmail(e.target.value.trim());
-    setCookie("scanned_domain", e.target.value.trim());
+    // setCookie("scanned_domain", e.target.value.trim());
   };
 
   const handleScanNow = () => {
     console.log("scan now..");
-    callGetDetailLeakedDataWithRefeshToken();
+    callGetDetailLeakedDataWithRefeshToken(selectedButton);
   };
 
   const handleDetails = (id, item) => {
@@ -215,16 +224,30 @@ export default function DomainSearchPage() {
     router.push(`${pathname}?${params.toString()}`);
   };
 
-  const callGetDetailLeakedDataWithRefeshToken = async () => {
-    await fetchWithRefreshToken(fetchGetDetailLeakedData, router, dispatch);
+  const handleButtonClick = (value) => {
+    setSelectedButton(value.target.name);
+    setPage(1);
+
+    params.set("type", value.target.name);
+    params.set("page", 1);
+    router.push(`${pathname}?${params.toString()}`);
   };
 
-  const fetchGetDetailLeakedData = async () => {
+  const callGetDetailLeakedDataWithRefeshToken = async (type) => {
+    await fetchWithRefreshToken(
+      fetchGetDetailLeakedData,
+      router,
+      dispatch,
+      type
+    );
+  };
+
+  const fetchGetDetailLeakedData = async (type) => {
     try {
       dispatch(setLoadingState(true));
 
       const res = await fetch(
-        `${APIDATAV1}search?q=${email}.com&page=${page}`,
+        `${APIDATAV1}compromised/${type}?page=${page}&search=&search_domain=${email}`,
         {
           method: "GET",
           credentials: "include",
@@ -249,13 +272,16 @@ export default function DomainSearchPage() {
       //   return res;
 
       if (data.data) {
-        // console.log("data executive admin: ", data);
+        console.log("data executive admin: ", data);
+        setCookie("scanned_domain", email);
+
         dispatch(setDomainSearchData(data.data));
         dispatch(setTotalExposuresDomainSearch(data.count_data));
         dispatch(setTotalPerPageDomainSearch(data.size));
         dispatch(setTotalAllPageDomainSearch(data.count_page));
         params.set("query", getCookie("scanned_domain"));
         params.set("page", page);
+        params.set("type", selectedButton);
         router.push(`${pathname}?${params.toString()}`);
         return res;
       }
@@ -275,20 +301,57 @@ export default function DomainSearchPage() {
 
   useEffect(() => {
     if (hasCookie("scanned_domain") && email) {
-      callGetDetailLeakedDataWithRefeshToken();
-
-      if (!searchParams.has("query") || !searchParams.has("page")) {
-        params.set("query", getCookie("scanned_domain"));
-        params.set("page", page);
-        router.push(`${pathname}?${params.toString()}`);
+      switch (selectedButton) {
+        case DOMAIN_SEARCH_EMPLOYEE:
+          callGetDetailLeakedDataWithRefeshToken(DOMAIN_SEARCH_EMPLOYEE);
+          if (
+            !searchParams.has("query") ||
+            !searchParams.has("page") ||
+            !searchParams.has("type")
+          ) {
+            params.set("query", getCookie("scanned_domain"));
+            params.set("page", page);
+            params.set("type", DOMAIN_SEARCH_EMPLOYEE);
+            router.push(`${pathname}?${params.toString()}`);
+          }
+          break;
+        case DOMAIN_SEARCH_USERS:
+          callGetDetailLeakedDataWithRefeshToken(DOMAIN_SEARCH_USERS);
+          if (
+            !searchParams.has("query") ||
+            !searchParams.has("page") ||
+            !searchParams.has("type")
+          ) {
+            params.set("query", getCookie("scanned_domain"));
+            params.set("page", page);
+            params.set("type", DOMAIN_SEARCH_USERS);
+            router.push(`${pathname}?${params.toString()}`);
+          }
+          break;
+        case DOMAIN_SEARCH_THIRDPARTY:
+          callGetDetailLeakedDataWithRefeshToken(DOMAIN_SEARCH_THIRDPARTY);
+          if (
+            !searchParams.has("query") ||
+            !searchParams.has("page") ||
+            !searchParams.has("type")
+          ) {
+            params.set("query", getCookie("scanned_domain"));
+            params.set("page", page);
+            params.set("type", DOMAIN_SEARCH_THIRDPARTY);
+            router.push(`${pathname}?${params.toString()}`);
+          }
+          break;
+        default:
+          break;
       }
     } else {
       deleteCookie("scanned_domain");
       params.delete("query");
       params.delete("page");
+      params.delete("type");
       router.push(`${pathname}`);
     }
-  }, [page]);
+  }, [page, selectedButton]);
 
   return (
     <main>
@@ -381,25 +444,31 @@ export default function DomainSearchPage() {
             dataLeakedDomain && dataLeakedDomain !== null ? "visible" : "hidden"
           )}
         >
-          <h1 className="text-heading-4 text-black">
-            Results of your data leak
-          </h1>
-          <h2 className="text-Base-normal text-text-description mt-3 max-w-[450px]">
-            Get details on data breaches that leak your info on the dark web.
-            See how you can become more secure based on each result.
-          </h2>
-
-          <div className="my-6 w-full">
-            <Alert
-              message={`We found ${totalExposuresDomain} exposures of your data.`}
-              type="warning"
-              showIcon
-              closable
-              style={{
-                textAlign: "left",
-              }}
+          <section className={clsx("flex mb-[24px] mr-auto")}>
+            <CompromiseButton
+              isActive={selectedButton === DOMAIN_SEARCH_EMPLOYEE}
+              // total={employeeData && employeeData.count}
+              value={"Employee"}
+              onClick={handleButtonClick}
+              nameData={DOMAIN_SEARCH_EMPLOYEE}
             />
-          </div>
+
+            <CompromiseButton
+              isActive={selectedButton === DOMAIN_SEARCH_USERS}
+              // total={usersData && usersData.count}
+              value={"Users"}
+              onClick={handleButtonClick}
+              nameData={DOMAIN_SEARCH_USERS}
+            />
+
+            <CompromiseButton
+              isActive={selectedButton === DOMAIN_SEARCH_THIRDPARTY}
+              // totalt={totalThirdParty && totalThirdParty}
+              value={"Third-party"}
+              onClick={handleButtonClick}
+              nameData={DOMAIN_SEARCH_THIRDPARTY}
+            />
+          </section>
 
           <div className="border-[1px] rounded-lg border-input-border w-auto ">
             <Table
