@@ -52,15 +52,15 @@ export default function DetailsDomainSearch() {
         id: 1,
         key: "Date identified",
         value:
-          hasOwnProperty("date_time_added") &&
-          convertDateFormat(detailsCompromisedData.date_time_added),
+          hasOwnProperty("datetime_added") &&
+          convertDateFormat(detailsCompromisedData.datetime_added),
       },
       {
         id: 2,
         key: "Date compromised",
         value:
-          hasOwnProperty("date_time_compromised") &&
-          convertDateFormat(detailsCompromisedData.date_time_compromised),
+          hasOwnProperty("datetime_compromised") &&
+          convertDateFormat(detailsCompromisedData.datetime_compromised),
       },
     ],
   };
@@ -108,7 +108,7 @@ export default function DetailsDomainSearch() {
         id: 2,
         key: "Machine ID",
         value:
-          hasOwnProperty("machince_id") && detailsCompromisedData.machince_id,
+          hasOwnProperty("machine_id") && detailsCompromisedData.machine_id,
       },
       {
         id: 3,
