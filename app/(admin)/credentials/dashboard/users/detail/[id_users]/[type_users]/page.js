@@ -37,6 +37,7 @@ export default function DetailRoleUsers({ params }) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
+  const [allDomain, setAllDomain] = useState();
   const [protectionCredits, setProtectionCredits] = useState("");
   const [keywordCredits, setKeywordCredits] = useState("");
   const [triggerChange, setTriggerChange] = useState(false);
@@ -185,20 +186,23 @@ export default function DetailRoleUsers({ params }) {
     try {
       dispatch(setLoadingState(true));
 
-      const res = await fetch(`${APIDATAV1}root/admin/domain`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          Authorization: `Bearer ${getCookie("access_token")}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          id_user: params.id_users,
-          page: 1,
-          size: 10,
-          search: "",
-        }),
-      });
+      const res = await fetch(
+        `${APIDATAV1}root/admin/domain?id_user=${params.id_users}&page=1&size=10`,
+        {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            Authorization: `Bearer ${getCookie("access_token")}`,
+            // "Content-Type": "application/json",
+          },
+          // body: JSON.stringify({
+          //   id_user: params.id_users,
+          //   page: 1,
+          //   size: 10,
+          //   search: "",
+          // }),
+        }
+      );
 
       if (res.status === 401 || res.status === 403) {
         return res;
@@ -213,6 +217,7 @@ export default function DetailRoleUsers({ params }) {
       }
 
       if (data.data) {
+        setAllDomain(data);
         return res;
       }
 
@@ -291,7 +296,7 @@ export default function DetailRoleUsers({ params }) {
 
   // End of: API Intregations
 
-  console.log("name: ", name);
+  console.log("all domain: ", allDomain);
 
   return (
     <main>
@@ -309,7 +314,7 @@ export default function DetailRoleUsers({ params }) {
               <h1 className="text-heading-2 text-black  ml-4">Details</h1>
             </div>
             <div>
-              <button
+              {/* <button
                 className={clsx(
                   `py-2 px-4 rounded-md text-primary-base text-Base-normal border-[1px] border-input-border hover:opacity-80 cursor-pointer `
                 )}
@@ -319,7 +324,7 @@ export default function DetailRoleUsers({ params }) {
                   ? "Deactivate"
                   : "Activate"}{" "}
                 accounts
-              </button>
+              </button> */}
               {/* <button
                 className={clsx(
                   `py-2 px-4 rounded-md text-primary-base text-Base-normal border-[1px] border-input-border hover:opacity-80 cursor-pointer ml-4 `
@@ -358,7 +363,7 @@ export default function DetailRoleUsers({ params }) {
                   </p>
                 </div>
                 <div>
-                  <ConfigProvider
+                  {/* <ConfigProvider
                     theme={{
                       token: {
                         colorPrimary: "#FF6F1E",
@@ -371,7 +376,7 @@ export default function DetailRoleUsers({ params }) {
                       defaultValue={demo}
                       disabled
                     />
-                  </ConfigProvider>
+                  </ConfigProvider> */}
                 </div>
               </section>
               <section className="mt-8 grid grid-cols-2 gap-4   ">
@@ -392,6 +397,7 @@ export default function DetailRoleUsers({ params }) {
                       size="large"
                       value={role}
                       onChange={handleRoleChange}
+                      disabled
                     />
                   </ConfigProvider>
                 </Form.Item>
@@ -507,24 +513,30 @@ export default function DetailRoleUsers({ params }) {
                 </div>
               </section>
               <section className="bg-white rounded-md p-8 mt-4">
-                <Form.Item
-                  label={"Url"}
-                  name={"url"}
-                  layout="vertical"
-                  rules={[
-                    {
-                      required: true,
-                    },
-                  ]}
-                >
-                  <Input
-                    placeholder="gmail.com"
-                    variant="filled"
-                    size="large"
-                    // onChange={handleRequiredUrlChange}
-                    // value={requiredUrl}
-                  />
-                </Form.Item>
+                {allDomain &&
+                  allDomain.data.map((data) => (
+                    <Form.Item
+                      label={"Url"}
+                      name={data.domain}
+                      layout="vertical"
+                      rules={[
+                        {
+                          required: true,
+                        },
+                      ]}
+                      key={data.id}
+                    >
+                      <Input
+                        placeholder="gmail.com"
+                        variant="filled"
+                        size="large"
+                        // onChange={handleRequiredUrlChange}
+                        value={data.domain}
+                        defaultValue={data.domain}
+                        disabled
+                      />
+                    </Form.Item>
+                  ))}
               </section>
             </div>
           </div>
