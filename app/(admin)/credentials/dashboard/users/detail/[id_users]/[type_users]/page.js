@@ -190,9 +190,13 @@ export default function DetailRoleUsers({ params }) {
         credentials: "include",
         headers: {
           Authorization: `Bearer ${getCookie("access_token")}`,
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           id_user: params.id_users,
+          page: 1,
+          size: 10,
+          search: "",
         }),
       });
 
