@@ -11,7 +11,7 @@ export const TOTAL_COMPROMISED_OVERVIEW_SELECT_STATUS_USER = "user";
 
 export const PARTNER_SECTION_ROLE_SECTION = "partner";
 export const MARKETING_SECTION_ROLE_SECTION = "marketing";
-export const USERS_SECTION_ROLE_SECTION = "user";
+export const USERS_SECTION_ROLE_SECTION = "users";
 export const ADMIN_SECTION_ROLE_SECTION = "admin";
 export const SUPERADMIN_SECTION_ROLE_SECTION = "superadmin";
 

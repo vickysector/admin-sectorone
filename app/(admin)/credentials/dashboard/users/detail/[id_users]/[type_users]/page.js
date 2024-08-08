@@ -9,6 +9,11 @@ import {
   USERS_SECTION_ROLE_SECTION,
 } from "@/app/_lib/variables/Variables";
 import { ConfigProvider, Form, Input, Select, Switch } from "antd";
+import { useEffect, useState } from "react";
+import { fetchWithRefreshToken } from "@/app/_lib/token/fetchWithRefreshToken";
+import { APIDATAV1 } from "@/app/_lib/helpers/APIKEYS";
+import { setLoadingState } from "@/app/_lib/store/features/Compromised/LoadingSlices";
+import { getCookie } from "cookies-next";
 
 export default function DetailRoleUsers({ params }) {
   // Start of: Redux
@@ -16,7 +21,22 @@ export default function DetailRoleUsers({ params }) {
   const dispatch = useDispatch();
   const router = useRouter();
 
+  console.log("params: ", params);
   // End of: Redux
+
+  // Start of: State
+
+  const [selectOptions, setSelecOptions] = useState([]);
+  const [detailsData, setDetailsData] = useState();
+  const [role, setRole] = useState("");
+  const [demo, setDemo] = useState(false);
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [protectionCredits, setProtectionCredits] = useState("");
+  const [keywordCredits, setKeywordCredits] = useState("");
+
+  // End of: State
 
   //   Start of: Functions Handler
 
@@ -24,11 +44,181 @@ export default function DetailRoleUsers({ params }) {
     router.back();
   };
 
+  const handleRoleChange = (value) => {
+    setRole(value);
+  };
+
+  const handleDemoChange = (checked) => {
+    setDemo(checked);
+  };
+
+  const handleNameChange = (event) => {
+    setName(event.target.value);
+  };
+
+  const handlePhoneChange = (event) => {
+    setPhone(event.target.value);
+  };
+
+  const handleEmailChange = (event) => {
+    setEmail(event.target.value);
+  };
+
   //   End of: Functions Handler
 
   // Start of: API Intregations
 
+  const FetchAllRoles = async () => {
+    try {
+      dispatch(setLoadingState(true));
+
+      const res = await fetch(`${APIDATAV1}admin/all/role`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          Authorization: `Bearer ${getCookie("access_token")}`,
+        },
+      });
+
+      if (res.status === 401 || res.status === 403) {
+        return res;
+      }
+
+      const data = await res.json();
+
+      if (data.data === null) {
+        throw res;
+      }
+
+      if (data.data) {
+        const updatedData = data.data.map((item) => {
+          return {
+            value: item.name_role,
+            label:
+              item.name_role.charAt(0).toUpperCase() + item.name_role.slice(1),
+          };
+        });
+
+        setSelecOptions(updatedData);
+
+        return res;
+      }
+
+      //   return res;
+    } catch (error) {
+      console.log("error user status: ", error);
+      return error;
+    } finally {
+      dispatch(setLoadingState(false));
+    }
+  };
+
+  const FetchAllRolesWithRefreshToken = async () => {
+    await fetchWithRefreshToken(FetchAllRoles, router, dispatch);
+  };
+
+  const FetchDetailsData = async () => {
+    try {
+      dispatch(setLoadingState(true));
+
+      const res = await fetch(`${APIDATAV1}admin/user/${params.id_users}`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          Authorization: `Bearer ${getCookie("access_token")}`,
+        },
+      });
+
+      if (res.status === 401 || res.status === 403) {
+        return res;
+      }
+
+      const data = await res.json();
+
+      console.log("details data: ", data);
+
+      if (data.data === null) {
+        throw res;
+      }
+
+      if (data.data) {
+        setDetailsData(data.data);
+        setRole(data.data.role);
+        setName(data.data.name);
+        setPhone(data.data.phone);
+        setEmail(data.data.email);
+        setDemo(data.data.is_demo);
+        setProtectionCredits(data.data.credit_executive);
+        setKeywordCredits(data.data.credit_keyword);
+        return res;
+      }
+
+      //   return res;
+    } catch (error) {
+      console.log("error user status: ", error);
+      return error;
+    } finally {
+      dispatch(setLoadingState(false));
+    }
+  };
+
+  const FetchDetailsDataWithRefreshToken = async () => {
+    await fetchWithRefreshToken(FetchDetailsData, router, dispatch);
+  };
+
+  const FetchDetailsDataDomain = async () => {
+    try {
+      dispatch(setLoadingState(true));
+
+      const res = await fetch(`${APIDATAV1}root/admin/domain`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          Authorization: `Bearer ${getCookie("access_token")}`,
+        },
+        body: JSON.stringify({
+          id_user: params.id_users,
+        }),
+      });
+
+      if (res.status === 401 || res.status === 403) {
+        return res;
+      }
+
+      const data = await res.json();
+
+      console.log("details data domain: ", data);
+
+      if (data.data === null) {
+        throw res;
+      }
+
+      if (data.data) {
+        return res;
+      }
+
+      //   return res;
+    } catch (error) {
+      console.log("error domain status: ", error);
+      return error;
+    } finally {
+      dispatch(setLoadingState(false));
+    }
+  };
+
+  const FetchDetailsDataDomainWithRefreshToken = async () => {
+    await fetchWithRefreshToken(FetchDetailsDataDomain, router, dispatch);
+  };
+
+  useEffect(() => {
+    FetchAllRolesWithRefreshToken();
+    FetchDetailsDataWithRefreshToken();
+    FetchDetailsDataDomainWithRefreshToken();
+  }, []);
+
   // End of: API Intregations
+
+  console.log("name: ", name);
 
   return (
     <main>
@@ -53,25 +243,39 @@ export default function DetailRoleUsers({ params }) {
               >
                 Deactivate accounts
               </button>
-              <button
+              {/* <button
                 className={clsx(
                   `py-2 px-4 rounded-md text-primary-base text-Base-normal border-[1px] border-input-border hover:opacity-80 cursor-pointer ml-4 `
                 )}
               >
                 Save
-              </button>
+              </button> */}
             </div>
           </div>
           <div>
             <div className="p-8 bg-white rounded-lg mt-8">
               <section className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-heading-5 text-black mb-1">
-                    Activate free trial mode
+                  {/* <h2 className="text-heading-5 text-black mb-1">
+                    Users is on {demo ? "Full Access" : "Demo"} Mode
+                  </h2> */}
+                  <h2 className="text-text-description text-Base-normal mb-1">
+                    Users is on{" "}
+                    <span className={clsx("text-heading-5 text-black")}>
+                      {demo ? "Full Access" : "Demo"}
+                    </span>{" "}
+                    Mode
                   </h2>
-                  <p className="text-text-description text-Base-normal">
+                  {/* <p className="text-text-description text-Base-normal">
                     By activating this mode, users will be restricted from
                     accessing some features on the SectorOne dashboard.
+                  </p> */}
+                  <p className="text-text-description text-Base-normal">
+                    This Account is currently{" "}
+                    <span className={clsx("text-heading-5 text-black")}>
+                      {detailsData.verified ? "Active" : "Inactive"}
+                    </span>{" "}
+                    and ready to be used.
                   </p>
                 </div>
                 <div>
@@ -82,14 +286,19 @@ export default function DetailRoleUsers({ params }) {
                       },
                     }}
                   >
-                    {/* <Switch onChange={handleDemoChange} value={demo} /> */}
+                    <Switch
+                      onChange={handleDemoChange}
+                      value={demo}
+                      defaultValue={demo}
+                      disabled
+                    />
                   </ConfigProvider>
                 </div>
               </section>
               <section className="mt-8 grid grid-cols-2 gap-4   ">
                 <Form.Item
                   label={"Role"}
-                  name={"role"}
+                  name={role}
                   layout="vertical"
                   rules={[
                     {
@@ -99,35 +308,38 @@ export default function DetailRoleUsers({ params }) {
                 >
                   <ConfigProvider theme={{ token: { colorPrimary: "FF6F1E" } }}>
                     <Select
-                      defaultValue={"user"}
-                      // options={selectOptions}
+                      defaultValue={detailsData && detailsData.role}
+                      options={selectOptions}
                       size="large"
-                      // value={role}
-                      // onChange={handleRoleChange}
+                      value={role}
+                      onChange={handleRoleChange}
                     />
                   </ConfigProvider>
                 </Form.Item>
                 <Form.Item
                   label={"Name"}
-                  name={"name"}
+                  name={name}
                   layout="vertical"
                   rules={[
                     {
                       required: true,
                     },
                   ]}
+                  className={clsx("text-Base-normal text-[#000000E0]")}
                 >
                   <Input
                     placeholder="John Smith"
                     variant="filled"
                     size="large"
                     onChange={(e) => handleNameChange(e)}
-                    // value={name}
+                    value={name}
+                    defaultValue={name}
+                    disabled
                   />
                 </Form.Item>
                 <Form.Item
                   label={"Phone number"}
-                  name={"phone"}
+                  name={phone}
                   layout="vertical"
                   rules={[
                     {
@@ -139,13 +351,15 @@ export default function DetailRoleUsers({ params }) {
                     placeholder="08123456789"
                     variant="filled"
                     size="large"
-                    // value={phone}
+                    value={phone}
                     onChange={(e) => handlePhoneChange(e)}
+                    defaultValue={phone}
+                    disabled
                   />
                 </Form.Item>
                 <Form.Item
                   label={"Email"}
-                  name={"email"}
+                  name={email}
                   layout="vertical"
                   rules={[
                     {
@@ -157,8 +371,50 @@ export default function DetailRoleUsers({ params }) {
                     placeholder="john@gmail.com"
                     variant="filled"
                     size="large"
-                    // value={email}
+                    value={email}
                     onChange={(e) => handleEmailChange(e)}
+                    defaultValue={email}
+                    disabled
+                  />
+                </Form.Item>
+                <Form.Item
+                  label={"Executive protection credits"}
+                  name={protectionCredits}
+                  layout="vertical"
+                  rules={[
+                    {
+                      required: true,
+                    },
+                  ]}
+                >
+                  <Input
+                    placeholder="10"
+                    variant="filled"
+                    size="large"
+                    value={protectionCredits}
+                    // onChange={(e) => handlePhoneChange(e)}
+                    defaultValue={protectionCredits}
+                    disabled
+                  />
+                </Form.Item>
+                <Form.Item
+                  label={"Search by keywords credits"}
+                  name={keywordCredits}
+                  layout="vertical"
+                  rules={[
+                    {
+                      required: true,
+                    },
+                  ]}
+                >
+                  <Input
+                    placeholder="10"
+                    variant="filled"
+                    size="large"
+                    value={keywordCredits}
+                    // onChange={(e) => handleEmailChange(e)}
+                    defaultValue={keywordCredits}
+                    disabled
                   />
                 </Form.Item>
               </section>
