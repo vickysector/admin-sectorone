@@ -5,7 +5,7 @@ const DetailsUsersSlices = createSlice({
   initialState: {
     confirm: false,
     PostFunctionDeactivateUser: null,
-    triggerChange: false,
+    successState: false,
   },
   reducers: {
     setConfirmDetailUserDeactivateState(state, action) {
@@ -14,8 +14,8 @@ const DetailsUsersSlices = createSlice({
     setDetailUserDeactivateFunction(state, action) {
       state.PostFunctionDeactivateUser = action.payload;
     },
-    setTriggerChangeDeactivateAccount(state, action) {
-      state.triggerChange = action.payload;
+    setSuccessState(state, action) {
+      state.successState = action.payload;
     },
   },
 });
@@ -23,7 +23,7 @@ const DetailsUsersSlices = createSlice({
 export const {
   setConfirmDetailUserDeactivateState,
   setDetailUserDeactivateFunction,
-  setTriggerChangeDeactivateAccount,
+  setSuccessState,
 } = DetailsUsersSlices.actions;
 
 export default DetailsUsersSlices.reducer;

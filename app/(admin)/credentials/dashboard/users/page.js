@@ -35,6 +35,7 @@ import {
 } from "@/app/_lib/variables/Variables";
 import clsx from "clsx";
 import { convertDateFormat } from "@/app/_lib/CalculatePassword";
+import OutlineButton from "@/app/_ui/components/buttons/OutlineButton";
 
 const { RangePicker } = DatePicker;
 
@@ -58,6 +59,9 @@ export default function UsersDashboardPage() {
   const [selectedButton, setSelectedButton] = useState(
     searchParams.get("type") || PARTNER_SECTION_ROLE_SECTION
   );
+  const [selectedOutlineButton, setSelectedOutlineButton] = useState(
+    searchParams.get("demo") || "false"
+  );
   const [page, setPage] = useState(searchParams.get("page") || 1);
   const [limit, setLimit] = useState(searchParams.get("limit") || 10);
   const [allTableData, setAllTableData] = useState();
@@ -70,6 +74,9 @@ export default function UsersDashboardPage() {
 
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [inputSearch, setInputSearch] = useState(
+    searchParams.get("search") || ""
+  );
 
   //   End of: State
 
@@ -133,7 +140,7 @@ export default function UsersDashboardPage() {
       dispatch(setLoadingState(true));
 
       const res = await fetch(
-        `${APIDATAV1}admin/user?page=${page}&limit=${limit}&search=&type=${type}`,
+        `${APIDATAV1}admin/user?page=${page}&limit=${limit}&search=${inputSearch}&type=${type}&is_demo=${selectedOutlineButton}`,
         {
           method: "GET",
           credentials: "include",
@@ -173,6 +180,7 @@ export default function UsersDashboardPage() {
     switch (selectedButton) {
       case PARTNER_SECTION_ROLE_SECTION:
         FetchGetAllTableDataWithRefreshToken(PARTNER_SECTION_ROLE_SECTION);
+        params.delete("demo");
 
         if (
           !searchParams.has("type") ||
@@ -187,6 +195,7 @@ export default function UsersDashboardPage() {
         break;
       case MARKETING_SECTION_ROLE_SECTION:
         FetchGetAllTableDataWithRefreshToken(MARKETING_SECTION_ROLE_SECTION);
+        params.delete("demo");
 
         if (
           !searchParams.has("type") ||
@@ -205,16 +214,19 @@ export default function UsersDashboardPage() {
         if (
           !searchParams.has("type") ||
           !searchParams.has("limit") ||
-          !searchParams.has("page")
+          !searchParams.has("page") ||
+          !searchParams.has("demo")
         ) {
           params.set("type", USERS_SECTION_ROLE_SECTION);
           params.set("page", 1);
           params.set("limit", 10);
+          params.set("demo", false);
           router.push(`${pathname}?${params.toString()}`);
         }
         break;
       case ADMIN_SECTION_ROLE_SECTION:
         FetchGetAllTableDataWithRefreshToken(ADMIN_SECTION_ROLE_SECTION);
+        params.delete("demo");
 
         if (
           !searchParams.has("type") ||
@@ -229,6 +241,7 @@ export default function UsersDashboardPage() {
         break;
       case SUPERADMIN_SECTION_ROLE_SECTION:
         FetchGetAllTableDataWithRefreshToken(SUPERADMIN_SECTION_ROLE_SECTION);
+        params.delete("demo");
 
         if (
           !searchParams.has("type") ||
@@ -244,7 +257,7 @@ export default function UsersDashboardPage() {
       default:
         break;
     }
-  }, [selectedButton, page]);
+  }, [selectedButton, page, selectedOutlineButton]);
 
   //   End of: Get Table data by Partner
 
@@ -254,10 +267,32 @@ export default function UsersDashboardPage() {
     setSelectedButton(value.target.name);
     setPage(1);
     setLimit(10);
+    setInputSearch("");
+    params.delete("search");
 
-    params.set("type", value.target.name);
+    if (selectedButton === USERS_SECTION_ROLE_SECTION) {
+      params.set("type", value.target.name);
+      params.set("page", 1);
+      params.set("limit", 10);
+      params.set("demo", selectedOutlineButton);
+      router.push(`${pathname}?${params.toString()}`);
+    } else {
+      params.delete("demo");
+      params.set("type", value.target.name);
+      params.set("page", 1);
+      params.set("limit", 10);
+      router.push(`${pathname}?${params.toString()}`);
+    }
+  };
+
+  const handleButtonOutlineClick = (value) => {
+    setSelectedOutlineButton(value.target.name);
+    setPage(1);
+    setLimit(10);
+
     params.set("page", 1);
     params.set("limit", 10);
+    params.set("demo", value.target.name);
     router.push(`${pathname}?${params.toString()}`);
   };
 
@@ -269,6 +304,106 @@ export default function UsersDashboardPage() {
 
   const handleChangeToDetailPage = (id, type) => {
     router.push(`${pathname}/detail/${id}/${type}`);
+  };
+
+  const handleChangeInputSearch = (e) => {
+    setInputSearch(e.target.value);
+  };
+
+  const handleClickSearch = () => {
+    params.set("search", inputSearch);
+    router.push(`${pathname}?${params.toString()}`);
+    switch (selectedButton) {
+      case PARTNER_SECTION_ROLE_SECTION:
+        FetchGetAllTableDataWithRefreshToken(PARTNER_SECTION_ROLE_SECTION);
+        params.delete("demo");
+
+        if (
+          !searchParams.has("type") ||
+          !searchParams.has("limit") ||
+          !searchParams.has("page") ||
+          !searchParams.has("search")
+        ) {
+          params.set("type", PARTNER_SECTION_ROLE_SECTION);
+          params.set("page", 1);
+          params.set("limit", 10);
+          params.set("search", inputSearch);
+
+          router.push(`${pathname}?${params.toString()}`);
+        }
+        break;
+      case MARKETING_SECTION_ROLE_SECTION:
+        FetchGetAllTableDataWithRefreshToken(MARKETING_SECTION_ROLE_SECTION);
+        params.delete("demo");
+
+        if (
+          !searchParams.has("type") ||
+          !searchParams.has("limit") ||
+          !searchParams.has("page") ||
+          !searchParams.has("search")
+        ) {
+          params.set("type", MARKETING_SECTION_ROLE_SECTION);
+          params.set("page", 1);
+          params.set("limit", 10);
+          params.set("search", inputSearch);
+          router.push(`${pathname}?${params.toString()}`);
+        }
+        break;
+      case USERS_SECTION_ROLE_SECTION:
+        FetchGetAllTableDataWithRefreshToken(USERS_SECTION_ROLE_SECTION);
+
+        if (
+          !searchParams.has("type") ||
+          !searchParams.has("limit") ||
+          !searchParams.has("page") ||
+          !searchParams.has("demo") ||
+          !searchParams.has("search")
+        ) {
+          params.set("type", USERS_SECTION_ROLE_SECTION);
+          params.set("page", 1);
+          params.set("limit", 10);
+          params.set("demo", false);
+          params.set("search", inputSearch);
+          router.push(`${pathname}?${params.toString()}`);
+        }
+        break;
+      case ADMIN_SECTION_ROLE_SECTION:
+        FetchGetAllTableDataWithRefreshToken(ADMIN_SECTION_ROLE_SECTION);
+        params.delete("demo");
+
+        if (
+          !searchParams.has("type") ||
+          !searchParams.has("limit") ||
+          !searchParams.has("page") ||
+          !searchParams.has("search")
+        ) {
+          params.set("type", ADMIN_SECTION_ROLE_SECTION);
+          params.set("page", 1);
+          params.set("limit", 10);
+          params.set("search", inputSearch);
+          router.push(`${pathname}?${params.toString()}`);
+        }
+        break;
+      case SUPERADMIN_SECTION_ROLE_SECTION:
+        FetchGetAllTableDataWithRefreshToken(SUPERADMIN_SECTION_ROLE_SECTION);
+        params.delete("demo");
+
+        if (
+          !searchParams.has("type") ||
+          !searchParams.has("limit") ||
+          !searchParams.has("page") ||
+          !searchParams.has("search")
+        ) {
+          params.set("type", SUPERADMIN_SECTION_ROLE_SECTION);
+          params.set("page", 1);
+          params.set("limit", 10);
+          params.set("search", inputSearch);
+          router.push(`${pathname}?${params.toString()}`);
+        }
+        break;
+      default:
+        break;
+    }
   };
 
   //   End of: Handle Functions
@@ -742,7 +877,6 @@ export default function UsersDashboardPage() {
               onClick={handleButtonClick}
               nameData={PARTNER_SECTION_ROLE_SECTION}
             />
-
             <CompromiseButton
               isActive={selectedButton === MARKETING_SECTION_ROLE_SECTION}
               // total={usersData && usersData.count}
@@ -750,7 +884,6 @@ export default function UsersDashboardPage() {
               onClick={handleButtonClick}
               nameData={MARKETING_SECTION_ROLE_SECTION}
             />
-
             <CompromiseButton
               isActive={selectedButton === USERS_SECTION_ROLE_SECTION}
               // total={totalThirdParty && totalThirdParty}
@@ -758,7 +891,6 @@ export default function UsersDashboardPage() {
               onClick={handleButtonClick}
               nameData={USERS_SECTION_ROLE_SECTION}
             />
-
             <CompromiseButton
               isActive={selectedButton === ADMIN_SECTION_ROLE_SECTION}
               // total={totalDevice && totalDevice}
@@ -766,7 +898,6 @@ export default function UsersDashboardPage() {
               onClick={handleButtonClick}
               nameData={ADMIN_SECTION_ROLE_SECTION}
             />
-
             <CompromiseButton
               isActive={selectedButton === SUPERADMIN_SECTION_ROLE_SECTION}
               // total={totalDevice && totalDevice}
@@ -774,6 +905,26 @@ export default function UsersDashboardPage() {
               onClick={handleButtonClick}
               nameData={SUPERADMIN_SECTION_ROLE_SECTION}
             />
+            {selectedButton === USERS_SECTION_ROLE_SECTION && (
+              <section className="pt-8 mb-[-20px] ">
+                <OutlineButton
+                  isActive={selectedOutlineButton === "false"}
+                  // total={GetOutlineTotalDataCompromiseOutlineButton(selectedButton)}
+                  value={"Full Access "}
+                  onClick={handleButtonOutlineClick}
+                  nameData={"false"}
+                />
+                <OutlineButton
+                  isActive={selectedOutlineButton === "true"}
+                  // total={GetOutlineTotalDataValidatedOutlineButton(
+                  //   selectedButton
+                  // )}
+                  value={"Free Trial "}
+                  onClick={handleButtonOutlineClick}
+                  nameData={"true"}
+                />{" "}
+              </section>
+            )}
           </section>
           <section className="p-8">
             <div className="">
@@ -795,8 +946,8 @@ export default function UsersDashboardPage() {
                       //   "cursor-not-allowed"
                     )}
                     placeholder={"Search by ID user or Login"}
-                    // onChange={handleSearchKeyword}
-                    // value={inputSearch}
+                    onChange={handleChangeInputSearch}
+                    value={inputSearch}
                     onKeyDown={(e) => {
                       if (e.key === "Enter") {
                         handleClickSearch();
@@ -809,7 +960,7 @@ export default function UsersDashboardPage() {
                   />
                   <div
                     className="px-3 cursor-pointer"
-                    // onClick={handleClickSearch}
+                    onClick={handleClickSearch}
                   >
                     <Image
                       src={"/images/sector_image_search.svg"}

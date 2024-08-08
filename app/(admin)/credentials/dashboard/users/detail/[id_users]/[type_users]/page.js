@@ -339,7 +339,7 @@ export default function DetailRoleUsers({ params }) {
                   <h2 className="text-text-description text-Base-normal mb-1">
                     Users is on{" "}
                     <span className={clsx("text-heading-5 text-black")}>
-                      {demo ? "Full Access" : "Demo"}
+                      {demo ? "Demo" : "Full Access"}
                     </span>{" "}
                     Mode
                   </h2>
