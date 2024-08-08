@@ -51,6 +51,9 @@ export default function DomainSearchPage() {
   const [selectedButton, setSelectedButton] = useState(
     searchParams.get("type") || DOMAIN_SEARCH_EMPLOYEE
   );
+  const [allRecentSearch, setAllRecentSearch] = useState();
+  const [isEmailFocused, setIsEmailFocused] = useState(false);
+  const [triggerChange, setTriggerChange] = useState(false);
 
   const canSend = email;
   const dispatch = useDispatch();
@@ -210,8 +213,12 @@ export default function DomainSearchPage() {
 
   const handleScanNow = () => {
     console.log("scan now..");
-    callGetDetailLeakedDataWithRefeshToken(selectedButton);
+    callGetDetailLeakedDataWithRefeshToken(selectedButton, email);
     callPostKeywordDomainSearchWithRefreshToken(email);
+    params.set("query", email);
+    params.set("page", page);
+    params.set("type", selectedButton);
+    router.push(`${pathname}?${params.toString()}`);
   };
 
   const handleDetails = (id, item) => {
@@ -247,21 +254,48 @@ export default function DomainSearchPage() {
     }
   };
 
-  const callGetDetailLeakedDataWithRefeshToken = async (type) => {
+  const handleIsEmailFocusTrue = () => {
+    setIsEmailFocused(true);
+  };
+
+  const handleIsEmailFotusFalse = () => {
+    setIsEmailFocused(false);
+  };
+
+  const handleDeleteIndividual = (id) => {
+    deleteRecentSearchData(id);
+  };
+
+  const handleDeleteAll = () => {
+    deleteAllRecentSearchData();
+  };
+
+  const handleClickSearchHistoryEmail = (email) => {
+    console.log("search history: ", email);
+    setEmail(email);
+    callGetDetailLeakedDataWithRefeshToken(selectedButton, email);
+
+    setCookie("scanned_domain", email);
+    params.set("query", getCookie("scanned_domain"));
+    router.push(`${pathname}?${params.toString()}`);
+  };
+
+  const callGetDetailLeakedDataWithRefeshToken = async (type, keyword) => {
     await fetchWithRefreshToken(
       fetchGetDetailLeakedData,
       router,
       dispatch,
-      type
+      type,
+      keyword
     );
   };
 
-  const fetchGetDetailLeakedData = async (type) => {
+  const fetchGetDetailLeakedData = async (type, keyword) => {
     try {
       dispatch(setLoadingState(true));
 
       const res = await fetch(
-        `${APIDATAV1}compromised/${type}?page=${page}&search=&search_domain=${email}`,
+        `${APIDATAV1}compromised/${type}?page=${page}&search=&search_domain=${keyword}`,
         {
           method: "GET",
           credentials: "include",
@@ -279,7 +313,7 @@ export default function DomainSearchPage() {
 
       if (data.data === null) {
         dispatch(setDomainSearchData(null));
-        setCookie("scanned_domain", email);
+        setCookie("scanned_domain", keyword);
         throw res;
       }
 
@@ -287,7 +321,7 @@ export default function DomainSearchPage() {
 
       if (data.data) {
         console.log("data executive admin: ", data);
-        setCookie("scanned_domain", email);
+        setCookie("scanned_domain", keyword);
 
         dispatch(setDomainSearchData(data.data));
         dispatch(setTotalExposuresDomainSearch(data.count_data));
@@ -348,6 +382,135 @@ export default function DomainSearchPage() {
     }
   };
 
+  const fetchRecentSearchData = async () => {
+    try {
+      dispatch(setLoadingState(true));
+
+      const res = await fetch(`${APIDATAV1}recent/search-domain`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          Authorization: `Bearer ${getCookie("access_token")}`,
+        },
+      });
+
+      if (res.status === 400) {
+        return res;
+      }
+
+      if (res.status === 401 || res.status === 403) {
+        return res;
+      }
+
+      const data = await res.json();
+
+      console.log("recent search data: ", data);
+
+      if (data.data === null) {
+        setAllRecentSearch();
+        throw res;
+      }
+
+      setAllRecentSearch(data.data);
+      return res;
+    } catch (error) {
+      return error;
+    } finally {
+      dispatch(setLoadingState(false));
+    }
+  };
+
+  const callRecentSearchData = async () => {
+    await fetchWithRefreshToken(fetchRecentSearchData, router, dispatch);
+  };
+
+  const DeleteRecentSearchData = async (deleteId = "") => {
+    try {
+      dispatch(setLoadingState(true));
+
+      setTriggerChange(false);
+
+      const res = await fetch(`${APIDATAV1}recent/search-domain`, {
+        method: "DELETE",
+        credentials: "include",
+        headers: {
+          Authorization: `Bearer ${getCookie("access_token")}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: deleteId,
+        }),
+      });
+
+      if (res.status === 400) {
+        return res;
+      }
+
+      if (res.status === 401 || res.status === 403) {
+        return res;
+      }
+
+      const data = await res.json();
+
+      if (data.data === null) {
+        setTriggerChange(true);
+        throw res;
+      }
+
+      // return res;
+    } catch (error) {
+      return error;
+    } finally {
+      dispatch(setLoadingState(false));
+    }
+  };
+
+  const deleteRecentSearchData = async (id) => {
+    await fetchWithRefreshToken(DeleteRecentSearchData, router, dispatch, id);
+  };
+
+  const DeleteAllRecentSearchData = async () => {
+    try {
+      dispatch(setLoadingState(true));
+
+      setTriggerChange(false);
+
+      const res = await fetch(`${APIDATAV1}recent/search-domain`, {
+        method: "DELETE",
+        credentials: "include",
+        headers: {
+          Authorization: `Bearer ${getCookie("access_token")}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (res.status === 400) {
+        return res;
+      }
+
+      if (res.status === 401 || res.status === 403) {
+        return res;
+      }
+
+      const data = await res.json();
+
+      if (data.data === null) {
+        setTriggerChange(true);
+        throw res;
+      }
+
+      // return res;
+    } catch (error) {
+      return error;
+    } finally {
+      dispatch(setLoadingState(false));
+    }
+  };
+
+  const deleteAllRecentSearchData = async () => {
+    await fetchWithRefreshToken(DeleteAllRecentSearchData, router, dispatch);
+  };
+
   useEffect(() => {
     setTimeout(() => {
       setIsErrorEmail(false);
@@ -358,7 +521,7 @@ export default function DomainSearchPage() {
     if (hasCookie("scanned_domain") && email) {
       switch (selectedButton) {
         case DOMAIN_SEARCH_EMPLOYEE:
-          callGetDetailLeakedDataWithRefeshToken(DOMAIN_SEARCH_EMPLOYEE);
+          callGetDetailLeakedDataWithRefeshToken(DOMAIN_SEARCH_EMPLOYEE, email);
           if (
             !searchParams.has("query") ||
             !searchParams.has("page") ||
@@ -371,7 +534,7 @@ export default function DomainSearchPage() {
           }
           break;
         case DOMAIN_SEARCH_USERS:
-          callGetDetailLeakedDataWithRefeshToken(DOMAIN_SEARCH_USERS);
+          callGetDetailLeakedDataWithRefeshToken(DOMAIN_SEARCH_USERS, email);
           if (
             !searchParams.has("query") ||
             !searchParams.has("page") ||
@@ -384,7 +547,10 @@ export default function DomainSearchPage() {
           }
           break;
         case DOMAIN_SEARCH_THIRDPARTY:
-          callGetDetailLeakedDataWithRefeshToken(DOMAIN_SEARCH_THIRDPARTY);
+          callGetDetailLeakedDataWithRefeshToken(
+            DOMAIN_SEARCH_THIRDPARTY,
+            email
+          );
           if (
             !searchParams.has("query") ||
             !searchParams.has("page") ||
@@ -407,6 +573,15 @@ export default function DomainSearchPage() {
       router.push(`${pathname}`);
     }
   }, [page, selectedButton]);
+
+  useEffect(() => {
+    setTriggerChange(false);
+    callRecentSearchData();
+  }, [triggerChange]);
+
+  useEffect(() => {
+    callRecentSearchData();
+  }, []);
 
   return (
     <main>
@@ -441,7 +616,73 @@ export default function DomainSearchPage() {
               placeholder="Enter domain"
               value={email}
               onChange={handleChangeEmail}
+              onFocus={handleIsEmailFocusTrue}
+              // onBlur={handleIsEmailFotusFalse}
+              onMouseEnter={handleIsEmailFocusTrue}
+              // onMouseLeave={handleIsEmailFotusFalse}
             />
+            {isEmailFocused && allRecentSearch && (
+              <div
+                className="bg-white drop-shadow-lg rounded-md p-4 absolute top-[50px] left-[20%] right-[31%] max-h-[320px] overflow-y-scroll pointer-events-auto z-10"
+                onMouseEnter={handleIsEmailFocusTrue}
+                onMouseLeave={handleIsEmailFotusFalse}
+              >
+                <div className="flex justify-between items-start">
+                  <div className="text-left">
+                    <h1 className="text-Base-strong text-black">
+                      Search history
+                    </h1>
+                    <p className="text-text-description text-SM-normal mt-1">
+                      Rescanning these email addresses does not reduce your
+                      search credit count.
+                    </p>
+                  </div>
+                  <button
+                    className="text-primary-base text-Base-normal"
+                    onClick={handleDeleteAll}
+                  >
+                    Clear
+                  </button>
+                </div>
+                <div className="mt-5">
+                  {allRecentSearch &&
+                    allRecentSearch.map((data) => (
+                      <div
+                        key={data.id}
+                        className="mt-4 flex items-center justify-between cursor-pointer hover:bg-[#FFEBD4] px-1.5 py-1 rounded-md"
+                      >
+                        <div className="flex items-center">
+                          <div>
+                            <Image
+                              src={"/images/recent_search_logo.svg"}
+                              alt="search icon"
+                              width={18}
+                              height={18}
+                            />
+                          </div>
+                          <h1
+                            className="text-Base-normal text-black ml-3"
+                            onClick={() =>
+                              handleClickSearchHistoryEmail(data.search_domain)
+                            }
+                          >
+                            {data.search_domain}
+                          </h1>
+                        </div>
+                        <div className="cursor pointer">
+                          <Image
+                            src={"/images/close_recent_search_logo.svg"}
+                            alt="search icon"
+                            width={9}
+                            height={9}
+                            onClick={() => handleDeleteIndividual(data.id)}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            )}
             <div className="ml-4">
               <AuthButton
                 value={"Scan now"}
