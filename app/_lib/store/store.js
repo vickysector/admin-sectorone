@@ -23,6 +23,7 @@ import DetailsSlices from "./features/Ransomware/DetailsSlices";
 import DetailsRansomwareSlices from "./features/Ransomware/DetailsRansomwareSlices";
 import AddUserSlice from "./features/Users/AddUserSlice";
 import DomainSearchSlices from "./features/DomainSearch/DomainSearchSlices";
+import DetailUserSlice from "./features/Users/DetailUserSlice";
 
 export const store = configureStore({
   reducer: {
@@ -50,5 +51,6 @@ export const store = configureStore({
     ransomwareAllDetailContent: DetailsRansomwareSlices,
     addUserRole: AddUserSlice,
     domainSearch: DomainSearchSlices,
+    detailUserDeactivate: DetailUserSlice,
   },
 });

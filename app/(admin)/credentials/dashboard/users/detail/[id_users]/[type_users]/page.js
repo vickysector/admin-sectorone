@@ -14,6 +14,10 @@ import { fetchWithRefreshToken } from "@/app/_lib/token/fetchWithRefreshToken";
 import { APIDATAV1 } from "@/app/_lib/helpers/APIKEYS";
 import { setLoadingState } from "@/app/_lib/store/features/Compromised/LoadingSlices";
 import { getCookie } from "cookies-next";
+import {
+  setConfirmDetailUserDeactivateState,
+  setDetailUserDeactivateFunction,
+} from "@/app/_lib/store/features/Users/DetailUserSlice";
 
 export default function DetailRoleUsers({ params }) {
   // Start of: Redux
@@ -35,6 +39,7 @@ export default function DetailRoleUsers({ params }) {
   const [email, setEmail] = useState("");
   const [protectionCredits, setProtectionCredits] = useState("");
   const [keywordCredits, setKeywordCredits] = useState("");
+  const [triggerChange, setTriggerChange] = useState(false);
 
   // End of: State
 
@@ -62,6 +67,16 @@ export default function DetailRoleUsers({ params }) {
 
   const handleEmailChange = (event) => {
     setEmail(event.target.value);
+  };
+
+  const handleDeactivateAccounts = () => {
+    dispatch(setConfirmDetailUserDeactivateState(true));
+    dispatch(
+      setDetailUserDeactivateFunction(
+        PostActiveOrDeactivateAccountWithRefreshToken
+      )
+    );
+    // PostActiveOrDeactivateAccountWithRefreshToken();
   };
 
   //   End of: Functions Handler
@@ -210,11 +225,65 @@ export default function DetailRoleUsers({ params }) {
     await fetchWithRefreshToken(FetchDetailsDataDomain, router, dispatch);
   };
 
+  const PostActiveOrDeactivateAccount = async () => {
+    try {
+      dispatch(setLoadingState(true));
+
+      setTriggerChange(false);
+      // dispatch(setTi);
+
+      const res = await fetch(`${APIDATAV1}root/admin/deactive/user`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          Authorization: `Bearer ${getCookie("access_token")}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id_user: params.id_users,
+        }),
+      });
+
+      if (res.status === 401 || res.status === 403) {
+        return res;
+      }
+
+      const data = await res.json();
+
+      console.log("deactivate status: ", data);
+
+      if (data.data === null) {
+        throw res;
+      }
+
+      if (data.data) {
+        setTriggerChange(true);
+        return res;
+      }
+
+      //   return res;
+    } catch (error) {
+      console.log("error deactivate status: ", error);
+      return error;
+    } finally {
+      dispatch(setLoadingState(false));
+    }
+  };
+
+  const PostActiveOrDeactivateAccountWithRefreshToken = async () => {
+    await fetchWithRefreshToken(
+      PostActiveOrDeactivateAccount,
+      router,
+      dispatch
+    );
+  };
+
   useEffect(() => {
+    setTriggerChange(false);
     FetchAllRolesWithRefreshToken();
     FetchDetailsDataWithRefreshToken();
     FetchDetailsDataDomainWithRefreshToken();
-  }, []);
+  }, [triggerChange]);
 
   // End of: API Intregations
 
@@ -240,8 +309,12 @@ export default function DetailRoleUsers({ params }) {
                 className={clsx(
                   `py-2 px-4 rounded-md text-primary-base text-Base-normal border-[1px] border-input-border hover:opacity-80 cursor-pointer `
                 )}
+                onClick={handleDeactivateAccounts}
               >
-                Deactivate accounts
+                {detailsData && detailsData.verified
+                  ? "Deactivate"
+                  : "Activate"}{" "}
+                accounts
               </button>
               {/* <button
                 className={clsx(
@@ -273,7 +346,9 @@ export default function DetailRoleUsers({ params }) {
                   <p className="text-text-description text-Base-normal">
                     This Account is currently{" "}
                     <span className={clsx("text-heading-5 text-black")}>
-                      {detailsData.verified ? "Active" : "Inactive"}
+                      {detailsData && detailsData.verified
+                        ? "Active"
+                        : "Inactive"}
                     </span>{" "}
                     and ready to be used.
                   </p>
