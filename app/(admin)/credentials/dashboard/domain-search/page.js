@@ -211,6 +211,7 @@ export default function DomainSearchPage() {
   const handleScanNow = () => {
     console.log("scan now..");
     callGetDetailLeakedDataWithRefeshToken(selectedButton);
+    callPostKeywordDomainSearchWithRefreshToken(email);
   };
 
   const handleDetails = (id, item) => {
@@ -300,6 +301,47 @@ export default function DomainSearchPage() {
       }
     } catch (error) {
       console.log("error get leaked data: ", error);
+      return error;
+    } finally {
+      dispatch(setLoadingState(false));
+    }
+  };
+
+  const callPostKeywordDomainSearchWithRefreshToken = async (key) => {
+    await fetchWithRefreshToken(postKeywordDomainSearch, router, dispatch, key);
+  };
+
+  const postKeywordDomainSearch = async (key) => {
+    try {
+      dispatch(setLoadingState(true));
+
+      const res = await fetch(`${APIDATAV1}recent/search-domain?q=${key}`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          Authorization: `Bearer ${getCookie("access_token")}`,
+        },
+      });
+
+      if (res.status === 401 || res.status === 403) {
+        return res;
+      }
+
+      const data = await res.json();
+
+      if (data.data === null) {
+        console.log("post keyword: ", data);
+        throw res;
+      }
+
+      //   return res;
+
+      if (data.data) {
+        console.log("success post keyword: ", data);
+        return res;
+      }
+    } catch (error) {
+      console.log("error send keyword: ", error);
       return error;
     } finally {
       dispatch(setLoadingState(false));
