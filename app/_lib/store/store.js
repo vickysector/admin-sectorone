@@ -24,6 +24,7 @@ import DetailsRansomwareSlices from "./features/Ransomware/DetailsRansomwareSlic
 import AddUserSlice from "./features/Users/AddUserSlice";
 import DomainSearchSlices from "./features/DomainSearch/DomainSearchSlices";
 import DetailUserSlice from "./features/Users/DetailUserSlice";
+import LogDetailAcitivitySlices from "./features/LogActivity/LogDetailAcitivitySlices";
 
 export const store = configureStore({
   reducer: {
@@ -52,5 +53,6 @@ export const store = configureStore({
     addUserRole: AddUserSlice,
     domainSearch: DomainSearchSlices,
     detailUserDeactivate: DetailUserSlice,
+    logActivityAdmin: LogDetailAcitivitySlices,
   },
 });

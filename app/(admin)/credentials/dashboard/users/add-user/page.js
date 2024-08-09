@@ -49,6 +49,8 @@ export default function DetailRoleUsers({ params }) {
 
   //   Start of: Functions Handler
 
+  console.log("all input: ", allInput);
+
   const handleBackToAllcyberattacks = () => {
     router.back();
   };

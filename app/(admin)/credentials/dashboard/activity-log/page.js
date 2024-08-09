@@ -3,6 +3,7 @@
 import { convertDateFormat } from "@/app/_lib/CalculatePassword";
 import { APIDATAV1 } from "@/app/_lib/helpers/APIKEYS";
 import { setLoadingLogState } from "@/app/_lib/store/features/LogActivity/LoadingLogSlices";
+import { setLogActivityState } from "@/app/_lib/store/features/LogActivity/LogDetailAcitivitySlices";
 import { fetchWithRefreshToken } from "@/app/_lib/token/fetchWithRefreshToken";
 import { Pagination, Table } from "antd";
 import clsx from "clsx";
@@ -52,7 +53,8 @@ export default function AcitivityLogPage() {
   };
 
   const handleChangeToDetailPage = (param) => {
-    router.push(`${pathname}/log/detail/${param.id}`);
+    dispatch(setLogActivityState(param));
+    router.push(`${pathname}/log/detail/${param.id_user}`);
   };
 
   const fetchLogActivity = async () => {

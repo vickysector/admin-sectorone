@@ -4,13 +4,13 @@ import { convertDateFormat } from "@/app/_lib/CalculatePassword";
 import { APIDATAV1 } from "@/app/_lib/helpers/APIKEYS";
 import { setLoadingLogState } from "@/app/_lib/store/features/LogActivity/LoadingLogSlices";
 import { fetchWithRefreshToken } from "@/app/_lib/token/fetchWithRefreshToken";
-import { Pagination, Table } from "antd";
+import { ConfigProvider, Pagination, Table } from "antd";
 import clsx from "clsx";
 import { getCookie } from "cookies-next";
 import Image from "next/image";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 export default function AcitivityLogPage(query_params) {
@@ -26,6 +26,12 @@ export default function AcitivityLogPage(query_params) {
 
   const dispatch = useDispatch();
   const router = useRouter();
+
+  const LogActivityData = useSelector(
+    (state) => state.logActivityAdmin.LogActivityData
+  );
+
+  console.log("log activity data: ", LogActivityData);
 
   // End of: Redux
 
@@ -58,11 +64,11 @@ export default function AcitivityLogPage(query_params) {
       const res = await fetch(
         `${APIDATAV1}admin/user/detail/activity?page=${page}&limit=${limit}&id_user=${query_params.params.detail_id}`,
         {
-          method: "POST",
+          method: "GET",
           credentials: "include",
           headers: {
             Authorization: `Bearer ${getCookie("access_token")}`,
-            "Content-Type": "application/json",
+            // "Content-Type": "application/json",
           },
           //   body: JSON.stringify({
           //     id_user: query_params.params.detail_id,
@@ -123,7 +129,7 @@ export default function AcitivityLogPage(query_params) {
       title: "Date added",
       key: "added",
       render: (param1) => {
-        return <p> {convertDateFormat(param1.create_at)} </p>;
+        return <p> {convertDateFormat(param1.CreatedAt)} </p>;
       },
     },
     {
@@ -141,39 +147,30 @@ export default function AcitivityLogPage(query_params) {
       },
     },
     {
-      title: "Company Name",
-      key: "company_name",
+      title: "Activity",
+      key: "activity",
       render: (param1) => {
-        return <p> {param1.company_name} </p>;
+        return <p> {param1.activity} </p>;
       },
     },
     {
-      title: "Status",
-      key: "status",
+      title: "Devices",
+      key: "devices",
       render: (param1) => {
         return (
           <div>
-            <p>{param1.description}</p>
+            <p>{param1.devices}</p>
           </div>
         );
       },
     },
     {
-      title: "Action",
-      key: "action",
+      title: "IP Address",
+      key: "devices",
       render: (param1) => {
         return (
           <div>
-            <button
-              className={clsx(
-                `py-2 px-4 rounded-md text-primary-base text-Base-normal border-[1px] border-input-border `
-              )}
-              //   onClick={() =>
-              //     handleChangeToDetailPage(param1.id, USERS_SECTION_ROLE_SECTION)
-              //   }
-            >
-              Details
-            </button>
+            <p>{param1.ipAddress}</p>
           </div>
         );
       },
@@ -197,7 +194,7 @@ export default function AcitivityLogPage(query_params) {
               <p className={clsx("text-text-description text-Base-normal")}>
                 Below is the details activity of{" "}
                 <span className={clsx("text-heading-5 text-black")}>
-                  [company]
+                  {LogActivityData && LogActivityData.company_name}
                 </span>{" "}
                 page
               </p>
@@ -221,16 +218,31 @@ export default function AcitivityLogPage(query_params) {
                   Showing {allTableData && allTableData.size} to{" "}
                   {allTableData && allTableData.count_data} entries
                 </p>
-                <Pagination
-                  type="primary"
-                  defaultCurrent={1}
-                  total={allTableData && allTableData.count_data}
-                  showSizeChanger={false}
-                  style={{ color: "#FF6F1E" }}
-                  hideOnSinglePage={true}
-                  onChange={handleChangePages}
-                  current={page}
-                />
+                <ConfigProvider
+                  theme={{
+                    components: {
+                      Pagination: {
+                        itemActiveBg: "#FF6F1E",
+                        itemLinkBg: "#fff",
+                        itemInputBg: "#fff",
+                      },
+                    },
+                    token: {
+                      colorPrimary: "white",
+                    },
+                  }}
+                >
+                  <Pagination
+                    type="primary"
+                    defaultCurrent={1}
+                    total={allTableData && allTableData.count_data}
+                    showSizeChanger={false}
+                    style={{ color: "#FF6F1E" }}
+                    hideOnSinglePage={true}
+                    onChange={handleChangePages}
+                    current={page}
+                  />
+                </ConfigProvider>
               </div>
             </div>
           </section>
