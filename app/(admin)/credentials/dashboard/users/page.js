@@ -36,6 +36,7 @@ import {
 import clsx from "clsx";
 import { convertDateFormat } from "@/app/_lib/CalculatePassword";
 import OutlineButton from "@/app/_ui/components/buttons/OutlineButton";
+import dayjs from "dayjs";
 
 const { RangePicker } = DatePicker;
 
@@ -72,8 +73,10 @@ export default function UsersDashboardPage() {
   const [activeUsers, setActiveUsers] = useState();
   const [inactiveUsers, setInactiveUser] = useState();
 
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const [startDate, setStartDate] = useState(
+    searchParams.get("startDate") || ""
+  );
+  const [endDate, setEndDate] = useState(searchParams.get("endDate") || "");
   const [inputSearch, setInputSearch] = useState(
     searchParams.get("search") || ""
   );
@@ -140,7 +143,7 @@ export default function UsersDashboardPage() {
       dispatch(setLoadingState(true));
 
       const res = await fetch(
-        `${APIDATAV1}admin/user?page=${page}&limit=${limit}&search=${inputSearch}&type=${type}&is_demo=${selectedOutlineButton}`,
+        `${APIDATAV1}admin/user?page=${page}&limit=${limit}&search=${inputSearch}&type=${type}&is_demo=${selectedOutlineButton}&start_date=${startDate}&end_date=${endDate}`,
         {
           method: "GET",
           credentials: "include",
@@ -220,7 +223,7 @@ export default function UsersDashboardPage() {
           params.set("type", USERS_SECTION_ROLE_SECTION);
           params.set("page", 1);
           params.set("limit", 10);
-          params.set("demo", false);
+          params.set("demo", selectedOutlineButton);
           router.push(`${pathname}?${params.toString()}`);
         }
         break;
@@ -257,7 +260,7 @@ export default function UsersDashboardPage() {
       default:
         break;
     }
-  }, [selectedButton, page, selectedOutlineButton]);
+  }, [selectedButton, page, selectedOutlineButton, startDate, endDate]);
 
   //   End of: Get Table data by Partner
 
@@ -268,27 +271,41 @@ export default function UsersDashboardPage() {
     setPage(1);
     setLimit(10);
     setInputSearch("");
+    setStartDate("");
+    setEndDate("");
     params.delete("search");
+    params.delete("demo");
+    params.delete("startDate");
+    params.delete("endDate");
 
-    if (selectedButton === USERS_SECTION_ROLE_SECTION) {
+    if (selectedButton !== USERS_SECTION_ROLE_SECTION) {
+      params.delete("demo");
+
+      params.set("type", value.target.name);
+      params.set("page", 1);
+      params.set("limit", 10);
+      router.push(`${pathname}?${params.toString()}`);
+    } else {
+      // params.delete("demo");
       params.set("type", value.target.name);
       params.set("page", 1);
       params.set("limit", 10);
       params.set("demo", selectedOutlineButton);
-      router.push(`${pathname}?${params.toString()}`);
-    } else {
-      params.delete("demo");
-      params.set("type", value.target.name);
-      params.set("page", 1);
-      params.set("limit", 10);
+
       router.push(`${pathname}?${params.toString()}`);
     }
   };
 
   const handleButtonOutlineClick = (value) => {
     setSelectedOutlineButton(value.target.name);
+    setInputSearch("");
+    setStartDate("");
+    setEndDate("");
     setPage(1);
     setLimit(10);
+    params.delete("search");
+    params.delete("startDate");
+    params.delete("endDate");
 
     params.set("page", 1);
     params.set("limit", 10);
@@ -308,6 +325,23 @@ export default function UsersDashboardPage() {
 
   const handleChangeInputSearch = (e) => {
     setInputSearch(e.target.value);
+  };
+
+  const handleRangePicker = (date) => {
+    if (date) {
+      setStartDate(date[0].format("YYYY-MM-DD"));
+      setEndDate(date[1].format("YYYY-MM-DD"));
+
+      params.set("startDate", date[0].format("YYYY-MM-DD"));
+      params.set("endDate", date[1].format("YYYY-MM-DD"));
+      // console.log("start date: ", date[0].format("YYYY-MM-DD"));
+      // console.log("end date: ", date[1].format("YYYY-MM-DD"));
+
+      router.push(`${pathname}?${params.toString()}`);
+    } else {
+      setStartDate("");
+      setEndDate("");
+    }
   };
 
   const handleClickSearch = () => {
@@ -362,7 +396,7 @@ export default function UsersDashboardPage() {
           params.set("type", USERS_SECTION_ROLE_SECTION);
           params.set("page", 1);
           params.set("limit", 10);
-          params.set("demo", false);
+          params.set("demo");
           params.set("search", inputSearch);
           router.push(`${pathname}?${params.toString()}`);
         }
@@ -994,7 +1028,7 @@ export default function UsersDashboardPage() {
                     }}
                   >
                     <RangePicker
-                      //   onChange={handleRangePicker}
+                      onChange={handleRangePicker}
                       className="ml-8"
                       size="large"
                       // disabled={handleDisableExportButton() === null}
