@@ -11,8 +11,9 @@ import Image from "next/image";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
-export default function AcitivityLogPage() {
+export default function AcitivityLogPage(query_params) {
   // Start of: Route Params
 
   const searchParams = useSearchParams();
@@ -31,19 +32,10 @@ export default function AcitivityLogPage() {
   const [allTableData, setAllTableData] = useState();
   const [page, setPage] = useState(searchParams.get("page") || 1);
   const [limit, setLimit] = useState(searchParams.get("limit") || 10);
-  const [searchKeyword, setSearchKeyword] = useState(
-    searchParams.get("search") || ""
-  );
 
   const handleChangePages = (paging) => {
     setPage(paging);
     params.set("page", paging);
-    router.push(`${pathname}?${params.toString()}`);
-  };
-
-  const handleHitSearch = () => {
-    fetchLogActivityWithRefreshToken();
-    params.set("search", searchKeyword);
     router.push(`${pathname}?${params.toString()}`);
   };
 
@@ -55,18 +47,26 @@ export default function AcitivityLogPage() {
     router.push(`${pathname}/log/detail/${param.id}`);
   };
 
+  const handleBackToAllcyberattacks = () => {
+    router.back();
+  };
+
   const fetchLogActivity = async () => {
     try {
       dispatch(setLoadingLogState(true));
 
       const res = await fetch(
-        `${APIDATAV1}admin/user/activity?page=${page}&limit=${limit}&search=${searchKeyword}`,
+        `${APIDATAV1}admin/user/detail/activity?page=${page}&limit=${limit}&id_user=${query_params.params.detail_id}`,
         {
-          method: "GET",
+          method: "POST",
           credentials: "include",
           headers: {
             Authorization: `Bearer ${getCookie("access_token")}`,
+            "Content-Type": "application/json",
           },
+          //   body: JSON.stringify({
+          //     id_user: query_params.params.detail_id,
+          //   }),
         }
       );
 
@@ -90,6 +90,7 @@ export default function AcitivityLogPage() {
       return res;
     } catch (error) {
       //   setLogActivityData(null);
+      console.log("error Log details: ", error);
       return error;
     } finally {
       dispatch(setLoadingLogState(false));
@@ -103,12 +104,7 @@ export default function AcitivityLogPage() {
   useEffect(() => {
     // fetchLogActivity(keywordSearch);
     fetchLogActivityWithRefreshToken();
-    if (
-      !searchParams.has("search") ||
-      !searchParams.has("limit") ||
-      !searchParams.has("page")
-    ) {
-      params.set("search", searchKeyword);
+    if (!searchParams.has("limit") || !searchParams.has("page")) {
       params.set("page", 1);
       params.set("limit", 10);
       router.push(`${pathname}?${params.toString()}`);
@@ -172,7 +168,9 @@ export default function AcitivityLogPage() {
               className={clsx(
                 `py-2 px-4 rounded-md text-primary-base text-Base-normal border-[1px] border-input-border `
               )}
-              onClick={() => handleChangeToDetailPage(param1)}
+              //   onClick={() =>
+              //     handleChangeToDetailPage(param1.id, USERS_SECTION_ROLE_SECTION)
+              //   }
             >
               Details
             </button>
@@ -187,39 +185,22 @@ export default function AcitivityLogPage() {
   return (
     <main>
       <section>
-        <h1 className="text-heading-2 text-black mb-8">Activity log</h1>
-        <div className="mt-4 bg-white  rounded-lg">
+        <div className="flex items-center">
+          <div onClick={handleBackToAllcyberattacks} className="cursor-pointer">
+            <ArrowBackIcon />
+          </div>
+          <h1 className="text-heading-2 text-black ml-4">Log Details</h1>
+        </div>
+        <div className="mt-8 bg-white  rounded-lg">
           <section className="p-8">
             <div className=" ">
-              <div className="flex items-center">
-                <div className="ml-4 bg-input-container border-input-border flex items-center justify-between border-t-2 border-b-2 border-r-2 rounded-lg w-[400px]">
-                  <input
-                    type="email"
-                    className={clsx(
-                      " bg-transparent  py-1.5 px-3  border-r-2  text-Base-normal w-full  "
-                    )}
-                    placeholder={"Search Company  "}
-                    onChange={handleSearchKeyword}
-                    value={searchKeyword}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        handleHitSearch();
-                      }
-                    }}
-                  />
-                  <div
-                    className="px-3 cursor-pointer"
-                    onClick={handleHitSearch}
-                  >
-                    <Image
-                      src={"/images/sector_image_search.svg"}
-                      alt="search icon"
-                      width={16}
-                      height={16}
-                    />
-                  </div>
-                </div>
-              </div>
+              <p className={clsx("text-text-description text-Base-normal")}>
+                Below is the details activity of{" "}
+                <span className={clsx("text-heading-5 text-black")}>
+                  [company]
+                </span>{" "}
+                page
+              </p>
             </div>
           </section>
           <section className="p-8 mt-[-30px]">

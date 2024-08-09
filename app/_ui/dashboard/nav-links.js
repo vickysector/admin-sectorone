@@ -53,6 +53,7 @@ const links = [
   {
     name: "Activity Log",
     href: "/credentials/dashboard/activity-log",
+    hrefDetail: "/credentials/dashboard/activity-log",
     icon: HistoryOutlinedIcon,
     breach: false,
   },
