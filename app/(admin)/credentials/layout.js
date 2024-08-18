@@ -79,6 +79,7 @@ import { setDetailsIsOpen } from "@/app/_lib/store/features/ExecutiveProtections
 import { setConfirmDetailUserDeactivateState } from "@/app/_lib/store/features/Users/DetailUserSlice";
 
 const { Dragger } = Upload;
+import dayjs from "dayjs";
 
 export default function DashboardLayout({ children }) {
   const [hide, setHide] = useState(false);
@@ -100,6 +101,9 @@ export default function DashboardLayout({ children }) {
   const [fileList, setFileList] = useState(null);
   const [successMessageUploadTxt, setSuccessMessageUploadTxt] = useState("");
   const [successUploadTxt, setSuccessUploadTxt] = useState(false);
+  const [successMessageCompressTxt, setSuccessMessageCompressTxt] =
+    useState("");
+  const [successCompressTxt, setSuccessCompressTxt] = useState(false);
 
   const dataLeakedDetails = useSelector(
     (state) => state.executiveProtections.detailsLeakedData.info_2
@@ -226,9 +230,18 @@ export default function DashboardLayout({ children }) {
     setSuccessUploadTxt(false);
   };
 
+  const handleCloseSuccessPopupCompressTxt = () => {
+    setSuccessCompressTxt(false);
+  };
+
   const handleCloseSuccessPopupUploadTxtAndRedirectToUsers = () => {
     setSuccessUploadTxt(false);
-    router.push("/credentials/dashboard/users");
+    // router.push("/credentials/dashboard/users");
+  };
+
+  const handleCloseSuccessPopupCompressxtAndRedirectToUsers = () => {
+    setSuccessCompressTxt(false);
+    // router.push("/credentials/dashboard/users");
   };
 
   //   const uploadTxtProps = {
@@ -256,6 +269,16 @@ export default function DashboardLayout({ children }) {
       message.error("You must Upload File First");
     } else {
       PostUploadTelegramTXTWithRefreshToken();
+    }
+
+    // console.log("file format formdata: ", typeof fileList.file);
+  };
+
+  const handleSubmitUploadCompressTxt = async (data) => {
+    if (fileList === null) {
+      message.error("You must Upload File First");
+    } else {
+      PostUploadCompressTelegramTXTWithRefreshToken();
     }
 
     // console.log("file format formdata: ", typeof fileList.file);
@@ -317,7 +340,83 @@ export default function DashboardLayout({ children }) {
     await fetchWithRefreshToken(PostUploadTelegramTXT, router, dispatch);
   };
 
+  const PostUploadCompressTelegramTXT = async () => {
+    const formData = new FormData();
+    formData.append("file", fileList.file.originFileObj);
+
+    try {
+      dispatch(setLoadingState(true));
+      setIsUploadTxt(false);
+
+      const res = await fetch(`${APIDATAV1}root/admin/compress/telegram`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          Authorization: `Bearer ${getCookie("access_token")}`,
+          //   "content-type": "multipart/form-data",
+        },
+        body: formData,
+      });
+
+      if (res.status === 401 || res.status === 403) {
+        return res;
+      }
+
+      const data = await res.blob();
+
+      console.log("compress TXT status: ", data);
+
+      // if (data.data === null) {
+      //   message.error("Opps.. there's something wrong when Compress TXT file ");
+      //   throw res;
+      // }
+
+      // if (data.data) {
+      //   setIsUploadTxt(false);
+      //   setSuccessMessageUploadTxt(data.data);
+      //   setSuccessUploadTxt(true);
+      //   setFileList(null);
+      // }
+
+      // return res;
+      if (typeof window !== "undefined") {
+        const downloadUrl = window.URL.createObjectURL(data);
+
+        const link = document.createElement("a");
+        link.href = downloadUrl;
+        link.download = `Compressed-data-${dayjs(new Date()).format(
+          "dddd-DD-MMMM-YYYY_HH-mm-ss-A"
+        )}.zip`; // Set the desired file name
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        setIsUploadTxt(false);
+        setSuccessMessageCompressTxt("Download Zip Successful!");
+        setSuccessCompressTxt(true);
+        return res;
+      }
+    } catch (error) {
+      console.log("error compress txt: ", error);
+      return error;
+    } finally {
+      dispatch(setLoadingState(false));
+    }
+  };
+
+  const PostUploadCompressTelegramTXTWithRefreshToken = async () => {
+    await fetchWithRefreshToken(
+      PostUploadCompressTelegramTXT,
+      router,
+      dispatch
+    );
+  };
+
   console.log("file list: ", fileList);
+  // console.log(
+  //   "dayjs: ",
+  //   dayjs(new Date()).format("dddd-DD-MMMM-YYYY_HH-mm-ss-A")
+  // );
 
   //   End of: Add role user (superadmin)
 
@@ -1221,6 +1320,49 @@ export default function DashboardLayout({ children }) {
       <div
         className={clsx(
           "fixed top-0 bottom-0 left-0 right-0 bg-[#000000B2] w-full z-50 flex items-center justify-center",
+          successCompressTxt ? "visible" : "hidden"
+        )}
+      >
+        <div className="bg-white p-[32px] rounded-lg w-[35%]">
+          <div className="flex justify-between items-center">
+            <h1 className="text-LG-strong  ">Compress TXT</h1>
+            <div
+              onClick={handleCloseSuccessPopupCompressTxt}
+              className="cursor-pointer"
+            >
+              <CloseOutlinedIcon />
+            </div>
+          </div>
+          <div className="mt-4 text-center">
+            <div className="mb-4">
+              <Image
+                alt="Success upload txt"
+                src={"/images/Success_upload_txt.svg"}
+                width={73}
+                height={73}
+                className="mx-auto"
+              />
+            </div>
+            <h2 className="text-LG-strong text-black">Compress successful!</h2>
+            <p className="text-Base-normal text-text-description mt-1">
+              {" "}
+              {successMessageCompressTxt}{" "}
+            </p>
+          </div>
+          <div className="mt-4 flex justify-end ">
+            <button
+              onClick={handleCloseSuccessPopupCompressxtAndRedirectToUsers}
+              className="py-2 px-4 rounded-md text-Base-normal border-[1px]  hover:opacity-80 cursor-pointer text-white bg-primary-base border-primary-base"
+            >
+              Done
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div
+        className={clsx(
+          "fixed top-0 bottom-0 left-0 right-0 bg-[#000000B2] w-full z-50 flex items-center justify-center",
           successUploadTxt ? "visible" : "hidden"
         )}
       >
@@ -1295,7 +1437,13 @@ export default function DashboardLayout({ children }) {
               </p>
             </Dragger>
             <button
-              className=" mt-6 bg-[#1677FF] rounded-md  text-white text-Base-normal py-1.5 px-3 text-center w-full "
+              className=" mt-6 bg-white border-[1px] border-[#D5D5D5] rounded-md  text-primary-base text-Base-normal py-1.5 px-3 text-center w-full "
+              onClick={handleSubmitUploadCompressTxt}
+            >
+              Compress TXT
+            </button>
+            <button
+              className=" mt-2 bg-[#1677FF] rounded-md  text-white text-Base-normal py-1.5 px-3 text-center w-full "
               onClick={handleSubmitUploadTxt}
             >
               Upload TXT
