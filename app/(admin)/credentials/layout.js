@@ -98,6 +98,8 @@ export default function DashboardLayout({ children }) {
 
   //   (superadmin)
   const [isUploadTxt, setIsUploadTxt] = useState(false);
+  const [isExceeds1Mb, setIsExceeds1Mb] = useState(false);
+  const [exceeds1MbMessage, setExceeds1MbMessage] = useState("");
   const [fileList, setFileList] = useState(null);
   const [successMessageUploadTxt, setSuccessMessageUploadTxt] = useState("");
   const [successUploadTxt, setSuccessUploadTxt] = useState(false);
@@ -315,8 +317,17 @@ export default function DashboardLayout({ children }) {
 
       console.log("upload TXT status: ", data);
 
+      // if (data.data === null && res === 413) {
+      //   setIsExceeds1Mb(true);
+      //   setIsUploadTxt(true);
+      //   throw res;
+      // }
+
       if (data.data === null) {
         message.error("Opps.. there's something wrong when Upload TXT file ");
+        setIsExceeds1Mb(true);
+        setExceeds1MbMessage(data.message);
+        setIsUploadTxt(true);
         throw res;
       }
 
@@ -366,19 +377,6 @@ export default function DashboardLayout({ children }) {
 
       console.log("compress TXT status: ", data);
 
-      // if (data.data === null) {
-      //   message.error("Opps.. there's something wrong when Compress TXT file ");
-      //   throw res;
-      // }
-
-      // if (data.data) {
-      //   setIsUploadTxt(false);
-      //   setSuccessMessageUploadTxt(data.data);
-      //   setSuccessUploadTxt(true);
-      //   setFileList(null);
-      // }
-
-      // return res;
       if (typeof window !== "undefined") {
         const downloadUrl = window.URL.createObjectURL(data);
 
@@ -1448,6 +1446,14 @@ export default function DashboardLayout({ children }) {
             >
               Upload TXT
             </button>
+            <p
+              className={clsx(
+                "mt-2 text-SM-normal text-[#FF4D4F]",
+                isExceeds1Mb ? "visible" : "hidden"
+              )}
+            >
+              {exceeds1MbMessage}
+            </p>
           </div>
           <div className="mt-8 flex justify-end "></div>
         </div>
