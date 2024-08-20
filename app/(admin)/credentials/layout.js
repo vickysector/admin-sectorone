@@ -100,7 +100,7 @@ export default function DashboardLayout({ children }) {
   const [isUploadTxt, setIsUploadTxt] = useState(false);
   const [isExceeds1Mb, setIsExceeds1Mb] = useState(false);
   const [exceeds1MbMessage, setExceeds1MbMessage] = useState("");
-  const [fileList, setFileList] = useState(null);
+  const [fileList, setFileList] = useState([]);
   const [successMessageUploadTxt, setSuccessMessageUploadTxt] = useState("");
   const [successUploadTxt, setSuccessUploadTxt] = useState(false);
   const [successMessageCompressTxt, setSuccessMessageCompressTxt] =
@@ -267,7 +267,7 @@ export default function DashboardLayout({ children }) {
   //   };
 
   const handleSubmitUploadTxt = async (data) => {
-    if (fileList === null) {
+    if (fileList.length === 0) {
       message.error("You must Upload File First");
     } else {
       PostUploadTelegramTXTWithRefreshToken();
@@ -277,7 +277,7 @@ export default function DashboardLayout({ children }) {
   };
 
   const handleSubmitUploadCompressTxt = async (data) => {
-    if (fileList === null) {
+    if (fileList.length === 0) {
       message.error("You must Upload File First");
     } else {
       PostUploadCompressTelegramTXTWithRefreshToken();
@@ -288,12 +288,12 @@ export default function DashboardLayout({ children }) {
 
   const handleUploadFile = (data) => {
     console.log("uploaded file: ", data);
-    setFileList(data);
+    setFileList(data.fileList);
   };
 
   const PostUploadTelegramTXT = async () => {
     const formData = new FormData();
-    formData.append("file", fileList.file.originFileObj);
+    formData.append("file", fileList[0].originFileObj);
 
     try {
       dispatch(setLoadingState(true));
@@ -335,7 +335,8 @@ export default function DashboardLayout({ children }) {
         setIsUploadTxt(false);
         setSuccessMessageUploadTxt(data.data);
         setSuccessUploadTxt(true);
-        setFileList(null);
+        setIsExceeds1Mb(false);
+        setFileList([]);
       }
 
       return res;
@@ -353,7 +354,7 @@ export default function DashboardLayout({ children }) {
 
   const PostUploadCompressTelegramTXT = async () => {
     const formData = new FormData();
-    formData.append("file", fileList.file.originFileObj);
+    formData.append("file", fileList[0].originFileObj);
 
     try {
       dispatch(setLoadingState(true));
@@ -370,6 +371,10 @@ export default function DashboardLayout({ children }) {
       });
 
       if (res.status === 401 || res.status === 403) {
+        return res;
+      }
+
+      if (res.status === 400) {
         return res;
       }
 
@@ -392,6 +397,8 @@ export default function DashboardLayout({ children }) {
         setIsUploadTxt(false);
         setSuccessMessageCompressTxt("Download Zip Successful!");
         setSuccessCompressTxt(true);
+        setIsExceeds1Mb(false);
+        setFileList([]);
         return res;
       }
     } catch (error) {
@@ -415,6 +422,18 @@ export default function DashboardLayout({ children }) {
   //   "dayjs: ",
   //   dayjs(new Date()).format("dddd-DD-MMMM-YYYY_HH-mm-ss-A")
   // );
+
+  const uploadTxtProps = {
+    accept: ".txt",
+    multiple: false,
+    maxCount: 1,
+    name: "upload_txt",
+    fileList: fileList,
+    onChange: handleUploadFile,
+    onDrop(e) {
+      console.log("Dropped files", e.dataTransfer.files);
+    },
+  };
 
   //   End of: Add role user (superadmin)
 
@@ -1416,13 +1435,14 @@ export default function DashboardLayout({ children }) {
           </div>
           <div className="mt-4">
             <Dragger
-              //   {...uploadTxtProps}
-              accept=".txt"
-              multiple={false}
-              maxCount={1}
-              name="upload_txt"
-              //   customRequest={handleSubmitUploadTxt}
-              onChange={handleUploadFile}
+              {...uploadTxtProps}
+              // accept=".txt"
+              // multiple={false}
+              // maxCount={1}
+              // name="upload_txt"
+              // //   customRequest={handleSubmitUploadTxt}
+              // onChange={handleUploadFile}
+              // onDrop={handleDropFile}
             >
               <p className="ant-upload-drag-icon">
                 <InboxOutlined style={{ color: "#FF6F1E" }} />
