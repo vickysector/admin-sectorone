@@ -13,6 +13,8 @@ const DomainSearchSlices = createSlice({
     detailBreachesEmployee: 0,
     detailBreachesThirdParty: 0,
     detailBreachesTotal: 0,
+    isAddDomainPopUp: false,
+    AddDomainEmail: "",
   },
   reducers: {
     setDomainSearchData(state, action) {
@@ -42,6 +44,12 @@ const DomainSearchSlices = createSlice({
     setDetailBreachesTotal(state, action) {
       state.detailBreachesTotal = action.payload;
     },
+    setIsAddDomainPopup(state, action) {
+      state.isAddDomainPopUp = action.payload;
+    },
+    setAddDomainEmail(state, action) {
+      state.AddDomainEmail = action.payload;
+    },
   },
 });
 
@@ -55,6 +63,8 @@ export const {
   setDetailBreachesEmployee,
   setDetailBreachesThirdParty,
   setDetailBreachesTotal,
+  setIsAddDomainPopup,
+  setAddDomainEmail,
 } = DomainSearchSlices.actions;
 
 export default DomainSearchSlices.reducer;

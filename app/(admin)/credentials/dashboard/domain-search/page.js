@@ -240,6 +240,10 @@ export default function DomainSearchPage() {
     router.push(`${pathname}?${params.toString()}`);
   };
 
+  const handleAddDomain = () => {
+    console.log("Add Domain", email);
+  };
+
   const handleDetails = (id, item) => {
     console.log("details page: ", item);
     router.push(`/credentials/dashboard/domain-search/details/${id}`);
@@ -683,10 +687,10 @@ export default function DomainSearchPage() {
           </h2>
         </div>
         <div className="mt-[32px] w-full">
-          <div className="flex text-center justify-center items-center relative">
+          <div className="grid text-center grid-cols-2 relative max-w-[60%] mx-auto gap-4">
             <input
               type="text"
-              className="rounded-md px-3 py-[5px] border-input-border border-2 w-[50%] text-LG-normal text-black"
+              className="rounded-md px-3 py-[5px] border-input-border border-2  text-LG-normal text-black col-span-2"
               placeholder="Enter domain"
               value={email}
               onChange={handleChangeEmail}
@@ -697,7 +701,7 @@ export default function DomainSearchPage() {
             />
             {isEmailFocused && allRecentSearch && (
               <div
-                className="bg-white drop-shadow-lg rounded-md p-4 absolute top-[50px] left-[20%] right-[31%] max-h-[320px] overflow-y-scroll pointer-events-auto z-10"
+                className="bg-white drop-shadow-lg rounded-md p-4 absolute top-[50px] left-[0] right-[0] max-h-[320px] overflow-y-scroll pointer-events-auto z-10"
                 onMouseEnter={handleIsEmailFocusTrue}
                 onMouseLeave={handleIsEmailFotusFalse}
               >
@@ -757,7 +761,15 @@ export default function DomainSearchPage() {
                 </div>
               </div>
             )}
-            <div className="ml-4">
+            <div className="">
+              <AuthButton
+                value={"Add domain"}
+                agreements={canSend}
+                onClick={handleAddDomain}
+                type="secondary"
+              />
+            </div>
+            <div className="">
               <AuthButton
                 value={"Scan now"}
                 agreements={canSend}
