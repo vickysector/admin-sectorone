@@ -7,6 +7,10 @@ import {
 import { APIDATAV1 } from "@/app/_lib/helpers/APIKEYS";
 import { setLoadingState } from "@/app/_lib/store/features/Compromised/LoadingSlices";
 import {
+  setDetailBreachesEmployee,
+  setDetailBreachesThirdParty,
+  setDetailBreachesTotal,
+  setDetailBreachesUser,
   setDetailsDomainSearch,
   setDomainSearchData,
   setTotalAllPageDomainSearch,
@@ -25,6 +29,7 @@ import {
   DOMAIN_SEARCH_THIRDPARTY,
   DOMAIN_SEARCH_USERS,
 } from "@/app/_lib/variables/Variables";
+import { DomainBreaches } from "@/app/_ui/components/breaches/DomainBreaches";
 import { AuthButton } from "@/app/_ui/components/buttons/AuthButton";
 import CompromiseButton from "@/app/_ui/components/buttons/CompromiseButton";
 import { Alert, ConfigProvider, Pagination, Table } from "antd";
@@ -75,6 +80,19 @@ export default function DomainSearchPage() {
 
   const totalAllPageDomainSearch = useSelector(
     (state) => state.domainSearch.totalAllPageDomainSearch
+  );
+
+  const dataBreachesUsers = useSelector(
+    (state) => state.domainSearch.detailBreachesUser
+  );
+  const dataBreachesEmployee = useSelector(
+    (state) => state.domainSearch.detailBreachesEmployee
+  );
+  const dataBreachesThirdParty = useSelector(
+    (state) => state.domainSearch.detailBreachesThirdParty
+  );
+  const dataBreachesTotal = useSelector(
+    (state) => state.domainSearch.detailBreachesTotal
   );
 
   const columnDomainSearch = [
@@ -215,6 +233,7 @@ export default function DomainSearchPage() {
     console.log("scan now..");
     callGetDetailLeakedDataWithRefeshToken(selectedButton, email);
     callPostKeywordDomainSearchWithRefreshToken(email);
+    callGetBreachesDataWithRefeshToken(email);
     params.set("query", email);
     params.set("page", page);
     params.set("type", selectedButton);
@@ -274,6 +293,8 @@ export default function DomainSearchPage() {
     console.log("search history: ", email);
     setEmail(email);
     callGetDetailLeakedDataWithRefeshToken(selectedButton, email);
+    callGetBreachesDataWithRefeshToken(email);
+    callRecentSearchData();
 
     setCookie("scanned_domain", email);
     params.set("query", getCookie("scanned_domain"));
@@ -335,6 +356,56 @@ export default function DomainSearchPage() {
       }
     } catch (error) {
       console.log("error get leaked data: ", error);
+      return error;
+    } finally {
+      dispatch(setLoadingState(false));
+    }
+  };
+
+  const callGetBreachesDataWithRefeshToken = async (keyword) => {
+    await fetchWithRefreshToken(
+      fetchGetAllDataBreaches,
+      router,
+      dispatch,
+      keyword
+    );
+  };
+
+  const fetchGetAllDataBreaches = async (keyword) => {
+    try {
+      dispatch(setLoadingState(true));
+
+      const res = await fetch(
+        `${APIDATAV1}root/admin/count/breaches?search=${keyword}`,
+        {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            Authorization: `Bearer ${getCookie("access_token")}`,
+          },
+        }
+      );
+
+      if (res.status === 401 || res.status === 403) {
+        return res;
+      }
+
+      const data = await res.json();
+
+      console.log("data breaches: ", data);
+
+      //   return res;
+
+      if (data.data) {
+        console.log("data breaches: ", data);
+        dispatch(setDetailBreachesUser(data.data.user_compromise));
+        dispatch(setDetailBreachesEmployee(data.data.employee_compromise));
+        dispatch(setDetailBreachesThirdParty(data.data.thidparty_compromise));
+        dispatch(setDetailBreachesTotal(data.data.total_compromise));
+        return res;
+      }
+    } catch (error) {
+      console.log("error get breaches data: ", error);
       return error;
     } finally {
       dispatch(setLoadingState(false));
@@ -522,6 +593,7 @@ export default function DomainSearchPage() {
       switch (selectedButton) {
         case DOMAIN_SEARCH_EMPLOYEE:
           callGetDetailLeakedDataWithRefeshToken(DOMAIN_SEARCH_EMPLOYEE, email);
+          callGetBreachesDataWithRefeshToken(email);
           if (
             !searchParams.has("query") ||
             !searchParams.has("page") ||
@@ -535,6 +607,7 @@ export default function DomainSearchPage() {
           break;
         case DOMAIN_SEARCH_USERS:
           callGetDetailLeakedDataWithRefeshToken(DOMAIN_SEARCH_USERS, email);
+          callGetBreachesDataWithRefeshToken(email);
           if (
             !searchParams.has("query") ||
             !searchParams.has("page") ||
@@ -551,6 +624,7 @@ export default function DomainSearchPage() {
             DOMAIN_SEARCH_THIRDPARTY,
             email
           );
+          callGetBreachesDataWithRefeshToken(email);
           if (
             !searchParams.has("query") ||
             !searchParams.has("page") ||
@@ -701,7 +775,30 @@ export default function DomainSearchPage() {
       >
         <section
           className={clsx(
-            "flex mb-[24px] mr-auto",
+            "grid grid-cols-4 gap-4 mb-[48px]",
+            typeof dataLeakedDomain === "string" ? "hidden" : "visible"
+          )}
+        >
+          <DomainBreaches
+            dataBreaches={dataBreachesTotal}
+            text={"Total compromises"}
+          />
+          <DomainBreaches
+            dataBreaches={dataBreachesEmployee}
+            text={"Employee compromises"}
+          />
+          <DomainBreaches
+            dataBreaches={dataBreachesUsers}
+            text={"User compromises"}
+          />
+          <DomainBreaches
+            dataBreaches={dataBreachesThirdParty}
+            text={"Third-party  compromises"}
+          />
+        </section>
+        <section
+          className={clsx(
+            "flex  mr-auto",
             typeof dataLeakedDomain === "string" ? "hidden" : "visible"
           )}
         >

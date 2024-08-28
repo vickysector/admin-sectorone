@@ -9,6 +9,10 @@ const DomainSearchSlices = createSlice({
     totalAllPageDomainSearch: 0,
     detailsDomainSearch: {},
     detailsIsOpen: false,
+    detailBreachesUser: 0,
+    detailBreachesEmployee: 0,
+    detailBreachesThirdParty: 0,
+    detailBreachesTotal: 0,
   },
   reducers: {
     setDomainSearchData(state, action) {
@@ -26,6 +30,18 @@ const DomainSearchSlices = createSlice({
     setDetailsDomainSearch(state, action) {
       state.detailsDomainSearch = action.payload;
     },
+    setDetailBreachesUser(state, action) {
+      state.detailBreachesUser = action.payload;
+    },
+    setDetailBreachesEmployee(state, action) {
+      state.detailBreachesEmployee = action.payload;
+    },
+    setDetailBreachesThirdParty(state, action) {
+      state.detailBreachesThirdParty = action.payload;
+    },
+    setDetailBreachesTotal(state, action) {
+      state.detailBreachesTotal = action.payload;
+    },
   },
 });
 
@@ -35,6 +51,10 @@ export const {
   setTotalPerPageDomainSearch,
   setTotalAllPageDomainSearch,
   setDetailsDomainSearch,
+  setDetailBreachesUser,
+  setDetailBreachesEmployee,
+  setDetailBreachesThirdParty,
+  setDetailBreachesTotal,
 } = DomainSearchSlices.actions;
 
 export default DomainSearchSlices.reducer;
