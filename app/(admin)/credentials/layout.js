@@ -1969,17 +1969,15 @@ export default function DashboardLayout({ children }) {
           height={38}
         />
         <div className="flex items-center">
-          {getCookie("user_status") === "true" && (
-            <div
-              className={clsx(
-                "cursor-pointer rounded-[6px] bg-[#1677FF] py-1.5 px-4 mr-4 flex items-center"
-                // getCookie("user_status") === "true" ? "visible" : "hidden"
-              )}
-              onClick={handleIsUploadToTxt}
-            >
-              <p className="text-Base-normal text-white ">Upload TXT</p>
-            </div>
-          )}
+          <div
+            className={clsx(
+              "cursor-pointer rounded-[6px] bg-[#1677FF] py-1.5 px-4 mr-4 flex items-center"
+              // getCookie("user_status") === "true" ? "visible" : "hidden"
+            )}
+            onClick={handleIsUploadToTxt}
+          >
+            <p className="text-Base-normal text-white ">Upload TXT</p>
+          </div>
 
           <div className="cursor-pointer" onClick={toggleAccount}>
             <AccountCircleOutlinedIcon
