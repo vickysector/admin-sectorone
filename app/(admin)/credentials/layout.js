@@ -549,6 +549,12 @@ export default function DashboardLayout({ children }) {
 
       const data = await res.json();
 
+      if (data.data === null) {
+        dispatch(
+          setUserListAddDomain("We can't find user with that email address")
+        );
+      }
+
       console.log("data all users for add domain: ", data);
 
       if (data.data) {
@@ -1641,36 +1647,43 @@ export default function DashboardLayout({ children }) {
             </div>
           </div>
           <div className={clsx("overflow-scroll h-[270px] ")}>
-            {userListAddDomain.map((data) => (
-              <div
-                className={clsx(
-                  "flex items-center mb-4 cursor-pointer w-[60%] transition-all p-2 rounded-md",
-                  data.id === emailChoosedAddDomain
-                    ? "bg-primary-base text-white"
-                    : "hover:bg-[#edebeb]"
-                )}
-                onClick={() => handleChooseEmailForAddDomain(data)}
-                id={data.id}
-              >
-                <HistoryIcon
+            {Array.isArray(userListAddDomain) &&
+              userListAddDomain.map((data) => (
+                <div
                   className={clsx(
+                    "flex items-center mb-4 cursor-pointer w-[60%] transition-all p-2 rounded-md",
                     data.id === emailChoosedAddDomain
-                      ? "text-white"
-                      : "text-[#00000073]"
+                      ? "bg-primary-base text-white"
+                      : "hover:bg-[#edebeb]"
                   )}
-                />
-                <p
-                  className={clsx(
-                    " text-Base-normal ml-[8px]",
-                    data.id === emailChoosedAddDomain
-                      ? "text-white"
-                      : "text-[#000000]"
-                  )}
+                  onClick={() => handleChooseEmailForAddDomain(data)}
+                  id={data.id}
                 >
-                  {data.email}
-                </p>
-              </div>
-            ))}
+                  <HistoryIcon
+                    className={clsx(
+                      data.id === emailChoosedAddDomain
+                        ? "text-white"
+                        : "text-[#00000073]"
+                    )}
+                  />
+                  <p
+                    className={clsx(
+                      " text-Base-normal ml-[8px]",
+                      data.id === emailChoosedAddDomain
+                        ? "text-white"
+                        : "text-[#000000]"
+                    )}
+                  >
+                    {data.email}
+                  </p>
+                </div>
+              ))}
+            {typeof userListAddDomain === "string" && (
+              <p className={clsx("text-Base-normal text-[#CF1322]")}>
+                {" "}
+                {userListAddDomain}{" "}
+              </p>
+            )}
           </div>
         </div>
       </div>
