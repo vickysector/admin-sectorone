@@ -15,6 +15,10 @@ const DomainSearchSlices = createSlice({
     detailBreachesTotal: 0,
     isAddDomainPopUp: false,
     AddDomainEmail: "",
+    addDomainSelectOptions: [],
+    isAlreadyPopup: false,
+    userListAddDomain: [],
+    emailChoosenAddDomain: "",
   },
   reducers: {
     setDomainSearchData(state, action) {
@@ -50,6 +54,18 @@ const DomainSearchSlices = createSlice({
     setAddDomainEmail(state, action) {
       state.AddDomainEmail = action.payload;
     },
+    setAddDomainSelectOptions(state, action) {
+      state.addDomainSelectOptions = action.payload;
+    },
+    setisAlreadyPopup(state, action) {
+      state.isAlreadyPopup = action.payload;
+    },
+    setUserListAddDomain(state, action) {
+      state.userListAddDomain = action.payload;
+    },
+    setEmailChoosenAddDoamin(state, action) {
+      state.emailChoosenAddDomain = action.payload;
+    },
   },
 });
 
@@ -65,6 +81,10 @@ export const {
   setDetailBreachesTotal,
   setIsAddDomainPopup,
   setAddDomainEmail,
+  setAddDomainSelectOptions,
+  setisAlreadyPopup,
+  setUserListAddDomain,
+  setEmailChoosenAddDoamin,
 } = DomainSearchSlices.actions;
 
 export default DomainSearchSlices.reducer;

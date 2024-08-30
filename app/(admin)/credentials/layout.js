@@ -12,11 +12,12 @@ import {
   UnlockTwoTone,
   LockTwoTone,
   InboxOutlined,
+  SearchOutlined,
 } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import clsx from "clsx";
 import { setCookie, getCookie, hasCookie, deleteCookie } from "cookies-next";
-import { useRouter, redirect } from "next/navigation";
+import { useRouter, redirect, usePathname } from "next/navigation";
 import { LogoutOutlined } from "@ant-design/icons";
 import { APIDATAV1, APIKEY } from "@/app/_lib/helpers/APIKEYS";
 import { LoadingSpin } from "@/app/_ui/components/utils/LoadingSpin";
@@ -80,6 +81,16 @@ import { setConfirmDetailUserDeactivateState } from "@/app/_lib/store/features/U
 
 const { Dragger } = Upload;
 import dayjs from "dayjs";
+import {
+  setIsAddDomainPopup,
+  setisAlreadyPopup,
+  setUserListAddDomain,
+} from "@/app/_lib/store/features/DomainSearch/DomainSearchSlices";
+import { Input, Select, Space, Form } from "antd";
+import HistoryIcon from "@mui/icons-material/History";
+const { Search } = Input;
+import ErrorIcon from "@mui/icons-material/Error";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 export default function DashboardLayout({ children }) {
   const [hide, setHide] = useState(false);
@@ -106,6 +117,17 @@ export default function DashboardLayout({ children }) {
   const [successMessageCompressTxt, setSuccessMessageCompressTxt] =
     useState("");
   const [successCompressTxt, setSuccessCompressTxt] = useState(false);
+  const [selectOptions, setSelecOptions] = useState([]);
+  const [role, setRole] = useState("user");
+  const [addDomainSearch, setAddDomainSearch] = useState("");
+  const [listUsersAddDomain, setListUsersAddDomain] = useState([]);
+  const [emailChoosedAddDomain, setEmailChoosedAddDomain] = useState("");
+  const [usersChoosedAddDomain, setUsersChoosedAddDomain] = useState("");
+  const [addDomainConfirmation, setAddDomainConfirmation] = useState(false);
+  const [errorStateAddDomain, setErrorStateAddDomain] = useState(false);
+  const [errorMsgAddDomain, setErrorMsgAddDomain] = useState("");
+  const [successStateAddDomain, setSuccessStateAddDomain] = useState(false);
+  const [successMsgAddDomain, setSuccessMsgAddDomain] = useState("");
 
   const dataLeakedDetails = useSelector(
     (state) => state.executiveProtections.detailsLeakedData.info_2
@@ -125,9 +147,76 @@ export default function DashboardLayout({ children }) {
     (state) => state.detailUserDeactivate.PostFunctionDeactivateUser
   );
 
+  // Start of: (superadmin) - Add Domain
+
+  const pathname = usePathname();
+
+  const isAddDomainPopup = useSelector(
+    (state) => state.domainSearch.isAddDomainPopUp
+  );
+
+  const addDomainSelectOptions = useSelector(
+    (state) => state.domainSearch.addDomainSelectOptions
+  );
+
+  const isAlreadyPopupAddDomain = useSelector(
+    (state) => state.domainSearch.isAlreadyPopup
+  );
+
+  const userListAddDomain = useSelector(
+    (state) => state.domainSearch.userListAddDomain
+  );
+
+  const emailChoosenAddDomain = useSelector(
+    (state) => state.domainSearch.emailChoosenAddDomain
+  );
+
   const handleCloseDetailExecutivePopup = () => {
     dispatch(setDetailsIsOpen(false));
   };
+
+  const handleCloseIsAddDomainPopup = () => {
+    dispatch(setIsAddDomainPopup(false));
+  };
+
+  const handleRoleChange = (value) => {
+    console.log("value role: ", value);
+    setRole(value);
+  };
+
+  const handleAddDomainSearch = (e) => {
+    console.log("add domain search ", e.target.value);
+    setAddDomainSearch(e.target.value);
+  };
+
+  const handleChooseEmailForAddDomain = (value) => {
+    console.log("value add domain: ", value);
+    setEmailChoosedAddDomain(value.id);
+    setUsersChoosedAddDomain(value.email);
+  };
+
+  const handleAddDomainConfirmationPopUp = () => {
+    if (emailChoosedAddDomain.length === 0) {
+      return;
+    } else {
+      dispatch(setIsAddDomainPopup(false));
+      setAddDomainConfirmation(true);
+    }
+  };
+
+  const handleAddDomainConfirmationCancel = () => {
+    setAddDomainConfirmation(false);
+    dispatch(setIsAddDomainPopup(true));
+  };
+
+  const handleAddDomainConfirmationYes = () => {
+    PostAddDomainWithRefreshToken();
+  };
+
+  console.log("emailchoosedadddomain: ", emailChoosedAddDomain);
+  console.log("add domain confirmation: ", addDomainConfirmation);
+
+  // End of: (superadmin) - Add Domain
 
   //   (superadmin)
 
@@ -436,6 +525,134 @@ export default function DashboardLayout({ children }) {
   };
 
   //   End of: Add role user (superadmin)
+
+  // Start of: Add domain (superadmin)
+
+  const FetchAllUsersForAddDomain = async () => {
+    try {
+      dispatch(setLoadingState(true));
+
+      const res = await fetch(
+        `${APIDATAV1}root/admin/all/user?page=1&limit=10&search=${addDomainSearch}&type=${role}`,
+        {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            Authorization: `Bearer ${getCookie("access_token")}`,
+          },
+        }
+      );
+
+      if (res.status === 401 || res.status === 403) {
+        return res;
+      }
+
+      const data = await res.json();
+
+      console.log("data all users for add domain: ", data);
+
+      if (data.data) {
+        dispatch(setUserListAddDomain(data.data));
+        // setListUsersAddDomain(data.data);
+        return res;
+      }
+
+      return res;
+    } catch (error) {
+      console.log("error all users for add domain: ", error);
+      return error;
+    } finally {
+      dispatch(setLoadingState(false));
+    }
+  };
+
+  const FetchAllUsersForAddDomainWithRefreshToken = async () => {
+    await fetchWithRefreshToken(FetchAllUsersForAddDomain, router, dispatch);
+  };
+
+  const PostAddDomain = async () => {
+    try {
+      dispatch(setLoadingState(true));
+      setAddDomainConfirmation(false);
+      dispatch(setIsAddDomainPopup(false));
+
+      const res = await fetch(`${APIDATAV1}root/admin/domain`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          Authorization: `Bearer ${getCookie("access_token")}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id_user: emailChoosedAddDomain,
+          name_domain: [emailChoosenAddDomain],
+        }),
+      });
+
+      if (res.status === 401 || res.status === 403) {
+        return res;
+      }
+
+      const data = await res.json();
+
+      if (data.data === null) {
+        setErrorStateAddDomain(true);
+        setErrorMsgAddDomain(data.message);
+        setTimeout(() => {
+          dispatch(setIsAddDomainPopup(true));
+        }, 4100);
+      }
+
+      console.log("test adding domain data ", data);
+
+      if (data.data) {
+        setSuccessStateAddDomain(true);
+      }
+
+      return res;
+    } catch (error) {
+      console.log("error while adding domain data: ", error);
+      // setIsErrorWhileAddData(true);
+      //   setMessageErrorWhileAddData(error.message);
+      return error;
+    } finally {
+      dispatch(setLoadingState(false));
+      setTimeout(() => {
+        setErrorStateAddDomain(false);
+      }, 4000);
+      setTimeout(() => {
+        setSuccessStateAddDomain(false);
+      }, 4000);
+    }
+  };
+
+  const PostAddDomainWithRefreshToken = async () => {
+    await fetchWithRefreshToken(PostAddDomain, router, dispatch);
+  };
+
+  useEffect(() => {
+    if (
+      isAlreadyPopupAddDomain === false &&
+      pathname === "/credentials/dashboard/domain-search"
+    ) {
+      console.log("running add domain fetch all users");
+      FetchAllUsersForAddDomainWithRefreshToken();
+    }
+  }, [role, pathname]);
+
+  useEffect(() => {
+    // console.log("running add domain fetch all users bawah");
+    FetchAllUsersForAddDomainWithRefreshToken();
+    setEmailChoosedAddDomain("");
+  }, [role]);
+
+  useEffect(() => {
+    // console.log("running add domain fetch all users bawah");
+    FetchAllUsersForAddDomainWithRefreshToken();
+    setEmailChoosedAddDomain("");
+  }, [addDomainSearch]);
+
+  // End of: Add domain - (superadmin)
 
   const isScanEmailNow = useSelector((state) => state.scanEmail.isScanNow);
   const scannedEmail = useSelector((state) => state.scanEmail.scannedEmail);
@@ -1267,6 +1484,198 @@ export default function DashboardLayout({ children }) {
           </div>
         </div>
       </div>
+
+      {/* (superadmin) */}
+
+      {/* Start of: (superadmin) :-Add domain Features */}
+      <div
+        className={clsx(
+          "fixed top-0 bottom-0 left-0 right-0 bg-[#000000B2] w-full z-50 flex items-center justify-center",
+          successStateAddDomain ? "visible" : "hidden"
+        )}
+      >
+        <div className="bg-white p-[32px] rounded-lg text-center">
+          <CheckCircleIcon className={clsx("text-success-chart size-10")} />
+          <p className={clsx("text-text-description text-Base-normal mt-4")}>
+            Success Adding{" "}
+            <span className="text-Base-strong">{emailChoosenAddDomain}</span> to{" "}
+            <span className="text-Base-strong">{usersChoosedAddDomain}</span>{" "}
+            <span className="text-Base-strong">{role}</span> <br />
+          </p>
+        </div>
+      </div>
+
+      <div
+        className={clsx(
+          "fixed top-0 bottom-0 left-0 right-0 bg-[#000000B2] w-full z-50 flex items-center justify-center",
+          errorStateAddDomain ? "visible" : "hidden"
+        )}
+      >
+        <div className="bg-white p-[32px] rounded-lg text-center">
+          <ErrorIcon className={clsx("text-error size-10")} />
+          <p className={clsx("text-text-description text-Base-normal mt-4")}>
+            Opps.. Error has occured <br />
+            <span className="text-Base-strong">{errorMsgAddDomain}</span>
+          </p>
+        </div>
+      </div>
+
+      <div
+        className={clsx(
+          "fixed top-0 bottom-0 left-0 right-0 bg-[#000000B2] w-full z-50 flex items-center justify-center",
+          addDomainConfirmation ? "visible" : "hidden"
+        )}
+      >
+        <div className="bg-white p-[32px] w-[400px] rounded-lg">
+          <h1 className="text-black text-LG-strong mb-2">
+            Add domain confirmation
+          </h1>
+          <p className="text-Base-normal text-text-description">
+            Are you sure you want to add domain{" "}
+            <span className="text-Base-strong">{emailChoosenAddDomain}</span> to{" "}
+            <span className="text-Base-strong">{usersChoosedAddDomain}</span>{" "}
+            {role}?
+          </p>
+          <div className="mt-[24px] ml-auto flex justify-end">
+            <button
+              className={clsx(
+                " bg-white text-primary-base py-[4px] px-4 border-[1px] border-[#D5D5D5] text-Base-normal rounded-[6px]"
+              )}
+              onClick={handleAddDomainConfirmationCancel}
+            >
+              Cancel
+            </button>
+            <button
+              className={clsx(
+                "ml-[8px] bg-primary-base text-white py-[4px] px-4 border-[1px] border-primary-base text-Base-normal rounded-[6px]"
+              )}
+              onClick={handleAddDomainConfirmationYes}
+            >
+              Yes, sure
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div
+        className={clsx(
+          "fixed top-0 bottom-0 left-0 right-0 bg-black w-full z-50 flex items-center justify-center",
+          isAddDomainPopup ? "visible" : "hidden"
+        )}
+      >
+        <div className="bg-white p-[32px] rounded-lg max-w-[750px] w-[750px] max-h-[450px] h-[450px]">
+          <div
+            className={clsx(
+              "text-Base-normal text-text-description mb-4 flex justify-between"
+            )}
+          >
+            <h1>{emailChoosenAddDomain}</h1>
+            <CloseOutlined
+              style={{ color: "#676767" }}
+              onClick={handleCloseIsAddDomainPopup}
+            />
+          </div>
+          <div className={clsx("flex items-center justify-between")}>
+            <h1 className={clsx("text-black text-LG-strong")}>User list</h1>
+          </div>
+          <div className={clsx("my-4 grid grid-cols-2 mb-4")}>
+            <ConfigProvider
+              theme={{
+                components: {
+                  Input: {
+                    activeBorderColor: "#FF6F1E",
+                  },
+                },
+                token: {
+                  colorPrimary: "#FF6F1E",
+                },
+              }}
+            >
+              <Input
+                placeholder="Search user emails"
+                allowClear={false}
+                style={{ width: 400 }}
+                variant="filled"
+                addonAfter={<SearchOutlined />}
+                onChange={(e) => handleAddDomainSearch(e)}
+                value={addDomainSearch}
+                size="large"
+              />
+            </ConfigProvider>
+            <div className={clsx("flex items-center justify-end")}>
+              <div>
+                <Form.Item
+                  // label={"Role"}
+                  // name={"role"}
+                  // layout="vertical"
+                  rules={[
+                    {
+                      required: true,
+                    },
+                  ]}
+                  style={{ marginBottom: "0", width: 100 }}
+                >
+                  <ConfigProvider theme={{ token: { colorPrimary: "FF6F1E" } }}>
+                    <Select
+                      defaultValue={"user"}
+                      options={addDomainSelectOptions}
+                      size="large"
+                      value={role}
+                      onChange={handleRoleChange}
+                    />
+                  </ConfigProvider>
+                </Form.Item>
+              </div>
+              <button
+                className={clsx(
+                  "py-[5px] px-4  rounded-[6px] border-[1px]  text-Base-normal ml-[9px] h-auto",
+                  emailChoosedAddDomain.length === 0
+                    ? "bg-[#0000000A] border-[#D5D5D5] text-[#00000040]"
+                    : "bg-primary-base border-primary-base text-white"
+                )}
+                onClick={handleAddDomainConfirmationPopUp}
+                disabled={emailChoosedAddDomain.length === 0}
+              >
+                Add Domain
+              </button>
+            </div>
+          </div>
+          <div className={clsx("overflow-scroll h-[270px] ")}>
+            {userListAddDomain.map((data) => (
+              <div
+                className={clsx(
+                  "flex items-center mb-4 cursor-pointer w-[60%] transition-all p-2 rounded-md",
+                  data.id === emailChoosedAddDomain
+                    ? "bg-primary-base text-white"
+                    : "hover:bg-[#edebeb]"
+                )}
+                onClick={() => handleChooseEmailForAddDomain(data)}
+                id={data.id}
+              >
+                <HistoryIcon
+                  className={clsx(
+                    data.id === emailChoosedAddDomain
+                      ? "text-white"
+                      : "text-[#00000073]"
+                  )}
+                />
+                <p
+                  className={clsx(
+                    " text-Base-normal ml-[8px]",
+                    data.id === emailChoosedAddDomain
+                      ? "text-white"
+                      : "text-[#000000]"
+                  )}
+                >
+                  {data.email}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* End of: (superadmin) - Add domain Features */}
 
       <div
         className={clsx(

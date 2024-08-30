@@ -7,12 +7,16 @@ import {
 import { APIDATAV1 } from "@/app/_lib/helpers/APIKEYS";
 import { setLoadingState } from "@/app/_lib/store/features/Compromised/LoadingSlices";
 import {
+  setAddDomainSelectOptions,
   setDetailBreachesEmployee,
   setDetailBreachesThirdParty,
   setDetailBreachesTotal,
   setDetailBreachesUser,
   setDetailsDomainSearch,
   setDomainSearchData,
+  setEmailChoosenAddDoamin,
+  setIsAddDomainPopup,
+  setisAlreadyPopup,
   setTotalAllPageDomainSearch,
   setTotalExposuresDomainSearch,
   setTotalPerPageDomainSearch,
@@ -93,6 +97,10 @@ export default function DomainSearchPage() {
   );
   const dataBreachesTotal = useSelector(
     (state) => state.domainSearch.detailBreachesTotal
+  );
+
+  const isAlreadyPopupAddDomain = useSelector(
+    (state) => state.domainSearch.isAlreadyPopup
   );
 
   const columnDomainSearch = [
@@ -242,6 +250,12 @@ export default function DomainSearchPage() {
 
   const handleAddDomain = () => {
     console.log("Add Domain", email);
+    dispatch(setIsAddDomainPopup(true));
+    dispatch(setisAlreadyPopup(true));
+    dispatch(setEmailChoosenAddDoamin(email));
+    if (isAlreadyPopupAddDomain === false) {
+      FetchAllRolesWithRefreshToken();
+    }
   };
 
   const handleDetails = (id, item) => {
@@ -584,6 +598,56 @@ export default function DomainSearchPage() {
 
   const deleteAllRecentSearchData = async () => {
     await fetchWithRefreshToken(DeleteAllRecentSearchData, router, dispatch);
+  };
+
+  const FetchAllRoles = async () => {
+    try {
+      dispatch(setLoadingState(true));
+
+      const res = await fetch(`${APIDATAV1}admin/all/role?domain=true`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          Authorization: `Bearer ${getCookie("access_token")}`,
+        },
+      });
+
+      if (res.status === 401 || res.status === 403) {
+        return res;
+      }
+
+      const data = await res.json();
+
+      if (data.data === null) {
+        throw res;
+      }
+
+      if (data.data) {
+        const updatedData = data.data.map((item) => {
+          return {
+            value: item.name_role,
+            label:
+              item.name_role.charAt(0).toUpperCase() + item.name_role.slice(1),
+          };
+        });
+
+        // setSelecOptions(updatedData);
+        dispatch(setAddDomainSelectOptions(updatedData));
+
+        return res;
+      }
+
+      //   return res;
+    } catch (error) {
+      console.log("error user status: ", error);
+      return error;
+    } finally {
+      dispatch(setLoadingState(false));
+    }
+  };
+
+  const FetchAllRolesWithRefreshToken = async () => {
+    await fetchWithRefreshToken(FetchAllRoles, router, dispatch);
   };
 
   useEffect(() => {
