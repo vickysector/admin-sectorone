@@ -1657,7 +1657,7 @@ export default function DashboardLayout({ children }) {
                       : "hover:bg-[#edebeb]"
                   )}
                   onClick={() => handleChooseEmailForAddDomain(data)}
-                  id={data.id}
+                  key={data.id}
                 >
                   <HistoryIcon
                     className={clsx(
