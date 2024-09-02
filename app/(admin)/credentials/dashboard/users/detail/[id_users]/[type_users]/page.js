@@ -7,6 +7,7 @@ import clsx from "clsx";
 import {
   MARKETING_SECTION_ROLE_SECTION,
   PARTNER_SECTION_ROLE_SECTION,
+  SUPERADMIN_SECTION_ROLE_SECTION,
   USERS_SECTION_ROLE_SECTION,
 } from "@/app/_lib/variables/Variables";
 import { ConfigProvider, Form, Input, Select, Switch } from "antd";
@@ -795,7 +796,6 @@ export default function DetailRoleUsers({ params }) {
       {/* Section Marketing */}
 
       {/* Section Partner */}
-
       {params.type_users === PARTNER_SECTION_ROLE_SECTION && (
         <section>
           <div className={clsx("flex items-center justify-between mb-4")}>
@@ -1042,8 +1042,251 @@ export default function DetailRoleUsers({ params }) {
           </div>
         </section>
       )}
-
       {/* Section Partner */}
+
+      {/* Section SuperAdmin */}
+      {params.type_users === SUPERADMIN_SECTION_ROLE_SECTION && (
+        <section>
+          <div className={clsx("flex items-center justify-between mb-4")}>
+            <div className="flex items-center">
+              <div
+                onClick={handleBackToAllcyberattacks}
+                className="cursor-pointer"
+              >
+                <ArrowBackIcon />
+              </div>
+              <h1 className="text-heading-2 text-black  ml-4">Details</h1>
+            </div>
+            <div>
+              {/* <button
+                className={clsx(
+                  `py-2 px-4 rounded-md text-primary-base text-Base-normal border-[1px] border-input-border hover:opacity-80 cursor-pointer `
+                )}
+                onClick={handleDeactivateAccounts}
+              >
+                {detailsData && detailsData.verified
+                  ? "Deactivate"
+                  : "Activate"}{" "}
+                accounts
+              </button> */}
+              {/* <button
+                className={clsx(
+                  `py-2 px-4 rounded-md text-primary-base text-Base-normal border-[1px] border-input-border hover:opacity-80 cursor-pointer ml-4 `
+                )}
+              >
+                Save
+              </button> */}
+            </div>
+          </div>
+          <div>
+            <div className="p-8 bg-white rounded-lg mt-8">
+              <section className="flex items-center justify-between">
+                <div>
+                  {/* <h2 className="text-heading-5 text-black mb-1">
+                    Users is on {demo ? "Full Access" : "Demo"} Mode
+                  </h2> */}
+                  <h2 className="text-text-description text-Base-normal mb-1">
+                    Users is on{" "}
+                    <span className={clsx("text-heading-5 text-black")}>
+                      {demo ? "Demo" : "Full Access"}
+                    </span>{" "}
+                    Mode
+                  </h2>
+                  {/* <p className="text-text-description text-Base-normal">
+                    By activating this mode, users will be restricted from
+                    accessing some features on the SectorOne dashboard.
+                  </p> */}
+                  <p className="text-text-description text-Base-normal">
+                    This Account is currently{" "}
+                    <span className={clsx("text-heading-5 text-black")}>
+                      {detailsData && detailsData.verified
+                        ? "Active"
+                        : "Inactive"}
+                    </span>{" "}
+                    and ready to be used.
+                  </p>
+                </div>
+                <div>
+                  {/* <ConfigProvider
+                    theme={{
+                      token: {
+                        colorPrimary: "#FF6F1E",
+                      },
+                    }}
+                  >
+                    <Switch
+                      onChange={handleDemoChange}
+                      value={demo}
+                      defaultValue={demo}
+                      disabled
+                    />
+                  </ConfigProvider> */}
+                </div>
+              </section>
+              <section className="mt-8 grid grid-cols-2 gap-4   ">
+                <Form.Item
+                  label={"Role"}
+                  name={role}
+                  layout="vertical"
+                  rules={[
+                    {
+                      required: true,
+                    },
+                  ]}
+                >
+                  <ConfigProvider theme={{ token: { colorPrimary: "FF6F1E" } }}>
+                    <Select
+                      defaultValue={detailsData && detailsData.role}
+                      options={selectOptions}
+                      size="large"
+                      value={role}
+                      onChange={handleRoleChange}
+                      disabled
+                    />
+                  </ConfigProvider>
+                </Form.Item>
+                <Form.Item
+                  label={"Name"}
+                  name={name}
+                  layout="vertical"
+                  rules={[
+                    {
+                      required: true,
+                    },
+                  ]}
+                  className={clsx("text-Base-normal text-[#000000E0]")}
+                >
+                  <Input
+                    placeholder="John Smith"
+                    variant="filled"
+                    size="large"
+                    onChange={(e) => handleNameChange(e)}
+                    value={name}
+                    defaultValue={name}
+                    disabled
+                  />
+                </Form.Item>
+                <Form.Item
+                  label={"Phone number"}
+                  name={phone}
+                  layout="vertical"
+                  rules={[
+                    {
+                      required: true,
+                    },
+                  ]}
+                >
+                  <Input
+                    placeholder="08123456789"
+                    variant="filled"
+                    size="large"
+                    value={phone}
+                    onChange={(e) => handlePhoneChange(e)}
+                    defaultValue={phone}
+                    disabled
+                  />
+                </Form.Item>
+                <Form.Item
+                  label={"Email"}
+                  name={email}
+                  layout="vertical"
+                  rules={[
+                    {
+                      required: true,
+                    },
+                  ]}
+                >
+                  <Input
+                    placeholder="john@gmail.com"
+                    variant="filled"
+                    size="large"
+                    value={email}
+                    onChange={(e) => handleEmailChange(e)}
+                    defaultValue={email}
+                    disabled
+                  />
+                </Form.Item>
+                <Form.Item
+                  label={"Executive protection credits"}
+                  name={protectionCredits}
+                  layout="vertical"
+                  rules={[
+                    {
+                      required: true,
+                    },
+                  ]}
+                >
+                  <Input
+                    placeholder="10"
+                    variant="filled"
+                    size="large"
+                    value={protectionCredits}
+                    // onChange={(e) => handlePhoneChange(e)}
+                    defaultValue={protectionCredits}
+                    disabled
+                  />
+                </Form.Item>
+                <Form.Item
+                  label={"Search by keywords credits"}
+                  name={keywordCredits}
+                  layout="vertical"
+                  rules={[
+                    {
+                      required: true,
+                    },
+                  ]}
+                >
+                  <Input
+                    placeholder="10"
+                    variant="filled"
+                    size="large"
+                    value={keywordCredits}
+                    // onChange={(e) => handleEmailChange(e)}
+                    defaultValue={keywordCredits}
+                    disabled
+                  />
+                </Form.Item>
+              </section>
+            </div>
+          </div>
+          <div>
+            <div className="mt-8">
+              <section className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-heading-4 text-black">URL list</h2>
+                </div>
+              </section>
+              <section className="bg-white rounded-md p-8 mt-4">
+                {allDomain &&
+                  allDomain.data.map((data) => (
+                    <Form.Item
+                      label={"Url"}
+                      name={data.domain}
+                      layout="vertical"
+                      rules={[
+                        {
+                          required: true,
+                        },
+                      ]}
+                      key={data.id}
+                    >
+                      <Input
+                        placeholder="gmail.com"
+                        variant="filled"
+                        size="large"
+                        // onChange={handleRequiredUrlChange}
+                        value={data.domain}
+                        defaultValue={data.domain}
+                        disabled
+                      />
+                    </Form.Item>
+                  ))}
+              </section>
+            </div>
+          </div>
+        </section>
+      )}
+      {/* Section SuperAdmin */}
     </main>
   );
 }
