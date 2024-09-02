@@ -91,6 +91,7 @@ import HistoryIcon from "@mui/icons-material/History";
 const { Search } = Input;
 import ErrorIcon from "@mui/icons-material/Error";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import EmailIcon from "@mui/icons-material/Email";
 
 export default function DashboardLayout({ children }) {
   const [hide, setHide] = useState(false);
@@ -1659,11 +1660,12 @@ export default function DashboardLayout({ children }) {
                   onClick={() => handleChooseEmailForAddDomain(data)}
                   key={data.id}
                 >
-                  <HistoryIcon
+                  <EmailIcon
                     className={clsx(
                       data.id === emailChoosedAddDomain
                         ? "text-white"
-                        : "text-[#00000073]"
+                        : "text-[#00000073]",
+                      "size-[20px]"
                     )}
                   />
                   <p
