@@ -53,7 +53,9 @@ export default function DomainSearchPage() {
 
   // End : Route Params
 
-  const [email, setEmail] = useState(getCookie("scanned_domain") || "");
+  const [email, setEmail] = useState(
+    getCookie("scanned_domain") || searchParams.get("query") || ""
+  );
   const [isErrorEmail, setIsErrorEmail] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [page, setPage] = useState(searchParams.get("page") || 1);

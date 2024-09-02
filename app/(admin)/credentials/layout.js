@@ -13,6 +13,7 @@ import {
   LockTwoTone,
   InboxOutlined,
   SearchOutlined,
+  LoadingOutlined,
 } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import clsx from "clsx";
@@ -82,6 +83,7 @@ import { setConfirmDetailUserDeactivateState } from "@/app/_lib/store/features/U
 const { Dragger } = Upload;
 import dayjs from "dayjs";
 import {
+  setCountAllPageAddDomain,
   setIsAddDomainPopup,
   setisAlreadyPopup,
   setUserListAddDomain,
@@ -129,6 +131,10 @@ export default function DashboardLayout({ children }) {
   const [errorMsgAddDomain, setErrorMsgAddDomain] = useState("");
   const [successStateAddDomain, setSuccessStateAddDomain] = useState(false);
   const [successMsgAddDomain, setSuccessMsgAddDomain] = useState("");
+  const [reachBottomUserList, setReachBottomUserList] = useState(false);
+  const [userListPage, setUserListPage] = useState(1);
+  const [isLoadingUserListAddDomain, setIsLoadingUserListAddDomain] =
+    useState(false);
 
   const dataLeakedDetails = useSelector(
     (state) => state.executiveProtections.detailsLeakedData.info_2
@@ -172,6 +178,10 @@ export default function DashboardLayout({ children }) {
     (state) => state.domainSearch.emailChoosenAddDomain
   );
 
+  const allPageUsersAddDomain = useSelector(
+    (state) => state.domainSearch.countAllPageAddDomain
+  );
+
   const handleCloseDetailExecutivePopup = () => {
     dispatch(setDetailsIsOpen(false));
   };
@@ -182,7 +192,9 @@ export default function DashboardLayout({ children }) {
 
   const handleRoleChange = (value) => {
     console.log("value role: ", value);
+    setUserListPage(1);
     setRole(value);
+    dispatch(setUserListAddDomain([]));
   };
 
   const handleAddDomainSearch = (e) => {
@@ -215,13 +227,23 @@ export default function DashboardLayout({ children }) {
   };
 
   const handleScrollUserList = (e) => {
-    if (e.target.scrollTop + e.target.clientHeight >= e.target.scrollHeight) {
-      console.log("react bottom");
+    console.log("reach bottom: ", reachBottomUserList);
+    if (userListPage < allPageUsersAddDomain) {
+      if (e.target.scrollTop + e.target.clientHeight >= e.target.scrollHeight) {
+        setReachBottomUserList(true);
+        setUserListPage(userListPage + 1);
+        // setReachBottomUserList(false);
+      }
+    } else {
+      setReachBottomUserList(false);
+      return;
     }
   };
 
   console.log("emailchoosedadddomain: ", emailChoosedAddDomain);
   console.log("add domain confirmation: ", addDomainConfirmation);
+  console.log("user list page: ", userListPage);
+  console.log("allpage add domain: ", allPageUsersAddDomain);
 
   // End of: (superadmin) - Add Domain
 
@@ -538,9 +560,10 @@ export default function DashboardLayout({ children }) {
   const FetchAllUsersForAddDomain = async () => {
     try {
       dispatch(setLoadingState(true));
+      setIsLoadingUserListAddDomain(true);
 
       const res = await fetch(
-        `${APIDATAV1}root/admin/all/user?page=1&limit=10&search=${addDomainSearch}&type=${role}`,
+        `${APIDATAV1}root/admin/all/user?page=${userListPage}&limit=10&search=${addDomainSearch}&type=${role}`,
         {
           method: "GET",
           credentials: "include",
@@ -565,7 +588,8 @@ export default function DashboardLayout({ children }) {
       console.log("data all users for add domain: ", data);
 
       if (data.data) {
-        dispatch(setUserListAddDomain(data.data));
+        dispatch(setUserListAddDomain([...userListAddDomain, ...data.data]));
+        dispatch(setCountAllPageAddDomain(data.count_page));
         // setListUsersAddDomain(data.data);
         return res;
       }
@@ -576,6 +600,7 @@ export default function DashboardLayout({ children }) {
       return error;
     } finally {
       dispatch(setLoadingState(false));
+      setIsLoadingUserListAddDomain(false);
     }
   };
 
@@ -664,6 +689,10 @@ export default function DashboardLayout({ children }) {
     FetchAllUsersForAddDomainWithRefreshToken();
     setEmailChoosedAddDomain("");
   }, [addDomainSearch]);
+
+  useEffect(() => {
+    FetchAllUsersForAddDomainWithRefreshToken();
+  }, [userListPage]);
 
   // End of: Add domain - (superadmin)
 
@@ -1694,6 +1723,13 @@ export default function DashboardLayout({ children }) {
                 {" "}
                 {userListAddDomain}{" "}
               </p>
+            )}
+            {isLoadingUserListAddDomain ? (
+              <div className={clsx("ml-[32px]")}>
+                <LoadingOutlined className={clsx("text-primary-base")} />
+              </div>
+            ) : (
+              ""
             )}
           </div>
         </div>
