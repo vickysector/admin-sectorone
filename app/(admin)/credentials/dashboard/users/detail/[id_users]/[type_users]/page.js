@@ -497,26 +497,44 @@ export default function DetailRoleUsers({ params }) {
                   />
                 </div>
 
-                <Form.Item
-                  label={"Phone number"}
-                  name={phone}
-                  layout="vertical"
-                  rules={[
-                    {
-                      required: true,
-                    },
-                  ]}
-                >
-                  <Input
-                    placeholder="08123456789"
-                    variant="filled"
-                    size="large"
-                    value={phone}
-                    onChange={(e) => handlePhoneChange(e)}
-                    defaultValue={phone}
-                    disabled
+                <div className="flex items-center justify-between">
+                  <Form.Item
+                    label={"Phone number"}
+                    name={phone}
+                    layout="vertical"
+                    rules={[
+                      {
+                        required: true,
+                      },
+                    ]}
+                    className={clsx("text-Base-normal text-[#000000E0] w-full")}
+                  >
+                    <Input
+                      placeholder="08123456789"
+                      variant="filled"
+                      size="large"
+                      value={phone}
+                      onChange={(e) => handlePhoneChange(e)}
+                      defaultValue={phone}
+                      disabled={!isPhoneEdited}
+                    />
+                  </Form.Item>
+                  <EditOutlined
+                    className={clsx(
+                      "ml-4 text-[#00000040] text-[20px] ",
+                      !isPhoneEdited ? "visible" : "hidden"
+                    )}
+                    onClick={handleSetIsPhoneEdited}
                   />
-                </Form.Item>
+                  <CloseCircleOutlined
+                    className={clsx(
+                      "ml-4 text-[#00000040] text-[20px] ",
+                      isPhoneEdited ? "visible" : "hidden"
+                    )}
+                    onClick={handleSetIsPhoneEdited}
+                  />
+                </div>
+
                 <Form.Item
                   label={"Email"}
                   name={email}
