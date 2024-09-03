@@ -35,15 +35,20 @@ import { FormattedParagraph } from "@/app/_ui/components/details/paragraphAi";
 import { DetailDescriptions } from "@/app/_ui/components/details/detailsDescriptions";
 import { setIsDetailActive } from "@/app/_lib/store/features/KeywordSearch/KeywordSearchSlices";
 
+import dayjs from "dayjs";
+
 export default function DetailsDomainSearch() {
   const detailsCompromisedData = useSelector(
     (state) => state.domainSearch.detailsDomainSearch
   );
 
+  const [dataStealers, setDataStealers] = useState([]);
+
   const router = useRouter();
   const dispatch = useDispatch();
 
   console.log("details compromised data: ", detailsCompromisedData);
+  console.log("temporary data (state): ", dataStealers);
 
   const Date = {
     title: "Date",
@@ -53,14 +58,20 @@ export default function DetailsDomainSearch() {
         key: "Date identified",
         value:
           hasOwnProperty("datetime_added") &&
-          convertDateFormat(detailsCompromisedData.datetime_added),
+          dayjs(detailsCompromisedData.datetime_added).format(
+            "dddd, D MMMM YYYY HH:mm"
+          ),
       },
       {
         id: 2,
         key: "Date compromised",
         value:
-          hasOwnProperty("datetime_compromised") &&
-          convertDateFormat(detailsCompromisedData.datetime_compromised),
+          dataStealers.length === 0
+            ? hasOwnProperty("datetime_compromised") &&
+              convertDateFormat(detailsCompromisedData.datetime_compromised)
+            : dayjs(dataStealers[0].date_compromised).format(
+                "dddd, D MMMM YYYY HH:mm"
+              ),
       },
     ],
   };
@@ -101,8 +112,11 @@ export default function DetailsDomainSearch() {
         id: 1,
         key: "Device name",
         value:
-          hasOwnProperty("computer_name") &&
-          detailsCompromisedData.computer_name,
+          dataStealers.length === 0
+            ? "-"
+            : dataStealers[0].computer_name.includes("Found")
+            ? "-"
+            : dataStealers[0].computer_name,
       },
       {
         id: 2,
@@ -113,7 +127,22 @@ export default function DetailsDomainSearch() {
       {
         id: 3,
         key: "Path",
-        value: hasOwnProperty("path") && detailsCompromisedData.path,
+        value:
+          dataStealers.length === 0
+            ? "-"
+            : dataStealers[0].malware_path.includes("Found")
+            ? "-"
+            : dataStealers[0].malware_path,
+      },
+      {
+        id: 4,
+        key: "Operating System",
+        value:
+          dataStealers.length === 0
+            ? "-"
+            : dataStealers[0].operating_system.includes("Found")
+            ? "-"
+            : dataStealers[0].operating_system,
       },
     ],
   };
@@ -124,7 +153,12 @@ export default function DetailsDomainSearch() {
       {
         id: 1,
         key: "IP Address",
-        value: hasOwnProperty("ip") && detailsCompromisedData.ip,
+        value:
+          dataStealers.length === 0
+            ? "-"
+            : dataStealers[0].ip.includes("Found")
+            ? "-"
+            : dataStealers[0].ip,
       },
       {
         id: 2,
@@ -135,13 +169,65 @@ export default function DetailsDomainSearch() {
         id: 3,
         key: "Antivirus",
         value:
-          hasOwnProperty("antivirus") &&
-          detailsCompromisedData.antivirus.length === 0
+          //   hasOwnProperty("antivirus") &&
+          //   detailsCompromisedData.antivirus.length === 0
+          //     ? "-"
+          //     : hasOwnProperty("antivirus") &&
+          //       detailsCompromisedData.antivirus.join(),
+          dataStealers.length === 0
             ? "-"
-            : hasOwnProperty("antivirus") &&
-              detailsCompromisedData.antivirus.join(),
+            : dataStealers[0].antiviruses.length === 0 ||
+              dataStealers[0].antiviruses.includes("Found")
+            ? "-"
+            : dataStealers[0].antiviruses.join(", "),
       },
     ],
+  };
+
+  const FetchDataTemporaryUsername = async () => {
+    try {
+      dispatch(setLoadingState(true));
+
+      const res = await fetch(
+        `http://18.138.131.113:8006/search-username?username=${
+          hasOwnProperty("login") && detailsCompromisedData.login
+        }`
+      );
+
+      const data = await res.json();
+
+      setDataStealers(data.stealers);
+
+      console.log("temporary data username: ", data);
+    } catch (error) {
+      console.log("error get temporary data username: ", error);
+      return error;
+    } finally {
+      dispatch(setLoadingState(false));
+    }
+  };
+
+  const FetchDataTemporaryEmail = async () => {
+    try {
+      dispatch(setLoadingState(true));
+
+      const res = await fetch(
+        `http://18.138.131.113:8006/search-email?email=${
+          hasOwnProperty("login") && detailsCompromisedData.login
+        }`
+      );
+
+      const data = await res.json();
+
+      setDataStealers(data.stealers);
+
+      console.log("temporary data email: ", data);
+    } catch (error) {
+      console.log("error get temporary data email: ", error);
+      return error;
+    } finally {
+      dispatch(setLoadingState(false));
+    }
   };
 
   function hasOwnProperty(property) {
@@ -156,6 +242,14 @@ export default function DetailsDomainSearch() {
   useEffect(() => {
     if (!hasOwnProperty("id")) {
       router.back();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (hasOwnProperty("login") && detailsCompromisedData.login.includes("@")) {
+      FetchDataTemporaryEmail();
+    } else {
+      FetchDataTemporaryUsername();
     }
   }, []);
 

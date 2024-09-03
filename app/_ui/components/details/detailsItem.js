@@ -4,7 +4,7 @@ export function DetailItems({ items }) {
       <div>
         <h2 className="text-black text-heading-4">{items.title}</h2>
 
-        <section className="grid grid-cols-3 mt-6">
+        <section className="grid grid-cols-3 mt-6 gap-4">
           {items.data.map((data) => (
             <div key={data.id}>
               <h3 className="text-LG-strong text-black">{data.key}</h3>
