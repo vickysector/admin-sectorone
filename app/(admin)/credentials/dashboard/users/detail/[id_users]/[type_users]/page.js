@@ -535,26 +535,44 @@ export default function DetailRoleUsers({ params }) {
                   />
                 </div>
 
-                <Form.Item
-                  label={"Email"}
-                  name={email}
-                  layout="vertical"
-                  rules={[
-                    {
-                      required: true,
-                    },
-                  ]}
-                >
-                  <Input
-                    placeholder="john@gmail.com"
-                    variant="filled"
-                    size="large"
-                    value={email}
-                    onChange={(e) => handleEmailChange(e)}
-                    defaultValue={email}
-                    disabled
+                <div className="flex items-center justify-between">
+                  <Form.Item
+                    label={"Email"}
+                    name={email}
+                    layout="vertical"
+                    rules={[
+                      {
+                        required: true,
+                      },
+                    ]}
+                    className={clsx("text-Base-normal text-[#000000E0] w-full")}
+                  >
+                    <Input
+                      placeholder="john@gmail.com"
+                      variant="filled"
+                      size="large"
+                      value={email}
+                      onChange={(e) => handleEmailChange(e)}
+                      defaultValue={email}
+                      disabled={!isEmailEdited}
+                    />
+                  </Form.Item>
+                  <EditOutlined
+                    className={clsx(
+                      "ml-4 text-[#00000040] text-[20px] ",
+                      !isEmailEdited ? "visible" : "hidden"
+                    )}
+                    onClick={handleSetIsEmailEdited}
                   />
-                </Form.Item>
+                  <CloseCircleOutlined
+                    className={clsx(
+                      "ml-4 text-[#00000040] text-[20px] ",
+                      isEmailEdited ? "visible" : "hidden"
+                    )}
+                    onClick={handleSetIsEmailEdited}
+                  />
+                </div>
+
                 <Form.Item
                   label={"Executive protection credits"}
                   name={protectionCredits}
