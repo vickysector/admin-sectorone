@@ -21,6 +21,7 @@ import {
   setConfirmDetailUserDeactivateState,
   setDetailUserDeactivateFunction,
 } from "@/app/_lib/store/features/Users/DetailUserSlice";
+import { CloseCircleOutlined, EditOutlined } from "@ant-design/icons";
 
 export default function DetailRoleUsers({ params }) {
   // Start of: Redux
@@ -44,8 +45,15 @@ export default function DetailRoleUsers({ params }) {
   const [protectionCredits, setProtectionCredits] = useState("");
   const [keywordCredits, setKeywordCredits] = useState("");
   const [triggerChange, setTriggerChange] = useState(false);
+  const [isRoleEdited, setIsRoleEdited] = useState(false);
 
   // End of: State
+
+  // Start of: Edit Functionality
+
+  const handleSetIsRoleEdited = () => [setIsRoleEdited((prev) => !prev)];
+
+  // End of: Edit Functionality
 
   //   Start of: Functions Handler
 
@@ -383,27 +391,46 @@ export default function DetailRoleUsers({ params }) {
                 </div>
               </section>
               <section className="mt-8 grid grid-cols-2 gap-4   ">
-                <Form.Item
-                  label={"Role"}
-                  name={role}
-                  layout="vertical"
-                  rules={[
-                    {
-                      required: true,
-                    },
-                  ]}
-                >
-                  <ConfigProvider theme={{ token: { colorPrimary: "FF6F1E" } }}>
-                    <Select
-                      defaultValue={detailsData && detailsData.role}
-                      options={selectOptions}
-                      size="large"
-                      value={role}
-                      onChange={handleRoleChange}
-                      disabled
-                    />
-                  </ConfigProvider>
-                </Form.Item>
+                <div className="flex items-center justify-between">
+                  <Form.Item
+                    label={"Role"}
+                    name={role}
+                    layout="vertical"
+                    rules={[
+                      {
+                        required: true,
+                      },
+                    ]}
+                    style={{ width: "100%" }}
+                  >
+                    <ConfigProvider
+                      theme={{ token: { colorPrimary: "FF6F1E" } }}
+                    >
+                      <Select
+                        defaultValue={detailsData && detailsData.role}
+                        options={selectOptions}
+                        size="large"
+                        value={role}
+                        onChange={handleRoleChange}
+                        disabled={!isRoleEdited}
+                      />
+                    </ConfigProvider>
+                  </Form.Item>
+                  <EditOutlined
+                    className={clsx(
+                      "ml-4 text-[#00000040] text-[20px] ",
+                      !isRoleEdited ? "visible" : "hidden"
+                    )}
+                    onClick={handleSetIsRoleEdited}
+                  />
+                  <CloseCircleOutlined
+                    className={clsx(
+                      "ml-4 text-[#00000040] text-[20px] ",
+                      isRoleEdited ? "visible" : "hidden"
+                    )}
+                    onClick={handleSetIsRoleEdited}
+                  />
+                </div>
                 <Form.Item
                   label={"Name"}
                   name={name}
