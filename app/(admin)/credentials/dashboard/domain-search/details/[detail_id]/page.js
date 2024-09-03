@@ -189,9 +189,16 @@ export default function DetailsDomainSearch() {
       dispatch(setLoadingState(true));
 
       const res = await fetch(
-        `http://18.138.131.113:8006/search-username?username=${
+        `${APIDATAV1}root/admin/search-username?username=${
           hasOwnProperty("login") && detailsCompromisedData.login
-        }`
+        }`,
+        {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            Authorization: `Bearer ${getCookie("access_token")}`,
+          },
+        }
       );
 
       const data = await res.json();
@@ -212,9 +219,16 @@ export default function DetailsDomainSearch() {
       dispatch(setLoadingState(true));
 
       const res = await fetch(
-        `http://18.138.131.113:8006/search-email?email=${
+        `${APIDATAV1}root/admin/search-email?email=${
           hasOwnProperty("login") && detailsCompromisedData.login
-        }`
+        }`,
+        {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            Authorization: `Bearer ${getCookie("access_token")}`,
+          },
+        }
       );
 
       const data = await res.json();
