@@ -45,13 +45,41 @@ export default function DetailRoleUsers({ params }) {
   const [protectionCredits, setProtectionCredits] = useState("");
   const [keywordCredits, setKeywordCredits] = useState("");
   const [triggerChange, setTriggerChange] = useState(false);
-  const [isRoleEdited, setIsRoleEdited] = useState(false);
 
   // End of: State
 
   // Start of: Edit Functionality
+  const [isRoleEdited, setIsRoleEdited] = useState(false);
+  const [isNameEdited, setIsNameEdited] = useState(false);
+  const [isPhoneEdited, setIsPhoneEdited] = useState(false);
+  const [isEmailEdited, setIsEmailEdited] = useState(false);
+  const [isProtectionCreditsEdited, setIsProtectionCreditsEdited] =
+    useState(false);
+  const [isKeywordCreditsEdited, setIsKeywordCreditsEdited] = useState(false);
 
-  const handleSetIsRoleEdited = () => [setIsRoleEdited((prev) => !prev)];
+  const handleSetIsRoleEdited = () => {
+    setIsRoleEdited((prev) => !prev);
+  };
+
+  const handleSetIsNameEdited = () => {
+    setIsNameEdited((prev) => !prev);
+  };
+
+  const handleSetIsPhoneEdited = () => {
+    setIsPhoneEdited((prev) => !prev);
+  };
+
+  const handleSetIsEmailEdited = () => {
+    setIsEmailEdited((prev) => !prev);
+  };
+
+  const handleSetIsProtectionCreditsEdited = () => {
+    setIsProtectionCreditsEdited((prev) => !prev);
+  };
+
+  const handleSetIsKeywordCreditsEdited = () => {
+    setIsKeywordCreditsEdited((prev) => !prev);
+  };
 
   // End of: Edit Functionality
 
@@ -431,27 +459,44 @@ export default function DetailRoleUsers({ params }) {
                     onClick={handleSetIsRoleEdited}
                   />
                 </div>
-                <Form.Item
-                  label={"Name"}
-                  name={name}
-                  layout="vertical"
-                  rules={[
-                    {
-                      required: true,
-                    },
-                  ]}
-                  className={clsx("text-Base-normal text-[#000000E0]")}
-                >
-                  <Input
-                    placeholder="John Smith"
-                    variant="filled"
-                    size="large"
-                    onChange={(e) => handleNameChange(e)}
-                    value={name}
-                    defaultValue={name}
-                    disabled
+                <div className="flex items-center justify-between">
+                  <Form.Item
+                    label={"Name"}
+                    name={name}
+                    layout="vertical"
+                    rules={[
+                      {
+                        required: true,
+                      },
+                    ]}
+                    className={clsx("text-Base-normal text-[#000000E0] w-full")}
+                  >
+                    <Input
+                      placeholder="John Smith"
+                      variant="filled"
+                      size="large"
+                      onChange={(e) => handleNameChange(e)}
+                      value={name}
+                      defaultValue={name}
+                      disabled={!isNameEdited}
+                    />
+                  </Form.Item>
+                  <EditOutlined
+                    className={clsx(
+                      "ml-4 text-[#00000040] text-[20px] ",
+                      !isNameEdited ? "visible" : "hidden"
+                    )}
+                    onClick={handleSetIsNameEdited}
                   />
-                </Form.Item>
+                  <CloseCircleOutlined
+                    className={clsx(
+                      "ml-4 text-[#00000040] text-[20px] ",
+                      isNameEdited ? "visible" : "hidden"
+                    )}
+                    onClick={handleSetIsNameEdited}
+                  />
+                </div>
+
                 <Form.Item
                   label={"Phone number"}
                   name={phone}
