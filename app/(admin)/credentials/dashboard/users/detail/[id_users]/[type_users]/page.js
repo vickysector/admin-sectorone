@@ -57,6 +57,35 @@ export default function DetailRoleUsers({ params }) {
   const [isProtectionCreditsEdited, setIsProtectionCreditsEdited] =
     useState(false);
   const [isKeywordCreditsEdited, setIsKeywordCreditsEdited] = useState(false);
+  const [isDemoEdited, setIsDemoEdited] = useState(false);
+  const [isAvailableForSaveRole, setIsAvailableForSaveRole] = useState(false);
+  const [isAvailableForSaveName, setIsAvailableForSaveName] = useState(false);
+  const [isAvailableForSavePhone, setIsAvailableForSavePhone] = useState(false);
+  const [isAvailableForSaveEmail, setIsAvailableForSaveEmail] = useState(false);
+  const [isAvailableForSaveProtections, setIsAvailableForSaveProtections] =
+    useState(false);
+  const [isAvailableForSaveKeyword, setIsAvailableForSaveKeyword] =
+    useState(false);
+  const [isAvailableForDemo, setIsAvailableForDemo] = useState(false);
+
+  const isAvailableForSave =
+    isAvailableForDemo ||
+    isAvailableForSaveRole ||
+    isAvailableForSaveName ||
+    isAvailableForSavePhone ||
+    isAvailableForSaveEmail ||
+    isAvailableForSaveProtections ||
+    isAvailableForSaveKeyword;
+
+  const handleSetIsDemoEdited = () => {
+    setIsDemoEdited(true);
+  };
+
+  const handleSetIsDemoEditedCancel = () => {
+    setIsDemoEdited(false);
+    setIsAvailableForDemo(false);
+    FetchDetailsDataDemoWithRefreshToken();
+  };
 
   const handleSetIsRoleEdited = () => {
     setIsRoleEdited(true);
@@ -64,6 +93,7 @@ export default function DetailRoleUsers({ params }) {
 
   const handleSetIsRoleEditedCancel = () => {
     setIsRoleEdited(false);
+    setIsAvailableForSaveRole(false);
     FetchDetailsDataRoleWithRefreshToken();
   };
 
@@ -73,6 +103,7 @@ export default function DetailRoleUsers({ params }) {
 
   const handleSetIsNameEditedCancel = () => {
     setIsNameEdited(false);
+    setIsAvailableForSaveName(false);
     FetchDetailsDataNameWithRefreshToken();
   };
 
@@ -82,6 +113,7 @@ export default function DetailRoleUsers({ params }) {
 
   const handleSetIsPhoneEditedCancel = () => {
     setIsPhoneEdited(false);
+    setIsAvailableForSavePhone(false);
     FetchDetailsDataPhoneWithRefreshToken();
   };
 
@@ -91,6 +123,7 @@ export default function DetailRoleUsers({ params }) {
 
   const handleSetIsEmailEditedCancel = () => {
     setIsEmailEdited(false);
+    setIsAvailableForSaveEmail(false);
     FetchDetailsDataEmailWithRefreshToken();
   };
 
@@ -100,6 +133,7 @@ export default function DetailRoleUsers({ params }) {
 
   const handleSetIsProtectionCreditsEditedCancel = () => {
     setIsProtectionCreditsEdited(false);
+    setIsAvailableForSaveProtections(false);
     FetchDetailsDataProtectionCreditsWithRefreshToken();
   };
 
@@ -109,6 +143,7 @@ export default function DetailRoleUsers({ params }) {
 
   const handleSetIsKeywordCreditsEditedCancel = () => {
     setIsKeywordCreditsEdited(false);
+    setIsAvailableForSaveKeyword(false);
     FetchDetailsDataKeywordCreditsWithRefreshToken();
   };
 
@@ -122,30 +157,37 @@ export default function DetailRoleUsers({ params }) {
 
   const handleRoleChange = (value) => {
     setRole(value);
+    setIsAvailableForSaveRole(true);
   };
 
   const handleDemoChange = (checked) => {
     setDemo(checked);
+    setIsAvailableForDemo(true);
   };
 
   const handleNameChange = (event) => {
     setName(event.target.value);
+    setIsAvailableForSaveName(true);
   };
 
   const handlePhoneChange = (event) => {
     setPhone(event.target.value);
+    setIsAvailableForSavePhone(true);
   };
 
   const handleEmailChange = (event) => {
     setEmail(event.target.value);
+    setIsAvailableForSaveEmail(true);
   };
 
   const handleExecutiveCreditsChange = (event) => {
     setProtectionCredits(event.target.value);
+    setIsAvailableForSaveProtections(true);
   };
 
   const handleKeywordCreditsChange = (event) => {
     setKeywordCredits(event.target.value);
+    setIsAvailableForSaveKeyword(true);
   };
 
   const handleDeactivateAccounts = (status) => {
@@ -262,6 +304,48 @@ export default function DetailRoleUsers({ params }) {
   };
 
   // Start of: fetch Detail Data ndividual
+
+  const FetchDetailsDataDemo = async () => {
+    try {
+      dispatch(setLoadingState(true));
+
+      const res = await fetch(`${APIDATAV1}admin/user/${params.id_users}`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          Authorization: `Bearer ${getCookie("access_token")}`,
+        },
+      });
+
+      if (res.status === 401 || res.status === 403) {
+        return res;
+      }
+
+      const data = await res.json();
+
+      console.log("details data: ", data);
+
+      if (data.data === null) {
+        throw res;
+      }
+
+      if (data.data) {
+        setDemo(data.data.is_demo);
+        return res;
+      }
+
+      //   return res;
+    } catch (error) {
+      console.log("error user status: ", error);
+      return error;
+    } finally {
+      dispatch(setLoadingState(false));
+    }
+  };
+
+  const FetchDetailsDataDemoWithRefreshToken = async () => {
+    await fetchWithRefreshToken(FetchDetailsDataDemo, router, dispatch);
+  };
 
   const FetchDetailsDataRole = async () => {
     try {
@@ -669,7 +753,7 @@ export default function DetailRoleUsers({ params }) {
               </button>
               <button
                 className={clsx(
-                  `py-2 px-4 rounded-md text-primary-base text-Base-normal border-[1px] border-input-border hover:opacity-80 cursor-pointer ml-4 `
+                  `py-2 px-4 rounded-md text-white bg-primary-base text-Base-normal border-[1px] hover:opacity-80 cursor-pointer ml-4 `
                 )}
               >
                 Save
@@ -705,7 +789,7 @@ export default function DetailRoleUsers({ params }) {
                     </span>{" "}
                   </p>
                 </div>
-                <div>
+                <div className="flex items-center">
                   <ConfigProvider
                     theme={{
                       token: {
@@ -717,8 +801,23 @@ export default function DetailRoleUsers({ params }) {
                       onChange={handleDemoChange}
                       value={demo}
                       defaultValue={demo}
+                      disabled={!isDemoEdited}
                     />
                   </ConfigProvider>
+                  <EditOutlined
+                    className={clsx(
+                      "ml-4 text-[#00000040] text-[20px] ",
+                      !isDemoEdited ? "visible" : "hidden"
+                    )}
+                    onClick={handleSetIsDemoEdited}
+                  />
+                  <CloseCircleOutlined
+                    className={clsx(
+                      "ml-4 text-[#00000040] text-[20px] ",
+                      isDemoEdited ? "visible" : "hidden"
+                    )}
+                    onClick={handleSetIsDemoEditedCancel}
+                  />
                 </div>
               </section>
               <section className="mt-8 grid grid-cols-2 gap-4   ">
