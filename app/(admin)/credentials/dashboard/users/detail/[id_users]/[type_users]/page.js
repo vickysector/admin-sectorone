@@ -678,20 +678,20 @@ export default function DetailRoleUsers({ params }) {
             <div className="p-8 bg-white rounded-lg mt-8">
               <section className="flex items-center justify-between">
                 <div>
-                  {/* <h2 className="text-heading-5 text-black mb-1">
-                    Users is on {demo ? "Full Access" : "Demo"} Mode
-                  </h2> */}
-                  <h2 className="text-text-description text-Base-normal mb-1">
+                  <h2 className="text-heading-5 text-black mb-1">
+                    Users is on {demo ? "Demo" : "Full Access"} Mode
+                  </h2>
+                  {/* <h2 className="text-text-description text-Base-normal mb-1">
                     Users is on{" "}
                     <span className={clsx("text-heading-5 text-black")}>
                       {demo ? "Demo" : "Full Access"}
                     </span>{" "}
                     Mode
-                  </h2>
-                  {/* <p className="text-text-description text-Base-normal">
+                  </h2> */}
+                  <p className="text-text-description text-Base-normal">
                     By activating this mode, users will be restricted from
                     accessing some features on the SectorOne dashboard.
-                  </p> */}
+                  </p>
                   <p className="text-text-description text-Base-normal">
                     This Account is currently{" "}
                     <span className={clsx("text-heading-5 text-black")}>
@@ -703,7 +703,7 @@ export default function DetailRoleUsers({ params }) {
                   </p>
                 </div>
                 <div>
-                  {/* <ConfigProvider
+                  <ConfigProvider
                     theme={{
                       token: {
                         colorPrimary: "#FF6F1E",
@@ -714,9 +714,8 @@ export default function DetailRoleUsers({ params }) {
                       onChange={handleDemoChange}
                       value={demo}
                       defaultValue={demo}
-                      disabled
                     />
-                  </ConfigProvider> */}
+                  </ConfigProvider>
                 </div>
               </section>
               <section className="mt-8 grid grid-cols-2 gap-4   ">
