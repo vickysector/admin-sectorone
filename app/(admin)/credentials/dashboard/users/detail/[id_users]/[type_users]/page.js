@@ -58,27 +58,51 @@ export default function DetailRoleUsers({ params }) {
   const [isKeywordCreditsEdited, setIsKeywordCreditsEdited] = useState(false);
 
   const handleSetIsRoleEdited = () => {
-    setIsRoleEdited((prev) => !prev);
+    setIsRoleEdited(true);
+  };
+
+  const handleSetIsRoleEditedCancel = () => {
+    setIsRoleEdited(false);
   };
 
   const handleSetIsNameEdited = () => {
-    setIsNameEdited((prev) => !prev);
+    setIsNameEdited(true);
+  };
+
+  const handleSetIsNameEditedCancel = () => {
+    setIsNameEdited(false);
   };
 
   const handleSetIsPhoneEdited = () => {
-    setIsPhoneEdited((prev) => !prev);
+    setIsPhoneEdited(true);
+  };
+
+  const handleSetIsPhoneEditedCancel = () => {
+    setIsPhoneEdited(false);
   };
 
   const handleSetIsEmailEdited = () => {
-    setIsEmailEdited((prev) => !prev);
+    setIsEmailEdited(true);
+  };
+
+  const handleSetIsEmailEditedCancel = () => {
+    setIsEmailEdited(false);
   };
 
   const handleSetIsProtectionCreditsEdited = () => {
-    setIsProtectionCreditsEdited((prev) => !prev);
+    setIsProtectionCreditsEdited(true);
+  };
+
+  const handleSetIsProtectionCreditsEditedCancel = () => {
+    setIsProtectionCreditsEdited(false);
   };
 
   const handleSetIsKeywordCreditsEdited = () => {
-    setIsKeywordCreditsEdited((prev) => !prev);
+    setIsKeywordCreditsEdited(true);
+  };
+
+  const handleSetIsKeywordCreditsEditedCancel = () => {
+    setIsKeywordCreditsEdited(false);
   };
 
   // End of: Edit Functionality
@@ -220,6 +244,269 @@ export default function DetailRoleUsers({ params }) {
   const FetchDetailsDataWithRefreshToken = async () => {
     await fetchWithRefreshToken(FetchDetailsData, router, dispatch);
   };
+
+  // Start of: fetch Detail Data ndividual
+
+  const FetchDetailsDataRole = async () => {
+    try {
+      dispatch(setLoadingState(true));
+
+      const res = await fetch(`${APIDATAV1}admin/user/${params.id_users}`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          Authorization: `Bearer ${getCookie("access_token")}`,
+        },
+      });
+
+      if (res.status === 401 || res.status === 403) {
+        return res;
+      }
+
+      const data = await res.json();
+
+      console.log("details data: ", data);
+
+      if (data.data === null) {
+        throw res;
+      }
+
+      if (data.data) {
+        setRole(data.data.role);
+        return res;
+      }
+
+      //   return res;
+    } catch (error) {
+      console.log("error user status: ", error);
+      return error;
+    } finally {
+      dispatch(setLoadingState(false));
+    }
+  };
+
+  const FetchDetailsDataRoleWithRefreshToken = async () => {
+    await fetchWithRefreshToken(FetchDetailsDataRole, router, dispatch);
+  };
+
+  const FetchDetailsDataName = async () => {
+    try {
+      dispatch(setLoadingState(true));
+
+      const res = await fetch(`${APIDATAV1}admin/user/${params.id_users}`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          Authorization: `Bearer ${getCookie("access_token")}`,
+        },
+      });
+
+      if (res.status === 401 || res.status === 403) {
+        return res;
+      }
+
+      const data = await res.json();
+
+      console.log("details data: ", data);
+
+      if (data.data === null) {
+        throw res;
+      }
+
+      if (data.data) {
+        setName(data.data.name);
+        return res;
+      }
+
+      //   return res;
+    } catch (error) {
+      console.log("error user status: ", error);
+      return error;
+    } finally {
+      dispatch(setLoadingState(false));
+    }
+  };
+
+  const FetchDetailsDataNameWithRefreshToken = async () => {
+    await fetchWithRefreshToken(FetchDetailsDataName, router, dispatch);
+  };
+
+  const FetchDetailsDataPhone = async () => {
+    try {
+      dispatch(setLoadingState(true));
+
+      const res = await fetch(`${APIDATAV1}admin/user/${params.id_users}`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          Authorization: `Bearer ${getCookie("access_token")}`,
+        },
+      });
+
+      if (res.status === 401 || res.status === 403) {
+        return res;
+      }
+
+      const data = await res.json();
+
+      console.log("details data: ", data);
+
+      if (data.data === null) {
+        throw res;
+      }
+
+      if (data.data) {
+        setPhone(data.data.phone);
+        return res;
+      }
+
+      //   return res;
+    } catch (error) {
+      console.log("error user status: ", error);
+      return error;
+    } finally {
+      dispatch(setLoadingState(false));
+    }
+  };
+
+  const FetchDetailsDataPhoneWithRefreshToken = async () => {
+    await fetchWithRefreshToken(FetchDetailsDataPhone, router, dispatch);
+  };
+
+  const FetchDetailsDataEmail = async () => {
+    try {
+      dispatch(setLoadingState(true));
+
+      const res = await fetch(`${APIDATAV1}admin/user/${params.id_users}`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          Authorization: `Bearer ${getCookie("access_token")}`,
+        },
+      });
+
+      if (res.status === 401 || res.status === 403) {
+        return res;
+      }
+
+      const data = await res.json();
+
+      console.log("details data: ", data);
+
+      if (data.data === null) {
+        throw res;
+      }
+
+      if (data.data) {
+        setEmail(data.data.email);
+        return res;
+      }
+
+      //   return res;
+    } catch (error) {
+      console.log("error user status: ", error);
+      return error;
+    } finally {
+      dispatch(setLoadingState(false));
+    }
+  };
+
+  const FetchDetailsDataEmailWithRefreshToken = async () => {
+    await fetchWithRefreshToken(FetchDetailsDataEmail, router, dispatch);
+  };
+
+  const FetchDetailsDataProtectionCredits = async () => {
+    try {
+      dispatch(setLoadingState(true));
+
+      const res = await fetch(`${APIDATAV1}admin/user/${params.id_users}`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          Authorization: `Bearer ${getCookie("access_token")}`,
+        },
+      });
+
+      if (res.status === 401 || res.status === 403) {
+        return res;
+      }
+
+      const data = await res.json();
+
+      console.log("details data: ", data);
+
+      if (data.data === null) {
+        throw res;
+      }
+
+      if (data.data) {
+        setProtectionCredits(data.data.credit_executive);
+        return res;
+      }
+
+      //   return res;
+    } catch (error) {
+      console.log("error user status: ", error);
+      return error;
+    } finally {
+      dispatch(setLoadingState(false));
+    }
+  };
+
+  const FetchDetailsDataProtectionCreditsWithRefreshToken = async () => {
+    await fetchWithRefreshToken(
+      FetchDetailsDataProtectionCredits,
+      router,
+      dispatch
+    );
+  };
+
+  const FetchDetailsDataKeywordCredits = async () => {
+    try {
+      dispatch(setLoadingState(true));
+
+      const res = await fetch(`${APIDATAV1}admin/user/${params.id_users}`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          Authorization: `Bearer ${getCookie("access_token")}`,
+        },
+      });
+
+      if (res.status === 401 || res.status === 403) {
+        return res;
+      }
+
+      const data = await res.json();
+
+      console.log("details data: ", data);
+
+      if (data.data === null) {
+        throw res;
+      }
+
+      if (data.data) {
+        setKeywordCredits(data.data.credit_keyword);
+        return res;
+      }
+
+      //   return res;
+    } catch (error) {
+      console.log("error user status: ", error);
+      return error;
+    } finally {
+      dispatch(setLoadingState(false));
+    }
+  };
+
+  const FetchDetailsDataKeywordCreditsWithRefreshToken = async () => {
+    await fetchWithRefreshToken(
+      FetchDetailsDataKeywordCredits,
+      router,
+      dispatch
+    );
+  };
+  // End of: Fetch Detail Data Individual
 
   const FetchDetailsDataDomain = async () => {
     try {
@@ -456,7 +743,7 @@ export default function DetailRoleUsers({ params }) {
                       "ml-4 text-[#00000040] text-[20px] ",
                       isRoleEdited ? "visible" : "hidden"
                     )}
-                    onClick={handleSetIsRoleEdited}
+                    onClick={handleSetIsRoleEditedCancel}
                   />
                 </div>
                 <div className="flex items-center justify-between">
@@ -493,7 +780,7 @@ export default function DetailRoleUsers({ params }) {
                       "ml-4 text-[#00000040] text-[20px] ",
                       isNameEdited ? "visible" : "hidden"
                     )}
-                    onClick={handleSetIsNameEdited}
+                    onClick={handleSetIsNameEditedCancel}
                   />
                 </div>
 
@@ -531,7 +818,7 @@ export default function DetailRoleUsers({ params }) {
                       "ml-4 text-[#00000040] text-[20px] ",
                       isPhoneEdited ? "visible" : "hidden"
                     )}
-                    onClick={handleSetIsPhoneEdited}
+                    onClick={handleSetIsPhoneEditedCancel}
                   />
                 </div>
 
@@ -569,7 +856,7 @@ export default function DetailRoleUsers({ params }) {
                       "ml-4 text-[#00000040] text-[20px] ",
                       isEmailEdited ? "visible" : "hidden"
                     )}
-                    onClick={handleSetIsEmailEdited}
+                    onClick={handleSetIsEmailEditedCancel}
                   />
                 </div>
 
@@ -607,7 +894,7 @@ export default function DetailRoleUsers({ params }) {
                       "ml-4 text-[#00000040] text-[20px] ",
                       isProtectionCreditsEdited ? "visible" : "hidden"
                     )}
-                    onClick={handleSetIsProtectionCreditsEdited}
+                    onClick={handleSetIsProtectionCreditsEditedCancel}
                   />
                 </div>
 
@@ -645,7 +932,7 @@ export default function DetailRoleUsers({ params }) {
                       "ml-4 text-[#00000040] text-[20px] ",
                       isKeywordCreditsEdited ? "visible" : "hidden"
                     )}
-                    onClick={handleSetIsKeywordCreditsEdited}
+                    onClick={handleSetIsKeywordCreditsEditedCancel}
                   />
                 </div>
               </section>
