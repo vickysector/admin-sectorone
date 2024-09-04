@@ -20,6 +20,7 @@ import { getCookie } from "cookies-next";
 import {
   setConfirmDetailUserDeactivateState,
   setDetailUserDeactivateFunction,
+  setVerifiedStatus,
 } from "@/app/_lib/store/features/Users/DetailUserSlice";
 import { CloseCircleOutlined, EditOutlined } from "@ant-design/icons";
 
@@ -147,13 +148,14 @@ export default function DetailRoleUsers({ params }) {
     setKeywordCredits(event.target.value);
   };
 
-  const handleDeactivateAccounts = () => {
+  const handleDeactivateAccounts = (status) => {
     dispatch(setConfirmDetailUserDeactivateState(true));
     dispatch(
       setDetailUserDeactivateFunction(
         PostActiveOrDeactivateAccountWithRefreshToken
       )
     );
+    dispatch(setVerifiedStatus(status));
     // PostActiveOrDeactivateAccountWithRefreshToken();
   };
 
@@ -654,24 +656,24 @@ export default function DetailRoleUsers({ params }) {
               <h1 className="text-heading-2 text-black  ml-4">Details</h1>
             </div>
             <div>
-              {/* <button
+              <button
                 className={clsx(
                   `py-2 px-4 rounded-md text-primary-base text-Base-normal border-[1px] border-input-border hover:opacity-80 cursor-pointer `
                 )}
-                onClick={handleDeactivateAccounts}
+                onClick={() => handleDeactivateAccounts(detailsData.verified)}
               >
                 {detailsData && detailsData.verified
                   ? "Deactivate"
                   : "Activate"}{" "}
                 accounts
-              </button> */}
-              {/* <button
+              </button>
+              <button
                 className={clsx(
                   `py-2 px-4 rounded-md text-primary-base text-Base-normal border-[1px] border-input-border hover:opacity-80 cursor-pointer ml-4 `
                 )}
               >
                 Save
-              </button> */}
+              </button>
             </div>
           </div>
           <div>
@@ -692,14 +694,15 @@ export default function DetailRoleUsers({ params }) {
                     By activating this mode, users will be restricted from
                     accessing some features on the SectorOne dashboard.
                   </p>
-                  <p className="text-text-description text-Base-normal">
+                  <p className="text-text-description text-Base-normal mt-4 italic">
                     This Account is currently{" "}
                     <span className={clsx("text-heading-5 text-black")}>
-                      {detailsData && detailsData.verified
-                        ? "Active"
-                        : "Inactive"}
+                      {detailsData && detailsData.verified ? (
+                        <span className="text-primary-base"> Active</span>
+                      ) : (
+                        <span className="text-error">Inactive</span>
+                      )}
                     </span>{" "}
-                    and ready to be used.
                   </p>
                 </div>
                 <div>

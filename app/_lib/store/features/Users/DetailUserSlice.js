@@ -6,6 +6,7 @@ const DetailsUsersSlices = createSlice({
     confirm: false,
     PostFunctionDeactivateUser: null,
     successState: false,
+    verifiedStatus: null,
   },
   reducers: {
     setConfirmDetailUserDeactivateState(state, action) {
@@ -17,6 +18,9 @@ const DetailsUsersSlices = createSlice({
     setSuccessState(state, action) {
       state.successState = action.payload;
     },
+    setVerifiedStatus(state, action) {
+      state.verifiedStatus = action.payload;
+    },
   },
 });
 
@@ -24,6 +28,7 @@ export const {
   setConfirmDetailUserDeactivateState,
   setDetailUserDeactivateFunction,
   setSuccessState,
+  setVerifiedStatus,
 } = DetailsUsersSlices.actions;
 
 export default DetailsUsersSlices.reducer;

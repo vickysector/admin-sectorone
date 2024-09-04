@@ -150,6 +150,10 @@ export default function DashboardLayout({ children }) {
     (state) => state.detailUserDeactivate.confirm
   );
 
+  const verifiedAccountStatus = useSelector(
+    (state) => state.detailUserDeactivate.verifiedStatus
+  );
+
   const callDetailsDeactivateAccountFunction = useSelector(
     (state) => state.detailUserDeactivate.PostFunctionDeactivateUser
   );
@@ -1739,13 +1743,14 @@ export default function DashboardLayout({ children }) {
 
       <div
         className={clsx(
-          "fixed top-0 bottom-0 left-0 right-0 bg-black w-full z-50 flex items-center justify-center",
+          "fixed top-0 bottom-0 left-0 right-0 bg-[#000000B2] w-full z-50 flex items-center justify-center",
           isDetailsDeactivateAccount ? "visible" : "hidden"
         )}
       >
         <div className="bg-white p-[32px] rounded-lg w-[30%]">
           <h1 className="text-LG-strong ">
-            Are you sure to Deactivate this Account?
+            Are you sure to {verifiedAccountStatus ? "Deactivate" : "Activate"}{" "}
+            this Account?
           </h1>
           <p className="text-Base-normal text-text-description mt-[12px]">
             this action cannot be undone
