@@ -63,6 +63,7 @@ export default function DetailRoleUsers({ params }) {
 
   const handleSetIsRoleEditedCancel = () => {
     setIsRoleEdited(false);
+    FetchDetailsDataRoleWithRefreshToken();
   };
 
   const handleSetIsNameEdited = () => {
@@ -71,6 +72,7 @@ export default function DetailRoleUsers({ params }) {
 
   const handleSetIsNameEditedCancel = () => {
     setIsNameEdited(false);
+    FetchDetailsDataNameWithRefreshToken();
   };
 
   const handleSetIsPhoneEdited = () => {
@@ -79,6 +81,7 @@ export default function DetailRoleUsers({ params }) {
 
   const handleSetIsPhoneEditedCancel = () => {
     setIsPhoneEdited(false);
+    FetchDetailsDataPhoneWithRefreshToken();
   };
 
   const handleSetIsEmailEdited = () => {
@@ -87,6 +90,7 @@ export default function DetailRoleUsers({ params }) {
 
   const handleSetIsEmailEditedCancel = () => {
     setIsEmailEdited(false);
+    FetchDetailsDataEmailWithRefreshToken();
   };
 
   const handleSetIsProtectionCreditsEdited = () => {
@@ -95,6 +99,7 @@ export default function DetailRoleUsers({ params }) {
 
   const handleSetIsProtectionCreditsEditedCancel = () => {
     setIsProtectionCreditsEdited(false);
+    FetchDetailsDataProtectionCreditsWithRefreshToken();
   };
 
   const handleSetIsKeywordCreditsEdited = () => {
@@ -103,6 +108,7 @@ export default function DetailRoleUsers({ params }) {
 
   const handleSetIsKeywordCreditsEditedCancel = () => {
     setIsKeywordCreditsEdited(false);
+    FetchDetailsDataKeywordCreditsWithRefreshToken();
   };
 
   // End of: Edit Functionality
@@ -131,6 +137,14 @@ export default function DetailRoleUsers({ params }) {
 
   const handleEmailChange = (event) => {
     setEmail(event.target.value);
+  };
+
+  const handleExecutiveCreditsChange = (event) => {
+    setProtectionCredits(event.target.value);
+  };
+
+  const handleKeywordCreditsChange = (event) => {
+    setKeywordCredits(event.target.value);
   };
 
   const handleDeactivateAccounts = () => {
@@ -709,7 +723,6 @@ export default function DetailRoleUsers({ params }) {
                 <div className="flex items-center justify-between">
                   <Form.Item
                     label={"Role"}
-                    name={role}
                     layout="vertical"
                     rules={[
                       {
@@ -749,7 +762,6 @@ export default function DetailRoleUsers({ params }) {
                 <div className="flex items-center justify-between">
                   <Form.Item
                     label={"Name"}
-                    name={name}
                     layout="vertical"
                     rules={[
                       {
@@ -787,7 +799,6 @@ export default function DetailRoleUsers({ params }) {
                 <div className="flex items-center justify-between">
                   <Form.Item
                     label={"Phone number"}
-                    name={phone}
                     layout="vertical"
                     rules={[
                       {
@@ -825,7 +836,6 @@ export default function DetailRoleUsers({ params }) {
                 <div className="flex items-center justify-between">
                   <Form.Item
                     label={"Email"}
-                    name={email}
                     layout="vertical"
                     rules={[
                       {
@@ -863,7 +873,6 @@ export default function DetailRoleUsers({ params }) {
                 <div className="flex items-center justify-between">
                   <Form.Item
                     label={"Executive protection credits"}
-                    name={protectionCredits}
                     layout="vertical"
                     rules={[
                       {
@@ -877,7 +886,7 @@ export default function DetailRoleUsers({ params }) {
                       variant="filled"
                       size="large"
                       value={protectionCredits}
-                      // onChange={(e) => handlePhoneChange(e)}
+                      onChange={(e) => handleExecutiveCreditsChange(e)}
                       defaultValue={protectionCredits}
                       disabled={!isProtectionCreditsEdited}
                     />
@@ -901,7 +910,6 @@ export default function DetailRoleUsers({ params }) {
                 <div className="flex items-center justify-between">
                   <Form.Item
                     label={"Search by keywords credits"}
-                    name={keywordCredits}
                     layout="vertical"
                     rules={[
                       {
@@ -915,7 +923,7 @@ export default function DetailRoleUsers({ params }) {
                       variant="filled"
                       size="large"
                       value={keywordCredits}
-                      // onChange={(e) => handleEmailChange(e)}
+                      onChange={(e) => handleKeywordCreditsChange(e)}
                       defaultValue={keywordCredits}
                       disabled={!isKeywordCreditsEdited}
                     />
