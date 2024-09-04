@@ -610,26 +610,44 @@ export default function DetailRoleUsers({ params }) {
                     onClick={handleSetIsProtectionCreditsEdited}
                   />
                 </div>
-                <Form.Item
-                  label={"Search by keywords credits"}
-                  name={keywordCredits}
-                  layout="vertical"
-                  rules={[
-                    {
-                      required: true,
-                    },
-                  ]}
-                >
-                  <Input
-                    placeholder="10"
-                    variant="filled"
-                    size="large"
-                    value={keywordCredits}
-                    // onChange={(e) => handleEmailChange(e)}
-                    defaultValue={keywordCredits}
-                    disabled
+
+                <div className="flex items-center justify-between">
+                  <Form.Item
+                    label={"Search by keywords credits"}
+                    name={keywordCredits}
+                    layout="vertical"
+                    rules={[
+                      {
+                        required: true,
+                      },
+                    ]}
+                    className={clsx("text-Base-normal text-[#000000E0] w-full")}
+                  >
+                    <Input
+                      placeholder="10"
+                      variant="filled"
+                      size="large"
+                      value={keywordCredits}
+                      // onChange={(e) => handleEmailChange(e)}
+                      defaultValue={keywordCredits}
+                      disabled={!isKeywordCreditsEdited}
+                    />
+                  </Form.Item>
+                  <EditOutlined
+                    className={clsx(
+                      "ml-4 text-[#00000040] text-[20px] ",
+                      !isKeywordCreditsEdited ? "visible" : "hidden"
+                    )}
+                    onClick={handleSetIsKeywordCreditsEdited}
                   />
-                </Form.Item>
+                  <CloseCircleOutlined
+                    className={clsx(
+                      "ml-4 text-[#00000040] text-[20px] ",
+                      isKeywordCreditsEdited ? "visible" : "hidden"
+                    )}
+                    onClick={handleSetIsKeywordCreditsEdited}
+                  />
+                </div>
               </section>
             </div>
           </div>
