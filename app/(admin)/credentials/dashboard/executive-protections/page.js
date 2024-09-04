@@ -59,8 +59,8 @@ export default function ExecutiveProtectionPage() {
   }
 
   const handleChangeEmail = (e) => {
-    setEmail(e.target.value.trim());
-    setCookie("scanned_email", e.target.value.trim());
+    setEmail(e.target.value.trimStart());
+    setCookie("scanned_email", e.target.value.trimStart());
   };
 
   const handleScanNow = () => {
