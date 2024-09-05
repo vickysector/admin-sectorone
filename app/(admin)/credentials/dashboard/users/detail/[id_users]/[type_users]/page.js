@@ -168,7 +168,16 @@ export default function DetailRoleUsers({ params }) {
     setIsProtectionCreditsEdited(false);
     setIsKeywordCreditsEdited(false);
     setIsDemoEdited(false);
+    isAvailableForDemo(false);
+    isAvailableForSaveEmail(false);
+    isAvailableForSaveName(false);
+    isAvailableForSavePhone(false);
+    isAvailableForSaveProtections(false);
+    isAvailableForSaveKeyword(false);
+    isAvailableForSaveRole(false);
   };
+
+  console.log("is available fo save ", isAvailableForSave);
 
   // End of: Edit Functionality
 
@@ -1683,56 +1692,62 @@ export default function DetailRoleUsers({ params }) {
               <h1 className="text-heading-2 text-black  ml-4">Details</h1>
             </div>
             <div>
-              {/* <button
+              <button
                 className={clsx(
                   `py-2 px-4 rounded-md text-primary-base text-Base-normal border-[1px] border-input-border hover:opacity-80 cursor-pointer `
                 )}
-                onClick={handleDeactivateAccounts}
+                onClick={() => handleDeactivateAccounts(detailsData.verified)}
               >
                 {detailsData && detailsData.verified
                   ? "Deactivate"
                   : "Activate"}{" "}
                 accounts
-              </button> */}
-              {/* <button
+              </button>
+              <button
                 className={clsx(
-                  `py-2 px-4 rounded-md text-primary-base text-Base-normal border-[1px] border-input-border hover:opacity-80 cursor-pointer ml-4 `
+                  `py-2 px-4 rounded-md  text-Base-normal border-[1px] hover:opacity-80 cursor-pointer ml-4 `,
+                  isAvailableForSave
+                    ? "text-white bg-primary-base"
+                    : "bg-[#0000000A] border-[1px] border-[#D5D5D5] text-[#00000040]"
                 )}
+                disabled={!isAvailableForSave}
+                onClick={handleSaveChanges}
               >
                 Save
-              </button> */}
+              </button>
             </div>
           </div>
           <div>
             <div className="p-8 bg-white rounded-lg mt-8">
               <section className="flex items-center justify-between">
                 <div>
-                  {/* <h2 className="text-heading-5 text-black mb-1">
-                    Users is on {demo ? "Full Access" : "Demo"} Mode
-                  </h2> */}
-                  <h2 className="text-text-description text-Base-normal mb-1">
-                    Users is on{" "}
-                    <span className={clsx("text-heading-5 text-black")}>
-                      {demo ? "Demo" : "Full Access"}
-                    </span>{" "}
-                    Mode
+                  <h2 className="text-heading-5 text-black mb-1">
+                    Users is on {demo ? "Demo" : "Full Access"} Mode
                   </h2>
-                  {/* <p className="text-text-description text-Base-normal">
+                  {/* <h2 className="text-text-description text-Base-normal mb-1">
+                   Users is on{" "}
+                   <span className={clsx("text-heading-5 text-black")}>
+                     {demo ? "Demo" : "Full Access"}
+                   </span>{" "}
+                   Mode
+                 </h2> */}
+                  <p className="text-text-description text-Base-normal">
                     By activating this mode, users will be restricted from
                     accessing some features on the SectorOne dashboard.
-                  </p> */}
-                  <p className="text-text-description text-Base-normal">
+                  </p>
+                  <p className="text-text-description text-Base-normal mt-4 italic">
                     This Account is currently{" "}
                     <span className={clsx("text-heading-5 text-black")}>
-                      {detailsData && detailsData.verified
-                        ? "Active"
-                        : "Inactive"}
+                      {detailsData && detailsData.verified ? (
+                        <span className="text-primary-base"> Active</span>
+                      ) : (
+                        <span className="text-error">Inactive</span>
+                      )}
                     </span>{" "}
-                    and ready to be used.
                   </p>
                 </div>
-                <div>
-                  {/* <ConfigProvider
+                <div className="flex items-center">
+                  <ConfigProvider
                     theme={{
                       token: {
                         colorPrimary: "#FF6F1E",
@@ -1743,134 +1758,249 @@ export default function DetailRoleUsers({ params }) {
                       onChange={handleDemoChange}
                       value={demo}
                       defaultValue={demo}
-                      disabled
+                      disabled={!isDemoEdited}
                     />
-                  </ConfigProvider> */}
+                  </ConfigProvider>
+                  <EditOutlined
+                    className={clsx(
+                      "ml-4 text-[#00000040] text-[20px] ",
+                      !isDemoEdited ? "visible" : "hidden"
+                    )}
+                    onClick={handleSetIsDemoEdited}
+                  />
+                  <CloseCircleOutlined
+                    className={clsx(
+                      "ml-4 text-[#00000040] text-[20px] ",
+                      isDemoEdited ? "visible" : "hidden"
+                    )}
+                    onClick={handleSetIsDemoEditedCancel}
+                  />
                 </div>
               </section>
               <section className="mt-8 grid grid-cols-2 gap-4   ">
-                <Form.Item
-                  label={"Role"}
-                  name={role}
-                  layout="vertical"
-                  rules={[
-                    {
-                      required: true,
-                    },
-                  ]}
-                >
-                  <ConfigProvider theme={{ token: { colorPrimary: "FF6F1E" } }}>
-                    <Select
-                      defaultValue={detailsData && detailsData.role}
-                      options={selectOptions}
+                <div className="flex items-center justify-between">
+                  <Form.Item
+                    label={"Role"}
+                    layout="vertical"
+                    rules={[
+                      {
+                        required: true,
+                      },
+                    ]}
+                    style={{ width: "100%" }}
+                  >
+                    <ConfigProvider
+                      theme={{ token: { colorPrimary: "FF6F1E" } }}
+                    >
+                      <Select
+                        defaultValue={detailsData && detailsData.role}
+                        options={selectOptions}
+                        size="large"
+                        value={role}
+                        onChange={handleRoleChange}
+                        disabled={!isRoleEdited}
+                      />
+                    </ConfigProvider>
+                  </Form.Item>
+                  <EditOutlined
+                    className={clsx(
+                      "ml-4 text-[#00000040] text-[20px] ",
+                      !isRoleEdited ? "visible" : "hidden"
+                    )}
+                    onClick={handleSetIsRoleEdited}
+                  />
+                  <CloseCircleOutlined
+                    className={clsx(
+                      "ml-4 text-[#00000040] text-[20px] ",
+                      isRoleEdited ? "visible" : "hidden"
+                    )}
+                    onClick={handleSetIsRoleEditedCancel}
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <Form.Item
+                    label={"Name"}
+                    layout="vertical"
+                    rules={[
+                      {
+                        required: true,
+                      },
+                    ]}
+                    className={clsx("text-Base-normal text-[#000000E0] w-full")}
+                  >
+                    <Input
+                      placeholder="John Smith"
+                      variant="filled"
                       size="large"
-                      value={role}
-                      onChange={handleRoleChange}
-                      disabled
+                      onChange={(e) => handleNameChange(e)}
+                      value={name}
+                      defaultValue={name}
+                      disabled={!isNameEdited}
                     />
-                  </ConfigProvider>
-                </Form.Item>
-                <Form.Item
-                  label={"Name"}
-                  name={name}
-                  layout="vertical"
-                  rules={[
-                    {
-                      required: true,
-                    },
-                  ]}
-                  className={clsx("text-Base-normal text-[#000000E0]")}
-                >
-                  <Input
-                    placeholder="John Smith"
-                    variant="filled"
-                    size="large"
-                    onChange={(e) => handleNameChange(e)}
-                    value={name}
-                    defaultValue={name}
-                    disabled
+                  </Form.Item>
+                  <EditOutlined
+                    className={clsx(
+                      "ml-4 text-[#00000040] text-[20px] ",
+                      !isNameEdited ? "visible" : "hidden"
+                    )}
+                    onClick={handleSetIsNameEdited}
                   />
-                </Form.Item>
-                <Form.Item
-                  label={"Phone number"}
-                  name={phone}
-                  layout="vertical"
-                  rules={[
-                    {
-                      required: true,
-                    },
-                  ]}
-                >
-                  <Input
-                    placeholder="08123456789"
-                    variant="filled"
-                    size="large"
-                    value={phone}
-                    onChange={(e) => handlePhoneChange(e)}
-                    defaultValue={phone}
-                    disabled
+                  <CloseCircleOutlined
+                    className={clsx(
+                      "ml-4 text-[#00000040] text-[20px] ",
+                      isNameEdited ? "visible" : "hidden"
+                    )}
+                    onClick={handleSetIsNameEditedCancel}
                   />
-                </Form.Item>
-                <Form.Item
-                  label={"Email"}
-                  name={email}
-                  layout="vertical"
-                  rules={[
-                    {
-                      required: true,
-                    },
-                  ]}
-                >
-                  <Input
-                    placeholder="john@gmail.com"
-                    variant="filled"
-                    size="large"
-                    value={email}
-                    onChange={(e) => handleEmailChange(e)}
-                    defaultValue={email}
-                    disabled
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <Form.Item
+                    label={"Phone number"}
+                    layout="vertical"
+                    rules={[
+                      {
+                        required: true,
+                      },
+                    ]}
+                    className={clsx("text-Base-normal text-[#000000E0] w-full")}
+                  >
+                    <Input
+                      placeholder="08123456789"
+                      variant="filled"
+                      size="large"
+                      value={phone}
+                      onChange={(e) => handlePhoneChange(e)}
+                      defaultValue={phone}
+                      disabled={!isPhoneEdited}
+                    />
+                  </Form.Item>
+                  <EditOutlined
+                    className={clsx(
+                      "ml-4 text-[#00000040] text-[20px] ",
+                      !isPhoneEdited ? "visible" : "hidden"
+                    )}
+                    onClick={handleSetIsPhoneEdited}
                   />
-                </Form.Item>
-                <Form.Item
-                  label={"Executive protection credits"}
-                  name={protectionCredits}
-                  layout="vertical"
-                  rules={[
-                    {
-                      required: true,
-                    },
-                  ]}
-                >
-                  <Input
-                    placeholder="10"
-                    variant="filled"
-                    size="large"
-                    value={protectionCredits}
-                    // onChange={(e) => handlePhoneChange(e)}
-                    defaultValue={protectionCredits}
-                    disabled
+                  <CloseCircleOutlined
+                    className={clsx(
+                      "ml-4 text-[#00000040] text-[20px] ",
+                      isPhoneEdited ? "visible" : "hidden"
+                    )}
+                    onClick={handleSetIsPhoneEditedCancel}
                   />
-                </Form.Item>
-                <Form.Item
-                  label={"Search by keywords credits"}
-                  name={keywordCredits}
-                  layout="vertical"
-                  rules={[
-                    {
-                      required: true,
-                    },
-                  ]}
-                >
-                  <Input
-                    placeholder="10"
-                    variant="filled"
-                    size="large"
-                    value={keywordCredits}
-                    // onChange={(e) => handleEmailChange(e)}
-                    defaultValue={keywordCredits}
-                    disabled
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <Form.Item
+                    label={"Email"}
+                    layout="vertical"
+                    rules={[
+                      {
+                        required: true,
+                      },
+                    ]}
+                    className={clsx("text-Base-normal text-[#000000E0] w-full")}
+                  >
+                    <Input
+                      placeholder="john@gmail.com"
+                      variant="filled"
+                      size="large"
+                      value={email}
+                      onChange={(e) => handleEmailChange(e)}
+                      defaultValue={email}
+                      disabled={!isEmailEdited}
+                    />
+                  </Form.Item>
+                  <EditOutlined
+                    className={clsx(
+                      "ml-4 text-[#00000040] text-[20px] ",
+                      !isEmailEdited ? "visible" : "hidden"
+                    )}
+                    onClick={handleSetIsEmailEdited}
                   />
-                </Form.Item>
+                  <CloseCircleOutlined
+                    className={clsx(
+                      "ml-4 text-[#00000040] text-[20px] ",
+                      isEmailEdited ? "visible" : "hidden"
+                    )}
+                    onClick={handleSetIsEmailEditedCancel}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <Form.Item
+                    label={"Executive protection credits"}
+                    layout="vertical"
+                    rules={[
+                      {
+                        required: true,
+                      },
+                    ]}
+                    className={clsx("text-Base-normal text-[#000000E0] w-full")}
+                  >
+                    <Input
+                      placeholder="10"
+                      variant="filled"
+                      size="large"
+                      value={protectionCredits}
+                      onChange={(e) => handleExecutiveCreditsChange(e)}
+                      defaultValue={protectionCredits}
+                      disabled={!isProtectionCreditsEdited}
+                    />
+                  </Form.Item>
+                  <EditOutlined
+                    className={clsx(
+                      "ml-4 text-[#00000040] text-[20px] ",
+                      !isProtectionCreditsEdited ? "visible" : "hidden"
+                    )}
+                    onClick={handleSetIsProtectionCreditsEdited}
+                  />
+                  <CloseCircleOutlined
+                    className={clsx(
+                      "ml-4 text-[#00000040] text-[20px] ",
+                      isProtectionCreditsEdited ? "visible" : "hidden"
+                    )}
+                    onClick={handleSetIsProtectionCreditsEditedCancel}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <Form.Item
+                    label={"Search by keywords credits"}
+                    layout="vertical"
+                    rules={[
+                      {
+                        required: true,
+                      },
+                    ]}
+                    className={clsx("text-Base-normal text-[#000000E0] w-full")}
+                  >
+                    <Input
+                      placeholder="10"
+                      variant="filled"
+                      size="large"
+                      value={keywordCredits}
+                      onChange={(e) => handleKeywordCreditsChange(e)}
+                      defaultValue={keywordCredits}
+                      disabled={!isKeywordCreditsEdited}
+                    />
+                  </Form.Item>
+                  <EditOutlined
+                    className={clsx(
+                      "ml-4 text-[#00000040] text-[20px] ",
+                      !isKeywordCreditsEdited ? "visible" : "hidden"
+                    )}
+                    onClick={handleSetIsKeywordCreditsEdited}
+                  />
+                  <CloseCircleOutlined
+                    className={clsx(
+                      "ml-4 text-[#00000040] text-[20px] ",
+                      isKeywordCreditsEdited ? "visible" : "hidden"
+                    )}
+                    onClick={handleSetIsKeywordCreditsEditedCancel}
+                  />
+                </div>
               </section>
             </div>
           </div>
@@ -1927,56 +2057,62 @@ export default function DetailRoleUsers({ params }) {
               <h1 className="text-heading-2 text-black  ml-4">Details</h1>
             </div>
             <div>
-              {/* <button
+              <button
                 className={clsx(
                   `py-2 px-4 rounded-md text-primary-base text-Base-normal border-[1px] border-input-border hover:opacity-80 cursor-pointer `
                 )}
-                onClick={handleDeactivateAccounts}
+                onClick={() => handleDeactivateAccounts(detailsData.verified)}
               >
                 {detailsData && detailsData.verified
                   ? "Deactivate"
                   : "Activate"}{" "}
                 accounts
-              </button> */}
-              {/* <button
+              </button>
+              <button
                 className={clsx(
-                  `py-2 px-4 rounded-md text-primary-base text-Base-normal border-[1px] border-input-border hover:opacity-80 cursor-pointer ml-4 `
+                  `py-2 px-4 rounded-md  text-Base-normal border-[1px] hover:opacity-80 cursor-pointer ml-4 `,
+                  isAvailableForSave
+                    ? "text-white bg-primary-base"
+                    : "bg-[#0000000A] border-[1px] border-[#D5D5D5] text-[#00000040]"
                 )}
+                disabled={!isAvailableForSave}
+                onClick={handleSaveChanges}
               >
                 Save
-              </button> */}
+              </button>
             </div>
           </div>
           <div>
             <div className="p-8 bg-white rounded-lg mt-8">
               <section className="flex items-center justify-between">
                 <div>
-                  {/* <h2 className="text-heading-5 text-black mb-1">
-                    Users is on {demo ? "Full Access" : "Demo"} Mode
-                  </h2> */}
-                  <h2 className="text-text-description text-Base-normal mb-1">
-                    Users is on{" "}
-                    <span className={clsx("text-heading-5 text-black")}>
-                      {demo ? "Demo" : "Full Access"}
-                    </span>{" "}
-                    Mode
+                  <h2 className="text-heading-5 text-black mb-1">
+                    Users is on {demo ? "Demo" : "Full Access"} Mode
                   </h2>
-                  {/* <p className="text-text-description text-Base-normal">
+                  {/* <h2 className="text-text-description text-Base-normal mb-1">
+                   Users is on{" "}
+                   <span className={clsx("text-heading-5 text-black")}>
+                     {demo ? "Demo" : "Full Access"}
+                   </span>{" "}
+                   Mode
+                 </h2> */}
+                  <p className="text-text-description text-Base-normal">
                     By activating this mode, users will be restricted from
                     accessing some features on the SectorOne dashboard.
-                  </p> */}
-                  <p className="text-text-description text-Base-normal">
+                  </p>
+                  <p className="text-text-description text-Base-normal mt-4 italic">
                     This Account is currently{" "}
                     <span className={clsx("text-heading-5 text-black")}>
-                      {detailsData && detailsData.verified
-                        ? "Active"
-                        : "Inactive"}
+                      {detailsData && detailsData.verified ? (
+                        <span className="text-primary-base"> Active</span>
+                      ) : (
+                        <span className="text-error">Inactive</span>
+                      )}
                     </span>{" "}
-                    and ready to be used.
                   </p>
                 </div>
-                <div>
-                  {/* <ConfigProvider
+                <div className="flex items-center">
+                  <ConfigProvider
                     theme={{
                       token: {
                         colorPrimary: "#FF6F1E",
@@ -1987,134 +2123,249 @@ export default function DetailRoleUsers({ params }) {
                       onChange={handleDemoChange}
                       value={demo}
                       defaultValue={demo}
-                      disabled
+                      disabled={!isDemoEdited}
                     />
-                  </ConfigProvider> */}
+                  </ConfigProvider>
+                  <EditOutlined
+                    className={clsx(
+                      "ml-4 text-[#00000040] text-[20px] ",
+                      !isDemoEdited ? "visible" : "hidden"
+                    )}
+                    onClick={handleSetIsDemoEdited}
+                  />
+                  <CloseCircleOutlined
+                    className={clsx(
+                      "ml-4 text-[#00000040] text-[20px] ",
+                      isDemoEdited ? "visible" : "hidden"
+                    )}
+                    onClick={handleSetIsDemoEditedCancel}
+                  />
                 </div>
               </section>
               <section className="mt-8 grid grid-cols-2 gap-4   ">
-                <Form.Item
-                  label={"Role"}
-                  name={role}
-                  layout="vertical"
-                  rules={[
-                    {
-                      required: true,
-                    },
-                  ]}
-                >
-                  <ConfigProvider theme={{ token: { colorPrimary: "FF6F1E" } }}>
-                    <Select
-                      defaultValue={detailsData && detailsData.role}
-                      options={selectOptions}
+                <div className="flex items-center justify-between">
+                  <Form.Item
+                    label={"Role"}
+                    layout="vertical"
+                    rules={[
+                      {
+                        required: true,
+                      },
+                    ]}
+                    style={{ width: "100%" }}
+                  >
+                    <ConfigProvider
+                      theme={{ token: { colorPrimary: "FF6F1E" } }}
+                    >
+                      <Select
+                        defaultValue={detailsData && detailsData.role}
+                        options={selectOptions}
+                        size="large"
+                        value={role}
+                        onChange={handleRoleChange}
+                        disabled={!isRoleEdited}
+                      />
+                    </ConfigProvider>
+                  </Form.Item>
+                  <EditOutlined
+                    className={clsx(
+                      "ml-4 text-[#00000040] text-[20px] ",
+                      !isRoleEdited ? "visible" : "hidden"
+                    )}
+                    onClick={handleSetIsRoleEdited}
+                  />
+                  <CloseCircleOutlined
+                    className={clsx(
+                      "ml-4 text-[#00000040] text-[20px] ",
+                      isRoleEdited ? "visible" : "hidden"
+                    )}
+                    onClick={handleSetIsRoleEditedCancel}
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <Form.Item
+                    label={"Name"}
+                    layout="vertical"
+                    rules={[
+                      {
+                        required: true,
+                      },
+                    ]}
+                    className={clsx("text-Base-normal text-[#000000E0] w-full")}
+                  >
+                    <Input
+                      placeholder="John Smith"
+                      variant="filled"
                       size="large"
-                      value={role}
-                      onChange={handleRoleChange}
-                      disabled
+                      onChange={(e) => handleNameChange(e)}
+                      value={name}
+                      defaultValue={name}
+                      disabled={!isNameEdited}
                     />
-                  </ConfigProvider>
-                </Form.Item>
-                <Form.Item
-                  label={"Name"}
-                  name={name}
-                  layout="vertical"
-                  rules={[
-                    {
-                      required: true,
-                    },
-                  ]}
-                  className={clsx("text-Base-normal text-[#000000E0]")}
-                >
-                  <Input
-                    placeholder="John Smith"
-                    variant="filled"
-                    size="large"
-                    onChange={(e) => handleNameChange(e)}
-                    value={name}
-                    defaultValue={name}
-                    disabled
+                  </Form.Item>
+                  <EditOutlined
+                    className={clsx(
+                      "ml-4 text-[#00000040] text-[20px] ",
+                      !isNameEdited ? "visible" : "hidden"
+                    )}
+                    onClick={handleSetIsNameEdited}
                   />
-                </Form.Item>
-                <Form.Item
-                  label={"Phone number"}
-                  name={phone}
-                  layout="vertical"
-                  rules={[
-                    {
-                      required: true,
-                    },
-                  ]}
-                >
-                  <Input
-                    placeholder="08123456789"
-                    variant="filled"
-                    size="large"
-                    value={phone}
-                    onChange={(e) => handlePhoneChange(e)}
-                    defaultValue={phone}
-                    disabled
+                  <CloseCircleOutlined
+                    className={clsx(
+                      "ml-4 text-[#00000040] text-[20px] ",
+                      isNameEdited ? "visible" : "hidden"
+                    )}
+                    onClick={handleSetIsNameEditedCancel}
                   />
-                </Form.Item>
-                <Form.Item
-                  label={"Email"}
-                  name={email}
-                  layout="vertical"
-                  rules={[
-                    {
-                      required: true,
-                    },
-                  ]}
-                >
-                  <Input
-                    placeholder="john@gmail.com"
-                    variant="filled"
-                    size="large"
-                    value={email}
-                    onChange={(e) => handleEmailChange(e)}
-                    defaultValue={email}
-                    disabled
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <Form.Item
+                    label={"Phone number"}
+                    layout="vertical"
+                    rules={[
+                      {
+                        required: true,
+                      },
+                    ]}
+                    className={clsx("text-Base-normal text-[#000000E0] w-full")}
+                  >
+                    <Input
+                      placeholder="08123456789"
+                      variant="filled"
+                      size="large"
+                      value={phone}
+                      onChange={(e) => handlePhoneChange(e)}
+                      defaultValue={phone}
+                      disabled={!isPhoneEdited}
+                    />
+                  </Form.Item>
+                  <EditOutlined
+                    className={clsx(
+                      "ml-4 text-[#00000040] text-[20px] ",
+                      !isPhoneEdited ? "visible" : "hidden"
+                    )}
+                    onClick={handleSetIsPhoneEdited}
                   />
-                </Form.Item>
-                <Form.Item
-                  label={"Executive protection credits"}
-                  name={protectionCredits}
-                  layout="vertical"
-                  rules={[
-                    {
-                      required: true,
-                    },
-                  ]}
-                >
-                  <Input
-                    placeholder="10"
-                    variant="filled"
-                    size="large"
-                    value={protectionCredits}
-                    // onChange={(e) => handlePhoneChange(e)}
-                    defaultValue={protectionCredits}
-                    disabled
+                  <CloseCircleOutlined
+                    className={clsx(
+                      "ml-4 text-[#00000040] text-[20px] ",
+                      isPhoneEdited ? "visible" : "hidden"
+                    )}
+                    onClick={handleSetIsPhoneEditedCancel}
                   />
-                </Form.Item>
-                <Form.Item
-                  label={"Search by keywords credits"}
-                  name={keywordCredits}
-                  layout="vertical"
-                  rules={[
-                    {
-                      required: true,
-                    },
-                  ]}
-                >
-                  <Input
-                    placeholder="10"
-                    variant="filled"
-                    size="large"
-                    value={keywordCredits}
-                    // onChange={(e) => handleEmailChange(e)}
-                    defaultValue={keywordCredits}
-                    disabled
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <Form.Item
+                    label={"Email"}
+                    layout="vertical"
+                    rules={[
+                      {
+                        required: true,
+                      },
+                    ]}
+                    className={clsx("text-Base-normal text-[#000000E0] w-full")}
+                  >
+                    <Input
+                      placeholder="john@gmail.com"
+                      variant="filled"
+                      size="large"
+                      value={email}
+                      onChange={(e) => handleEmailChange(e)}
+                      defaultValue={email}
+                      disabled={!isEmailEdited}
+                    />
+                  </Form.Item>
+                  <EditOutlined
+                    className={clsx(
+                      "ml-4 text-[#00000040] text-[20px] ",
+                      !isEmailEdited ? "visible" : "hidden"
+                    )}
+                    onClick={handleSetIsEmailEdited}
                   />
-                </Form.Item>
+                  <CloseCircleOutlined
+                    className={clsx(
+                      "ml-4 text-[#00000040] text-[20px] ",
+                      isEmailEdited ? "visible" : "hidden"
+                    )}
+                    onClick={handleSetIsEmailEditedCancel}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <Form.Item
+                    label={"Executive protection credits"}
+                    layout="vertical"
+                    rules={[
+                      {
+                        required: true,
+                      },
+                    ]}
+                    className={clsx("text-Base-normal text-[#000000E0] w-full")}
+                  >
+                    <Input
+                      placeholder="10"
+                      variant="filled"
+                      size="large"
+                      value={protectionCredits}
+                      onChange={(e) => handleExecutiveCreditsChange(e)}
+                      defaultValue={protectionCredits}
+                      disabled={!isProtectionCreditsEdited}
+                    />
+                  </Form.Item>
+                  <EditOutlined
+                    className={clsx(
+                      "ml-4 text-[#00000040] text-[20px] ",
+                      !isProtectionCreditsEdited ? "visible" : "hidden"
+                    )}
+                    onClick={handleSetIsProtectionCreditsEdited}
+                  />
+                  <CloseCircleOutlined
+                    className={clsx(
+                      "ml-4 text-[#00000040] text-[20px] ",
+                      isProtectionCreditsEdited ? "visible" : "hidden"
+                    )}
+                    onClick={handleSetIsProtectionCreditsEditedCancel}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <Form.Item
+                    label={"Search by keywords credits"}
+                    layout="vertical"
+                    rules={[
+                      {
+                        required: true,
+                      },
+                    ]}
+                    className={clsx("text-Base-normal text-[#000000E0] w-full")}
+                  >
+                    <Input
+                      placeholder="10"
+                      variant="filled"
+                      size="large"
+                      value={keywordCredits}
+                      onChange={(e) => handleKeywordCreditsChange(e)}
+                      defaultValue={keywordCredits}
+                      disabled={!isKeywordCreditsEdited}
+                    />
+                  </Form.Item>
+                  <EditOutlined
+                    className={clsx(
+                      "ml-4 text-[#00000040] text-[20px] ",
+                      !isKeywordCreditsEdited ? "visible" : "hidden"
+                    )}
+                    onClick={handleSetIsKeywordCreditsEdited}
+                  />
+                  <CloseCircleOutlined
+                    className={clsx(
+                      "ml-4 text-[#00000040] text-[20px] ",
+                      isKeywordCreditsEdited ? "visible" : "hidden"
+                    )}
+                    onClick={handleSetIsKeywordCreditsEditedCancel}
+                  />
+                </div>
               </section>
             </div>
           </div>
