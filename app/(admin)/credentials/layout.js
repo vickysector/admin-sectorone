@@ -1555,7 +1555,7 @@ export default function DashboardLayout({ children }) {
                         values.join(", ")
                       ) : typeof values === "object" ? (
                         Object.entries(values).map(([k, v]) => (
-                          <p>
+                          <p key={k}>
                             {k} : {v}
                           </p>
                         ))
