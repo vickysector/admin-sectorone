@@ -7,6 +7,9 @@ const DetailsUsersSlices = createSlice({
     PostFunctionDeactivateUser: null,
     successState: false,
     verifiedStatus: null,
+    successStateEditUser: false,
+    confirmEditUsers: false,
+    PostFunctionEditUsers: null,
   },
   reducers: {
     setConfirmDetailUserDeactivateState(state, action) {
@@ -21,6 +24,15 @@ const DetailsUsersSlices = createSlice({
     setVerifiedStatus(state, action) {
       state.verifiedStatus = action.payload;
     },
+    setConfirmEditUsers(state, action) {
+      state.confirmEditUsers = action.payload;
+    },
+    setSuccessStateEditUser(state, action) {
+      state.successStateEditUser = action.payload;
+    },
+    setPostFunctionEditUsers(state, action) {
+      state.PostFunctionEditUsers = action.payload;
+    },
   },
 });
 
@@ -29,6 +41,9 @@ export const {
   setDetailUserDeactivateFunction,
   setSuccessState,
   setVerifiedStatus,
+  setConfirmEditUsers,
+  setSuccessStateEditUser,
+  setPostFunctionEditUsers,
 } = DetailsUsersSlices.actions;
 
 export default DetailsUsersSlices.reducer;

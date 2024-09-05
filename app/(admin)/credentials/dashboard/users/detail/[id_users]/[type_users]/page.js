@@ -19,7 +19,9 @@ import { setLoadingState } from "@/app/_lib/store/features/Compromised/LoadingSl
 import { getCookie } from "cookies-next";
 import {
   setConfirmDetailUserDeactivateState,
+  setConfirmEditUsers,
   setDetailUserDeactivateFunction,
+  setPostFunctionEditUsers,
   setVerifiedStatus,
 } from "@/app/_lib/store/features/Users/DetailUserSlice";
 import { CloseCircleOutlined, EditOutlined } from "@ant-design/icons";
@@ -76,6 +78,8 @@ export default function DetailRoleUsers({ params }) {
     isAvailableForSaveEmail ||
     isAvailableForSaveProtections ||
     isAvailableForSaveKeyword;
+
+  console.log("is available for save ", isAvailableForSave);
 
   const handleSetIsDemoEdited = () => {
     setIsDemoEdited(true);
@@ -145,6 +149,25 @@ export default function DetailRoleUsers({ params }) {
     setIsKeywordCreditsEdited(false);
     setIsAvailableForSaveKeyword(false);
     FetchDetailsDataKeywordCreditsWithRefreshToken();
+  };
+
+  const handleSaveChanges = () => {
+    if (isAvailableForSave) {
+      dispatch(setConfirmEditUsers(true));
+      dispatch(setPostFunctionEditUsers(PostEditUsersAccountithRefreshToken));
+    } else {
+      return;
+    }
+  };
+
+  const clearAllEditState = () => {
+    setIsRoleEdited(false);
+    setIsNameEdited(false);
+    setIsPhoneEdited(false);
+    setIsEmailEdited(false);
+    setIsProtectionCreditsEdited(false);
+    setIsKeywordCreditsEdited(false);
+    setIsDemoEdited(false);
   };
 
   // End of: Edit Functionality
@@ -713,6 +736,63 @@ export default function DetailRoleUsers({ params }) {
     );
   };
 
+  const PostEditUsersAccount = async () => {
+    try {
+      dispatch(setLoadingState(true));
+
+      setTriggerChange(false);
+      // dispatch(setTi);
+
+      const res = await fetch(`${APIDATAV1}root/admin/user`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: {
+          Authorization: `Bearer ${getCookie("access_token")}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id_user: params.id_users,
+          email: email,
+          role: role,
+          name: name,
+          phone: phone,
+          credit_executive: Number(protectionCredits),
+          credit_keyword: Number(keywordCredits),
+          is_demo: demo,
+        }),
+      });
+
+      if (res.status === 401 || res.status === 403) {
+        return res;
+      }
+
+      const data = await res.json();
+
+      console.log("edit users status: ", data);
+
+      if (data.data === null) {
+        throw res;
+      }
+
+      if (data.data) {
+        setTriggerChange(true);
+        clearAllEditState();
+        return res;
+      }
+
+      //   return res;
+    } catch (error) {
+      console.log("error edit users status: ", error);
+      return error;
+    } finally {
+      dispatch(setLoadingState(false));
+    }
+  };
+
+  const PostEditUsersAccountithRefreshToken = async () => {
+    await fetchWithRefreshToken(PostEditUsersAccount, router, dispatch);
+  };
+
   useEffect(() => {
     setTriggerChange(false);
     FetchAllRolesWithRefreshToken();
@@ -753,8 +833,13 @@ export default function DetailRoleUsers({ params }) {
               </button>
               <button
                 className={clsx(
-                  `py-2 px-4 rounded-md text-white bg-primary-base text-Base-normal border-[1px] hover:opacity-80 cursor-pointer ml-4 `
+                  `py-2 px-4 rounded-md  text-Base-normal border-[1px] hover:opacity-80 cursor-pointer ml-4 `,
+                  isAvailableForSave
+                    ? "text-white bg-primary-base"
+                    : "bg-[#0000000A] border-[1px] border-[#D5D5D5] text-[#00000040]"
                 )}
+                disabled={!isAvailableForSave}
+                onClick={handleSaveChanges}
               >
                 Save
               </button>
