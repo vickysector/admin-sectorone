@@ -1543,7 +1543,16 @@ export default function DashboardLayout({ children }) {
                 console.log("values (details): ", values);
                 return (
                   <div className="mt-8" key={key}>
-                    <h1 className="text-LG-strong"> {key} </h1>
+                    <h1 className="text-LG-strong">
+                      {" "}
+                      {Array.isArray(values) ? (
+                        <></>
+                      ) : typeof values === "object" ? (
+                        Object.entries(values).map(([k, v]) => <></>)
+                      ) : (
+                        <p>{key}</p>
+                      )}{" "}
+                    </h1>
                     <h2
                       className="text-text-description text-LG-normal mt-1"
                       style={{
@@ -1552,12 +1561,10 @@ export default function DashboardLayout({ children }) {
                       }}
                     >
                       {Array.isArray(values) ? (
-                        values.join(", ")
+                        ""
                       ) : typeof values === "object" ? (
                         Object.entries(values).map(([k, v]) => (
-                          <p key={k}>
-                            {k} : {v}
-                          </p>
+                          <p key={k}>{/* {k} : {v} */}</p>
                         ))
                       ) : (
                         <p>{values}</p>
