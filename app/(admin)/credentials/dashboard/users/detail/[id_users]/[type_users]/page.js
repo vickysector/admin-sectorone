@@ -69,15 +69,16 @@ export default function DetailRoleUsers({ params }) {
   const [isAvailableForSaveKeyword, setIsAvailableForSaveKeyword] =
     useState(false);
   const [isAvailableForDemo, setIsAvailableForDemo] = useState(false);
+  const [isAvailableForSave, setIsAvailableForSave] = useState(false);
 
-  const isAvailableForSave =
-    isAvailableForDemo ||
-    isAvailableForSaveRole ||
-    isAvailableForSaveName ||
-    isAvailableForSavePhone ||
-    isAvailableForSaveEmail ||
-    isAvailableForSaveProtections ||
-    isAvailableForSaveKeyword;
+  // const isAvailableForSave =
+  //   isAvailableForDemo ||
+  //   isAvailableForSaveRole ||
+  //   isAvailableForSaveName ||
+  //   isAvailableForSavePhone ||
+  //   isAvailableForSaveEmail ||
+  //   isAvailableForSaveProtections ||
+  //   isAvailableForSaveKeyword;
 
   console.log("is available for save ", isAvailableForSave);
 
@@ -168,16 +169,36 @@ export default function DetailRoleUsers({ params }) {
     setIsProtectionCreditsEdited(false);
     setIsKeywordCreditsEdited(false);
     setIsDemoEdited(false);
-    isAvailableForDemo(false);
-    isAvailableForSaveEmail(false);
-    isAvailableForSaveName(false);
-    isAvailableForSavePhone(false);
-    isAvailableForSaveProtections(false);
-    isAvailableForSaveKeyword(false);
-    isAvailableForSaveRole(false);
+    setIsAvailableForDemo(false);
+    setIsAvailableForSaveEmail(false);
+    setIsAvailableForSaveName(false);
+    setIsAvailableForSavePhone(false);
+    setIsAvailableForSaveProtections(false);
+    setIsAvailableForSaveKeyword(false);
+    setIsAvailableForSaveRole(false);
   };
 
   console.log("is available fo save ", isAvailableForSave);
+
+  useEffect(() => {
+    setIsAvailableForSave(
+      isAvailableForDemo ||
+        isAvailableForSaveRole ||
+        isAvailableForSaveName ||
+        isAvailableForSavePhone ||
+        isAvailableForSaveEmail ||
+        isAvailableForSaveProtections ||
+        isAvailableForSaveKeyword
+    );
+  }, [
+    isAvailableForDemo,
+    isAvailableForSaveRole,
+    isAvailableForSaveName,
+    isAvailableForSavePhone,
+    isAvailableForSaveEmail,
+    isAvailableForSaveProtections,
+    isAvailableForSaveKeyword,
+  ]);
 
   // End of: Edit Functionality
 
@@ -786,6 +807,7 @@ export default function DetailRoleUsers({ params }) {
       if (data.data) {
         setTriggerChange(true);
         clearAllEditState();
+        setIsAvailableForSave(false);
         return res;
       }
 
