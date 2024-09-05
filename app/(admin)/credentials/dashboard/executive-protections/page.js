@@ -46,6 +46,15 @@ export default function ExecutiveProtectionPage() {
     (state) => state.executiveProtections.totalExposures
   );
 
+  const dataLeakedDetails = useSelector(
+    (state) => state.executiveProtections.detailsLeakedData.info_2
+  );
+
+  console.log(
+    "data executive admin baru (index) (details): ",
+    dataLeakedDetails
+  );
+
   function sliceObject(obj, chunkSize = 3) {
     const entries = Object.entries(obj);
     if (entries.length <= chunkSize) return [obj];
@@ -69,6 +78,7 @@ export default function ExecutiveProtectionPage() {
   };
 
   const handleDetails = (item) => {
+    console.log("item (details): ", item);
     dispatch(setDetailsLeakedData(item));
     dispatch(setDetailsIsOpen(true));
     // console.log("item leaked details: ", item);
@@ -134,21 +144,27 @@ export default function ExecutiveProtectionPage() {
         return res;
       }
 
-      if (data.data === null) {
+      if (data.success === false) {
         setIsErrorEmail(true);
         setErrorMessage(data.message);
+        dispatch(setLeakedData(null));
         throw res;
       }
 
       //   return res;
 
-      if ("No results found" in data.List) {
-        dispatch(setLeakedData(null));
-        return res;
-      } else {
-        let totalItems = Object.keys(data.List).length;
-        dispatch(setLeakedData(data));
-        dispatch(setTotalExposures(totalItems));
+      // if ("No results found" in data.List) {
+      //   dispatch(setLeakedData(null));
+      //   return res;
+      // } else {
+      //   let totalItems = Object.keys(data.List).length;
+      //   dispatch(setLeakedData(data));
+      //   dispatch(setTotalExposures(totalItems));
+      //   return res;
+      // }
+      if (data.success === true) {
+        dispatch(setLeakedData(data.result));
+        dispatch(setTotalExposures(data.found));
         return res;
       }
     } catch (error) {
@@ -286,17 +302,17 @@ export default function ExecutiveProtectionPage() {
     await fetchWithRefreshToken(DeleteAllRecentSearchData, router, dispatch);
   };
 
-  const MapLeakedData =
-    dataLeaked &&
-    Object.entries(dataLeaked.List).map(([website, data]) => {
-      let leakedKeys = [];
-      if (data.Data && data.Data.length > 0) {
-        leakedKeys = Object.keys(data.Data[0]);
-      }
+  // const MapLeakedData =
+  //   dataLeaked &&
+  //   Object.entries(dataLeaked.List).map(([website, data]) => {
+  //     let leakedKeys = [];
+  //     if (data.Data && data.Data.length > 0) {
+  //       leakedKeys = Object.keys(data.Data[0]);
+  //     }
 
-      let idDetailData = dataLeaked.id;
-      return { website, leakedKeys, idDetailData };
-    });
+  //     let idDetailData = dataLeaked.id;
+  //     return { website, leakedKeys, idDetailData };
+  //   });
 
   useEffect(() => {
     setTimeout(() => {
@@ -520,7 +536,7 @@ export default function ExecutiveProtectionPage() {
                 </tr>
               </thead>
               <tbody className="text-Base-normal text-text-description">
-                {MapLeakedData &&
+                {/* {MapLeakedData &&
                   MapLeakedData.map((data, index) => {
                     console.log("data leaked keys ", data.leakedKeys);
                     console.log(
@@ -563,6 +579,45 @@ export default function ExecutiveProtectionPage() {
                           <button
                             className="rounded-md border-[1px] border-input-border text-primary-base text-Base-normal py-1.5 px-4"
                             onClick={() => handleDetails(allData)}
+                          >
+                            Details
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })} */}
+                {dataLeaked &&
+                  dataLeaked.map((data, index) => {
+                    console.log("data executive admin baru (data): ", data);
+                    console.log("data executive admin baru (index): ", index);
+                    let keys = Object.entries(data).map(([k, v]) => k);
+                    // console.log("data executive admin baru (key): ", key);
+
+                    return (
+                      <tr
+                        className="border-b-[2px] border-[#D5D5D5]"
+                        key={index}
+                      >
+                        <td className="py-[19px] px-[16px]"> {index + 1} </td>
+                        <td className="py-[19px] px-[16px]">
+                          {data.source.name}
+                        </td>
+                        <td className="py-[19px] px-[16px] w-[45%]">
+                          {keys.map((field) => (
+                            <>
+                              <span
+                                className="inline-block bg-white text-text-description rounded-[100px] border-[1px] border-[#D5D5D5] text-SM-normal py-1 px-4 mr-2 mt-2"
+                                key={field}
+                              >
+                                {field}
+                              </span>
+                            </>
+                          ))}
+                        </td>
+                        <td className="py-[19px] px-[16px]">
+                          <button
+                            className="rounded-md border-[1px] border-input-border text-primary-base text-Base-normal py-1.5 px-4"
+                            onClick={() => handleDetails(data)}
                           >
                             Details
                           </button>

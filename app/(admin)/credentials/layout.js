@@ -140,7 +140,7 @@ export default function DashboardLayout({ children }) {
     useState(false);
 
   const dataLeakedDetails = useSelector(
-    (state) => state.executiveProtections.detailsLeakedData.info_2
+    (state) => state.executiveProtections.detailsLeakedData
   );
 
   console.log("data leaked details: ", dataLeakedDetails);
@@ -1489,6 +1489,11 @@ export default function DashboardLayout({ children }) {
     }
   }, []);
 
+  console.log(
+    "data executive admin baru (index) (details): ",
+    dataLeakedDetails
+  );
+
   return (
     <main className="relative bg-input-container">
       {/* Start of: Loading State Cards */}
@@ -1533,20 +1538,34 @@ export default function DashboardLayout({ children }) {
           </div>
           <div className="mt-6">
             {dataLeakedDetails &&
-              Object.entries(dataLeakedDetails).map(([key, values]) => (
-                <div className="mt-8" key={key}>
-                  <h1 className="text-LG-strong">{key}</h1>
-                  <h2
-                    className="text-text-description text-LG-normal mt-1"
-                    style={{
-                      maxWidth: "450px",
-                      wordWrap: "break-word",
-                    }}
-                  >
-                    {values}
-                  </h2>
-                </div>
-              ))}
+              Object.entries(dataLeakedDetails).map(([key, values]) => {
+                console.log("key (details): ", key);
+                console.log("values (details): ", values);
+                return (
+                  <div className="mt-8" key={key}>
+                    <h1 className="text-LG-strong"> {key} </h1>
+                    <h2
+                      className="text-text-description text-LG-normal mt-1"
+                      style={{
+                        maxWidth: "450px",
+                        wordWrap: "break-word",
+                      }}
+                    >
+                      {Array.isArray(values) ? (
+                        values.join(", ")
+                      ) : typeof values === "object" ? (
+                        Object.entries(values).map(([k, v]) => (
+                          <p>
+                            {k} : {v}
+                          </p>
+                        ))
+                      ) : (
+                        <p>{values}</p>
+                      )}
+                    </h2>
+                  </div>
+                );
+              })}
           </div>
         </div>
       </div>
