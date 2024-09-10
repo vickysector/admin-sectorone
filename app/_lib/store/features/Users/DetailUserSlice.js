@@ -10,6 +10,8 @@ const DetailsUsersSlices = createSlice({
     successStateEditUser: false,
     confirmEditUsers: false,
     PostFunctionEditUsers: null,
+    confirmDeleteDomain: false,
+    PostFunctionDeleteDomain: null,
   },
   reducers: {
     setConfirmDetailUserDeactivateState(state, action) {
@@ -33,6 +35,12 @@ const DetailsUsersSlices = createSlice({
     setPostFunctionEditUsers(state, action) {
       state.PostFunctionEditUsers = action.payload;
     },
+    setConfirmDeleteDomain(state, action) {
+      state.confirmDeleteDomain = action.payload;
+    },
+    setPostFunctionDeleteDomain(state, action) {
+      state.PostFunctionDeleteDomain = action.payload;
+    },
   },
 });
 
@@ -44,6 +52,8 @@ export const {
   setConfirmEditUsers,
   setSuccessStateEditUser,
   setPostFunctionEditUsers,
+  setConfirmDeleteDomain,
+  setPostFunctionDeleteDomain,
 } = DetailsUsersSlices.actions;
 
 export default DetailsUsersSlices.reducer;

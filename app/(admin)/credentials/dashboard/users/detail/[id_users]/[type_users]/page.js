@@ -18,13 +18,16 @@ import { APIDATAV1 } from "@/app/_lib/helpers/APIKEYS";
 import { setLoadingState } from "@/app/_lib/store/features/Compromised/LoadingSlices";
 import { getCookie } from "cookies-next";
 import {
+  setConfirmDeleteDomain,
   setConfirmDetailUserDeactivateState,
   setConfirmEditUsers,
   setDetailUserDeactivateFunction,
+  setPostFunctionDeleteDomain,
   setPostFunctionEditUsers,
   setVerifiedStatus,
 } from "@/app/_lib/store/features/Users/DetailUserSlice";
 import { CloseCircleOutlined, EditOutlined } from "@ant-design/icons";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 
 export default function DetailRoleUsers({ params }) {
   // Start of: Redux
@@ -50,6 +53,35 @@ export default function DetailRoleUsers({ params }) {
   const [triggerChange, setTriggerChange] = useState(false);
 
   // End of: State
+
+  // Start of: Edit Domain
+
+  const [isDomainEdited, setIsDomainEdited] = useState("");
+  const [IsAvailableForSaveDomain, setIsAvailableForSaveDomain] =
+    useState(false);
+  const [domain, setDomain] = useState("");
+
+  const handleSetIsDomainEdited = (domainId) => {
+    setIsDomainEdited(domainId);
+  };
+
+  console.log("domain edited: ", isDomainEdited);
+
+  const handleSetIsDomainEditedCancel = () => {
+    setIsDomainEdited("");
+    setIsAvailableForSaveDomain(false);
+  };
+
+  const handleDeleteDomainById = (domainId) => {
+    dispatch(setConfirmDeleteDomain(true));
+    dispatch(
+      setPostFunctionDeleteDomain(() =>
+        DeleteDetailsDataDomainWithRefreshToken(domainId)
+      )
+    );
+  };
+
+  // End of: Edit Domain
 
   // Start of: Edit Functionality
   const [isRoleEdited, setIsRoleEdited] = useState(false);
@@ -661,6 +693,56 @@ export default function DetailRoleUsers({ params }) {
   };
   // End of: Fetch Detail Data Individual
 
+  const DeleteDetailsDataDomain = async (domainId) => {
+    try {
+      dispatch(setLoadingState(true));
+
+      setTriggerChange(false);
+
+      const res = await fetch(`${APIDATAV1}root/admin/domain/${domainId}`, {
+        method: "DELETE",
+        credentials: "include",
+        headers: {
+          Authorization: `Bearer ${getCookie("access_token")}`,
+          // "Content-Type": "application/json",
+        },
+      });
+
+      if (res.status === 401 || res.status === 403) {
+        return res;
+      }
+
+      const data = await res.json();
+
+      console.log("details delete domain status: ", data);
+
+      if (data.success === false) {
+        throw res;
+      }
+
+      if (data.success) {
+        setTriggerChange(true);
+        return res;
+      }
+
+      //   return res;
+    } catch (error) {
+      console.log("error delete domain status: ", error);
+      return error;
+    } finally {
+      dispatch(setLoadingState(false));
+    }
+  };
+
+  const DeleteDetailsDataDomainWithRefreshToken = async (domainId) => {
+    await fetchWithRefreshToken(
+      DeleteDetailsDataDomain,
+      router,
+      dispatch,
+      domainId
+    );
+  };
+
   const FetchDetailsDataDomain = async () => {
     try {
       dispatch(setLoadingState(true));
@@ -1166,34 +1248,93 @@ export default function DetailRoleUsers({ params }) {
           <div>
             <div className="mt-8">
               <section className="flex items-center justify-between">
-                <div>
+                <div
+                  className={clsx("flex items-center justify-between w-full")}
+                >
                   <h2 className="text-heading-4 text-black">URL list</h2>
+                  <div>
+                    {/* <button
+                      className={clsx(
+                        `py-2 px-4 rounded-md text-primary-base text-Base-normal border-[1px] border-input-border hover:opacity-80 cursor-pointer `
+                      )}
+                      onClick={() =>
+                        handleDeactivateAccounts(detailsData.verified)
+                      }
+                    >
+                      {detailsData && detailsData.verified
+                        ? "Deactivate"
+                        : "Activate"}{" "}
+                      accounts
+                    </button> */}
+                    <button
+                      className={clsx(
+                        `py-2 px-4 rounded-md  text-Base-normal border-[1px] hover:opacity-80 cursor-pointer ml-4 `,
+                        isAvailableForSave
+                          ? "text-white bg-primary-base"
+                          : "bg-[#0000000A] border-[1px] border-[#D5D5D5] text-[#00000040]"
+                      )}
+                      disabled={!isAvailableForSave}
+                      onClick={handleSaveChanges}
+                    >
+                      Save
+                    </button>
+                  </div>
                 </div>
               </section>
               <section className="bg-white rounded-md p-8 mt-4">
                 {allDomain &&
                   allDomain.data.map((data) => (
-                    <Form.Item
-                      label={"Url"}
-                      name={data.domain}
-                      layout="vertical"
-                      rules={[
-                        {
-                          required: true,
-                        },
-                      ]}
+                    <div
+                      className="flex items-center justify-between"
                       key={data.id}
                     >
-                      <Input
-                        placeholder="gmail.com"
-                        variant="filled"
-                        size="large"
-                        // onChange={handleRequiredUrlChange}
-                        value={data.domain}
-                        defaultValue={data.domain}
-                        disabled
+                      <Form.Item
+                        label={"Url"}
+                        name={data.domain}
+                        layout="vertical"
+                        rules={[
+                          {
+                            required: true,
+                          },
+                        ]}
+                        key={data.id}
+                        className={clsx(
+                          "text-Base-normal text-[#000000E0] w-full"
+                        )}
+                      >
+                        <Input
+                          placeholder="gmail.com"
+                          variant="filled"
+                          size="large"
+                          // onChange={handleRequiredUrlChange}
+                          value={data.domain}
+                          defaultValue={data.domain}
+                          disabled={isDomainEdited !== data.id}
+                        />
+                      </Form.Item>
+                      <DeleteOutlineIcon
+                        className={clsx(
+                          "ml-4 text-[#00000040] text-[20px] ",
+                          isDomainEdited !== data.id ? "visible" : "hidden",
+                          allDomain.data.length > 1 ? "visible" : "hidden"
+                        )}
+                        onClick={() => handleDeleteDomainById(data.id)}
                       />
-                    </Form.Item>
+                      <EditOutlined
+                        className={clsx(
+                          "ml-4 text-[#00000040] text-[20px] ",
+                          isDomainEdited !== data.id ? "visible" : "hidden"
+                        )}
+                        onClick={() => handleSetIsDomainEdited(data.id)}
+                      />
+                      <CloseCircleOutlined
+                        className={clsx(
+                          "ml-4 text-[#00000040] text-[20px] ",
+                          isDomainEdited === data.id ? "visible" : "hidden"
+                        )}
+                        onClick={handleSetIsDomainEditedCancel}
+                      />
+                    </div>
                   ))}
               </section>
             </div>
