@@ -189,7 +189,7 @@ export default function DetailsDomainSearch() {
       dispatch(setLoadingState(true));
 
       const res = await fetch(
-        `${APIDATAV1}root/admin/search-username?username=${
+        `${APIDATAV1}compromised/search-username?username=${
           hasOwnProperty("login") && detailsCompromisedData.login
         }`,
         {
@@ -219,7 +219,7 @@ export default function DetailsDomainSearch() {
       dispatch(setLoadingState(true));
 
       const res = await fetch(
-        `${APIDATAV1}root/admin/search-email?email=${
+        `${APIDATAV1}compromised/search-email?email=${
           hasOwnProperty("login") && detailsCompromisedData.login
         }`,
         {
