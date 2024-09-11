@@ -224,6 +224,10 @@ export default function DashboardLayout({ children }) {
   const handleAddDomainSearch = (e) => {
     console.log("add domain search ", e.target.value);
     setAddDomainSearch(e.target.value);
+    dispatch(setUserListAddDomain([]));
+    if (!addDomainSearch) {
+      setUserListPage(1);
+    }
   };
 
   const handleChooseEmailForAddDomain = (value) => {
