@@ -915,7 +915,7 @@ export default function DetailRoleUsers({ params }) {
 
   // End of: API Intregations
 
-  console.log("all domain: ", allDomain);
+  console.log("all domain test: ", allDomain && allDomain.size);
 
   return (
     <main>
@@ -1316,7 +1316,7 @@ export default function DetailRoleUsers({ params }) {
                         className={clsx(
                           "ml-4 text-[#00000040] text-[20px] ",
                           isDomainEdited !== data.id ? "visible" : "hidden",
-                          allDomain.data.length > 1 ? "visible" : "hidden"
+                          allDomain && allDomain.size > 1 ? "visible" : "hidden"
                         )}
                         onClick={() => handleDeleteDomainById(data.id)}
                       />
