@@ -10,6 +10,7 @@ import { APIKEY } from "@/app/_lib/helpers/APIKEYS";
 import { LoadingSpin } from "@/app/_ui/components/utils/LoadingSpin";
 import { setCookie, getCookie, hasCookie, deleteCookie } from "cookies-next";
 import { useRouter, redirect } from "next/navigation";
+import { DeleteCookies } from "@/app/_lib/helpers/DeleteCookies";
 
 export default function FaAuthPage() {
   const [showOtp, setShowOtp] = useState(false);
@@ -17,6 +18,7 @@ export default function FaAuthPage() {
   const [loadingSendOtp, setLoadingSendOtp] = useState(false);
   const [errorOtp, setErrorOtp] = useState(false);
   const [errorOtpMessage, setErrorOtpMessage] = useState("");
+  const [isSuperAdmin, setIsSuperAdmin] = useState(true);
 
   const router = useRouter();
 
@@ -59,7 +61,16 @@ export default function FaAuthPage() {
         setCookie("access_token", data.data.access_token);
         setCookie("email_credentials", data.data.email);
         setCookie("role", data.data.role);
-        router.push("/credentials/dashboard/users");
+        if (getCookie("role") === "superadmin") {
+          router.push("/credentials/dashboard/users");
+        } else {
+          setIsSuperAdmin(false);
+          setTimeout(() => {
+            setIsSuperAdmin(true);
+            DeleteCookies();
+            router.push("/auth/login");
+          }, 3000);
+        }
       } catch (error) {
         setErrorOtpMessage("Inccorrect OTP. Please try again");
         setErrorOtp(true);
@@ -88,7 +99,17 @@ export default function FaAuthPage() {
         <LoadingSpin />
       </div>
       <section className="flex-1 flex flex-col items-center justify-center h-full w-full ">
-        <div className="w-[65%]">
+        <div className="w-[65%] relative">
+          <div
+            className={clsx(
+              "absolute left-0 top-[-25%] py-[14px] px-4 bg-[#FFF1F0] rounded-[4px] shadow-md",
+              !isSuperAdmin ? "visible" : "hidden"
+            )}
+          >
+            <h1 className={clsx("text-Base-normal text-[#CF1322] ")}>
+              You do not have enough privileges to access the dashboard admin.
+            </h1>
+          </div>
           <h1 className="text-heading-1 w-[80%]">Enter verification code</h1>
           <p className="text-LG-normal text-text-description mt-[8px] mb-8">
             We notification you the four digit code to your 2FA account enter
