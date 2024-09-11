@@ -20,9 +20,11 @@ import { getCookie } from "cookies-next";
 import {
   setConfirmDeleteDomain,
   setConfirmDetailUserDeactivateState,
+  setConfirmEditDomain,
   setConfirmEditUsers,
   setDetailUserDeactivateFunction,
   setPostFunctionDeleteDomain,
+  setPostFunctionEditDomain,
   setPostFunctionEditUsers,
   setVerifiedStatus,
 } from "@/app/_lib/store/features/Users/DetailUserSlice";
@@ -59,10 +61,46 @@ export default function DetailRoleUsers({ params }) {
   const [isDomainEdited, setIsDomainEdited] = useState("");
   const [IsAvailableForSaveDomain, setIsAvailableForSaveDomain] =
     useState(false);
-  const [domain, setDomain] = useState("");
+  const [domain, setDomain] = useState([]);
+
+  const handleSaveChangesDomain = () => {
+    console.log("edited domain");
+    dispatch(setConfirmEditDomain(true));
+    dispatch(setPostFunctionEditDomain(EditDetailsDataDomainWithRefreshToken));
+  };
+
+  const handleEditDomainChange = (event, domainId) => {
+    // console.log("testing: ", event.target.value);
+    setIsAvailableForSaveDomain(true);
+    console.log(
+      "edit domain (id): ",
+      allDomain.data.filter((item) => item.id === domainId)
+    );
+
+    const editedDomain = allDomain.data
+      .filter((item) => item.id === domainId)
+      .map((item) => ({
+        id_domain: item.id,
+        domain: event.target.value,
+      }));
+
+    console.log("edit domain (total): ", editedDomain);
+    const newEditedDomain = allDomain.data
+      .map((item) => ({
+        id_domain: item.id,
+        domain: item.domain,
+      }))
+      .filter((item) => item.id_domain !== domainId);
+
+    setDomain([...newEditedDomain, ...editedDomain]);
+  };
+
+  console.log("edit domain: ", domain);
 
   const handleSetIsDomainEdited = (domainId) => {
     setIsDomainEdited(domainId);
+    setIsAvailableForSaveDomain(false);
+    FetchDetailsDataDomainWithRefreshToken();
   };
 
   console.log("domain edited: ", isDomainEdited);
@@ -70,6 +108,7 @@ export default function DetailRoleUsers({ params }) {
   const handleSetIsDomainEditedCancel = () => {
     setIsDomainEdited("");
     setIsAvailableForSaveDomain(false);
+    FetchDetailsDataDomainWithRefreshToken();
   };
 
   const handleDeleteDomainById = (domainId) => {
@@ -693,6 +732,54 @@ export default function DetailRoleUsers({ params }) {
   };
   // End of: Fetch Detail Data Individual
 
+  const EditDetailsDataDomain = async (domainId) => {
+    console.log("domain status final: ", domain);
+    try {
+      dispatch(setLoadingState(true));
+
+      setTriggerChange(false);
+
+      const res = await fetch(`${APIDATAV1}root/admin/domain`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: {
+          Authorization: `Bearer ${getCookie("access_token")}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(domain),
+      });
+
+      if (res.status === 401 || res.status === 403) {
+        return res;
+      }
+
+      const data = await res.json();
+
+      console.log("details edit domain status: ", data);
+
+      if (data.success === false) {
+        throw res;
+      }
+
+      if (data.success) {
+        setTriggerChange(true);
+        setIsDomainEdited("");
+        return res;
+      }
+
+      //   return res;
+    } catch (error) {
+      console.log("error edit domain status: ", error);
+      return error;
+    } finally {
+      dispatch(setLoadingState(false));
+    }
+  };
+
+  const EditDetailsDataDomainWithRefreshToken = async () => {
+    await fetchWithRefreshToken(EditDetailsDataDomain, router, dispatch);
+  };
+
   const DeleteDetailsDataDomain = async (domainId) => {
     try {
       dispatch(setLoadingState(true));
@@ -915,7 +1002,7 @@ export default function DetailRoleUsers({ params }) {
 
   // End of: API Intregations
 
-  console.log("all domain test: ", allDomain && allDomain.size);
+  console.log("all domain ", allDomain);
 
   return (
     <main>
@@ -1269,12 +1356,12 @@ export default function DetailRoleUsers({ params }) {
                     <button
                       className={clsx(
                         `py-2 px-4 rounded-md  text-Base-normal border-[1px] hover:opacity-80 cursor-pointer ml-4 `,
-                        isAvailableForSave
+                        IsAvailableForSaveDomain
                           ? "text-white bg-primary-base"
                           : "bg-[#0000000A] border-[1px] border-[#D5D5D5] text-[#00000040]"
                       )}
-                      disabled={!isAvailableForSave}
-                      onClick={handleSaveChanges}
+                      disabled={!IsAvailableForSaveDomain}
+                      onClick={handleSaveChangesDomain}
                     >
                       Save
                     </button>
@@ -1306,7 +1393,7 @@ export default function DetailRoleUsers({ params }) {
                           placeholder="gmail.com"
                           variant="filled"
                           size="large"
-                          // onChange={handleRequiredUrlChange}
+                          onChange={(e) => handleEditDomainChange(e, data.id)}
                           value={data.domain}
                           defaultValue={data.domain}
                           disabled={isDomainEdited !== data.id}

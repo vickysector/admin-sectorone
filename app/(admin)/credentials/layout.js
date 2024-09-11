@@ -81,6 +81,7 @@ import { setDetailsIsOpen } from "@/app/_lib/store/features/ExecutiveProtections
 import {
   setConfirmDeleteDomain,
   setConfirmDetailUserDeactivateState,
+  setConfirmEditDomain,
   setConfirmEditUsers,
 } from "@/app/_lib/store/features/Users/DetailUserSlice";
 
@@ -162,6 +163,10 @@ export default function DashboardLayout({ children }) {
     (state) => state.detailUserDeactivate.confirmDeleteDomain
   );
 
+  const isDetailsEditChangeDomainAccount = useSelector(
+    (state) => state.detailUserDeactivate.confirmEditDomain
+  );
+
   const verifiedAccountStatus = useSelector(
     (state) => state.detailUserDeactivate.verifiedStatus
   );
@@ -176,6 +181,10 @@ export default function DashboardLayout({ children }) {
 
   const callDetailsDeleteUsersFunction = useSelector(
     (state) => state.detailUserDeactivate.PostFunctionDeleteDomain
+  );
+
+  const callDetailsChangeDomainFunction = useSelector(
+    (state) => state.detailUserDeactivate.PostFunctionEditDomain
   );
 
   // Start of: (superadmin) - Add Domain
@@ -370,9 +379,18 @@ export default function DashboardLayout({ children }) {
     dispatch(setConfirmDeleteDomain(false));
   };
 
+  const handleCancelChangeDomain = () => {
+    dispatch(setConfirmEditDomain(false));
+  };
+
   const handleYesDeleteDomain = () => {
     callDetailsDeleteUsersFunction();
     dispatch(setConfirmDeleteDomain(false));
+  };
+
+  const handleYesEditDomain = () => {
+    callDetailsChangeDomainFunction();
+    dispatch(setConfirmEditDomain(false));
   };
 
   const isSuccessAddUserRole = useSelector(
@@ -1808,6 +1826,40 @@ export default function DashboardLayout({ children }) {
       </div>
 
       {/* End of: (superadmin) - Add domain Features */}
+
+      <div
+        className={clsx(
+          "fixed top-0 bottom-0 left-0 right-0 bg-[#000000B2] w-full z-50 flex items-center justify-center",
+          isDetailsEditChangeDomainAccount ? "visible" : "hidden"
+        )}
+      >
+        <div className="bg-white p-[32px] rounded-lg w-[30%]">
+          <h1 className="text-LG-strong ">
+            Are you sure you want Change this domain for this account?
+          </h1>
+          <p className="text-Base-normal text-text-description mt-[12px]">
+            this action cannot be undone
+          </p>
+          <div className="mt-8 flex justify-end ">
+            <div>
+              <button
+                className="py-2 px-4 rounded-md text-Base-normal border-[1px] border-input-border hover:opacity-80 cursor-pointer  "
+                onClick={handleCancelChangeDomain}
+              >
+                Cancel
+              </button>
+            </div>
+            <div className="ml-4">
+              <button
+                onClick={handleYesEditDomain}
+                className="py-2 px-4 rounded-md text-Base-normal border-[1px]  hover:opacity-80 cursor-pointer text-white bg-primary-base border-primary-base"
+              >
+                Yes
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div
         className={clsx(
