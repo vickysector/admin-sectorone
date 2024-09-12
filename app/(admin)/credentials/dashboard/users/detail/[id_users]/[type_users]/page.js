@@ -30,6 +30,7 @@ import {
 } from "@/app/_lib/store/features/Users/DetailUserSlice";
 import { CloseCircleOutlined, EditOutlined } from "@ant-design/icons";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import { v4 as uuidv4 } from "uuid";
 
 export default function DetailRoleUsers({ params }) {
   // Start of: Redux
@@ -49,7 +50,7 @@ export default function DetailRoleUsers({ params }) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
-  const [allDomain, setAllDomain] = useState();
+  const [allDomain, setAllDomain] = useState({ data: [] });
   const [protectionCredits, setProtectionCredits] = useState("");
   const [keywordCredits, setKeywordCredits] = useState("");
   const [triggerChange, setTriggerChange] = useState(false);
@@ -67,6 +68,13 @@ export default function DetailRoleUsers({ params }) {
     console.log("edited domain");
     dispatch(setConfirmEditDomain(true));
     dispatch(setPostFunctionEditDomain(EditDetailsDataDomainWithRefreshToken));
+  };
+
+  const handleAddUrlNewDomain = () => {
+    setAllDomain((prev) => ({
+      ...prev,
+      data: [...(prev?.data || []), { id: uuidv4(), domain: "" }],
+    }));
   };
 
   const handleEditDomainChange = (event, domainId) => {
@@ -1344,14 +1352,9 @@ export default function DetailRoleUsers({ params }) {
                       className={clsx(
                         `py-2 px-4 rounded-md text-primary-base text-Base-normal border-[1px] border-input-border hover:opacity-80 cursor-pointer `
                       )}
-                      onClick={() =>
-                        handleDeactivateAccounts(detailsData.verified)
-                      }
+                      onClick={() => handleAddUrlNewDomain()}
                     >
-                      {detailsData && detailsData.verified
-                        ? "Deactivate"
-                        : "Activate"}{" "}
-                      accounts
+                      Add URL
                     </button> */}
                     <button
                       className={clsx(
