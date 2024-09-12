@@ -2208,12 +2208,12 @@ export default function DetailRoleUsers({ params }) {
                     Users is on {demo ? "Demo" : "Full Access"} Mode
                   </h2>
                   {/* <h2 className="text-text-description text-Base-normal mb-1">
-                   Users is on{" "}
-                   <span className={clsx("text-heading-5 text-black")}>
-                     {demo ? "Demo" : "Full Access"}
-                   </span>{" "}
-                   Mode
-                 </h2> */}
+                  Users is on{" "}
+                  <span className={clsx("text-heading-5 text-black")}>
+                    {demo ? "Demo" : "Full Access"}
+                  </span>{" "}
+                  Mode
+                </h2> */}
                   <p className="text-text-description text-Base-normal">
                     By activating this mode, users will be restricted from
                     accessing some features on the SectorOne dashboard.
@@ -2490,34 +2490,88 @@ export default function DetailRoleUsers({ params }) {
           <div>
             <div className="mt-8">
               <section className="flex items-center justify-between">
-                <div>
+                <div
+                  className={clsx("flex items-center justify-between w-full")}
+                >
                   <h2 className="text-heading-4 text-black">URL list</h2>
+                  <div>
+                    {/* <button
+                    className={clsx(
+                      `py-2 px-4 rounded-md text-primary-base text-Base-normal border-[1px] border-input-border hover:opacity-80 cursor-pointer `
+                    )}
+                    onClick={() => handleAddUrlNewDomain()}
+                  >
+                    Add URL
+                  </button> */}
+                    <button
+                      className={clsx(
+                        `py-2 px-4 rounded-md  text-Base-normal border-[1px] hover:opacity-80 cursor-pointer ml-4 `,
+                        IsAvailableForSaveDomain
+                          ? "text-white bg-primary-base"
+                          : "bg-[#0000000A] border-[1px] border-[#D5D5D5] text-[#00000040]"
+                      )}
+                      disabled={!IsAvailableForSaveDomain}
+                      onClick={handleSaveChangesDomain}
+                    >
+                      Save
+                    </button>
+                  </div>
                 </div>
               </section>
               <section className="bg-white rounded-md p-8 mt-4">
                 {allDomain &&
                   allDomain.data.map((data) => (
-                    <Form.Item
-                      label={"Url"}
-                      name={data.domain}
-                      layout="vertical"
-                      rules={[
-                        {
-                          required: true,
-                        },
-                      ]}
+                    <div
+                      className="flex items-center justify-between"
                       key={data.id}
                     >
-                      <Input
-                        placeholder="gmail.com"
-                        variant="filled"
-                        size="large"
-                        // onChange={handleRequiredUrlChange}
-                        value={data.domain}
-                        defaultValue={data.domain}
-                        disabled
+                      <Form.Item
+                        label={"Url"}
+                        name={data.domain}
+                        layout="vertical"
+                        rules={[
+                          {
+                            required: true,
+                          },
+                        ]}
+                        key={data.id}
+                        className={clsx(
+                          "text-Base-normal text-[#000000E0] w-full"
+                        )}
+                      >
+                        <Input
+                          placeholder="gmail.com"
+                          variant="filled"
+                          size="large"
+                          onChange={(e) => handleEditDomainChange(e, data.id)}
+                          value={data.domain}
+                          defaultValue={data.domain}
+                          disabled={isDomainEdited !== data.id}
+                        />
+                      </Form.Item>
+                      <DeleteOutlineIcon
+                        className={clsx(
+                          "ml-4 text-[#00000040] text-[20px] ",
+                          isDomainEdited !== data.id ? "visible" : "hidden",
+                          allDomain && allDomain.size > 1 ? "visible" : "hidden"
+                        )}
+                        onClick={() => handleDeleteDomainById(data.id)}
                       />
-                    </Form.Item>
+                      <EditOutlined
+                        className={clsx(
+                          "ml-4 text-[#00000040] text-[20px] ",
+                          isDomainEdited !== data.id ? "visible" : "hidden"
+                        )}
+                        onClick={() => handleSetIsDomainEdited(data.id)}
+                      />
+                      <CloseCircleOutlined
+                        className={clsx(
+                          "ml-4 text-[#00000040] text-[20px] ",
+                          isDomainEdited === data.id ? "visible" : "hidden"
+                        )}
+                        onClick={handleSetIsDomainEditedCancel}
+                      />
+                    </div>
                   ))}
               </section>
             </div>
@@ -2573,12 +2627,12 @@ export default function DetailRoleUsers({ params }) {
                     Users is on {demo ? "Demo" : "Full Access"} Mode
                   </h2>
                   {/* <h2 className="text-text-description text-Base-normal mb-1">
-                   Users is on{" "}
-                   <span className={clsx("text-heading-5 text-black")}>
-                     {demo ? "Demo" : "Full Access"}
-                   </span>{" "}
-                   Mode
-                 </h2> */}
+                  Users is on{" "}
+                  <span className={clsx("text-heading-5 text-black")}>
+                    {demo ? "Demo" : "Full Access"}
+                  </span>{" "}
+                  Mode
+                </h2> */}
                   <p className="text-text-description text-Base-normal">
                     By activating this mode, users will be restricted from
                     accessing some features on the SectorOne dashboard.
@@ -2855,34 +2909,88 @@ export default function DetailRoleUsers({ params }) {
           <div>
             <div className="mt-8">
               <section className="flex items-center justify-between">
-                <div>
+                <div
+                  className={clsx("flex items-center justify-between w-full")}
+                >
                   <h2 className="text-heading-4 text-black">URL list</h2>
+                  <div>
+                    {/* <button
+                    className={clsx(
+                      `py-2 px-4 rounded-md text-primary-base text-Base-normal border-[1px] border-input-border hover:opacity-80 cursor-pointer `
+                    )}
+                    onClick={() => handleAddUrlNewDomain()}
+                  >
+                    Add URL
+                  </button> */}
+                    <button
+                      className={clsx(
+                        `py-2 px-4 rounded-md  text-Base-normal border-[1px] hover:opacity-80 cursor-pointer ml-4 `,
+                        IsAvailableForSaveDomain
+                          ? "text-white bg-primary-base"
+                          : "bg-[#0000000A] border-[1px] border-[#D5D5D5] text-[#00000040]"
+                      )}
+                      disabled={!IsAvailableForSaveDomain}
+                      onClick={handleSaveChangesDomain}
+                    >
+                      Save
+                    </button>
+                  </div>
                 </div>
               </section>
               <section className="bg-white rounded-md p-8 mt-4">
                 {allDomain &&
                   allDomain.data.map((data) => (
-                    <Form.Item
-                      label={"Url"}
-                      name={data.domain}
-                      layout="vertical"
-                      rules={[
-                        {
-                          required: true,
-                        },
-                      ]}
+                    <div
+                      className="flex items-center justify-between"
                       key={data.id}
                     >
-                      <Input
-                        placeholder="gmail.com"
-                        variant="filled"
-                        size="large"
-                        // onChange={handleRequiredUrlChange}
-                        value={data.domain}
-                        defaultValue={data.domain}
-                        disabled
+                      <Form.Item
+                        label={"Url"}
+                        name={data.domain}
+                        layout="vertical"
+                        rules={[
+                          {
+                            required: true,
+                          },
+                        ]}
+                        key={data.id}
+                        className={clsx(
+                          "text-Base-normal text-[#000000E0] w-full"
+                        )}
+                      >
+                        <Input
+                          placeholder="gmail.com"
+                          variant="filled"
+                          size="large"
+                          onChange={(e) => handleEditDomainChange(e, data.id)}
+                          value={data.domain}
+                          defaultValue={data.domain}
+                          disabled={isDomainEdited !== data.id}
+                        />
+                      </Form.Item>
+                      <DeleteOutlineIcon
+                        className={clsx(
+                          "ml-4 text-[#00000040] text-[20px] ",
+                          isDomainEdited !== data.id ? "visible" : "hidden",
+                          allDomain && allDomain.size > 1 ? "visible" : "hidden"
+                        )}
+                        onClick={() => handleDeleteDomainById(data.id)}
                       />
-                    </Form.Item>
+                      <EditOutlined
+                        className={clsx(
+                          "ml-4 text-[#00000040] text-[20px] ",
+                          isDomainEdited !== data.id ? "visible" : "hidden"
+                        )}
+                        onClick={() => handleSetIsDomainEdited(data.id)}
+                      />
+                      <CloseCircleOutlined
+                        className={clsx(
+                          "ml-4 text-[#00000040] text-[20px] ",
+                          isDomainEdited === data.id ? "visible" : "hidden"
+                        )}
+                        onClick={handleSetIsDomainEditedCancel}
+                      />
+                    </div>
                   ))}
               </section>
             </div>
