@@ -58,6 +58,7 @@ export default function DetailRoleUsers({ params }) {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [allDomain, setAllDomain] = useState({ data: [] });
+  const [allDomainPage, setAllDomainPage] = useState(1);
   const [protectionCredits, setProtectionCredits] = useState("");
   const [keywordCredits, setKeywordCredits] = useState("");
   const [triggerChange, setTriggerChange] = useState(false);
@@ -67,6 +68,13 @@ export default function DetailRoleUsers({ params }) {
   );
 
   // End of: State
+
+  // Start of: Add Domain
+  const handleChangeAllDomainPage = (page) => {
+    setAllDomainPage(page);
+  };
+
+  // End of: Add Domain
 
   // Start of: Edit Domain
 
@@ -857,7 +865,7 @@ export default function DetailRoleUsers({ params }) {
       dispatch(setLoadingState(true));
 
       const res = await fetch(
-        `${APIDATAV1}root/admin/domain?id_user=${params.id_users}&page=1&size=10`,
+        `${APIDATAV1}root/admin/domain?id_user=${params.id_users}&page=${allDomainPage}&size=5`,
         {
           method: "GET",
           credentials: "include",
@@ -1022,6 +1030,10 @@ export default function DetailRoleUsers({ params }) {
     FetchDetailsDataWithRefreshToken();
     FetchDetailsDataDomainWithRefreshToken();
   }, [triggerChange, triggerChangeAfterAddDomain]);
+
+  useEffect(() => {
+    FetchDetailsDataDomainWithRefreshToken();
+  }, [allDomainPage]);
 
   // End of: API Intregations
 
@@ -1492,12 +1504,13 @@ export default function DetailRoleUsers({ params }) {
                     <Pagination
                       type="primary"
                       defaultCurrent={1}
-                      // total={logActivityData.count}
+                      total={allDomain && allDomain.count_data}
                       showSizeChanger={false}
                       style={{ color: "#FF6F1E" }}
                       // hideOnSinglePage={true}
-                      // onChange={handlePageChange}
-                      // current={page}
+                      onChange={handleChangeAllDomainPage}
+                      current={allDomainPage}
+                      defaultPageSize={5}
                     />
                   </ConfigProvider>
                 </div>
