@@ -11,7 +11,7 @@ import {
   SUPERADMIN_SECTION_ROLE_SECTION,
   USERS_SECTION_ROLE_SECTION,
 } from "@/app/_lib/variables/Variables";
-import { ConfigProvider, Form, Input, Select, Switch } from "antd";
+import { ConfigProvider, Form, Input, Pagination, Select, Switch } from "antd";
 import { useEffect, useState } from "react";
 import { fetchWithRefreshToken } from "@/app/_lib/token/fetchWithRefreshToken";
 import { APIDATAV1 } from "@/app/_lib/helpers/APIKEYS";
@@ -31,7 +31,11 @@ import {
   setTriggerChangeAfterAddDomain,
   setVerifiedStatus,
 } from "@/app/_lib/store/features/Users/DetailUserSlice";
-import { CloseCircleOutlined, EditOutlined } from "@ant-design/icons";
+import {
+  CloseCircleOutlined,
+  EditOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { v4 as uuidv4 } from "uuid";
 
@@ -1383,6 +1387,31 @@ export default function DetailRoleUsers({ params }) {
                 </div>
               </section>
               <section className="bg-white rounded-md p-8 mt-4">
+                <div className={clsx("mb-8")}>
+                  <ConfigProvider
+                    theme={{
+                      components: {
+                        Input: {
+                          activeBorderColor: "#FF6F1E",
+                        },
+                      },
+                      token: {
+                        colorPrimary: "#FF6F1E",
+                      },
+                    }}
+                  >
+                    <Input
+                      placeholder="Search ID user/ Login/ Role"
+                      allowClear={false}
+                      style={{ width: 500 }}
+                      variant="filled"
+                      addonAfter={<SearchOutlined />}
+                      // onChange={(e) => handleAddDomainSearch(e)}
+                      // value={addDomainSearch}
+                      size="large"
+                    />
+                  </ConfigProvider>
+                </div>
                 {allDomain &&
                   allDomain.data.map((data) => (
                     <div
@@ -1390,7 +1419,7 @@ export default function DetailRoleUsers({ params }) {
                       key={data.id}
                     >
                       <Form.Item
-                        label={"Url"}
+                        label={"URL"}
                         name={data.domain}
                         layout="vertical"
                         rules={[
@@ -1437,6 +1466,41 @@ export default function DetailRoleUsers({ params }) {
                       />
                     </div>
                   ))}
+
+                <div className={clsx("flex justify-between items-center mt-8")}>
+                  <div>
+                    <h1
+                      className={clsx("text-Base-normal text-text-description")}
+                    >
+                      Showing {allDomain.size} to {allDomain.count_data} entries
+                    </h1>
+                  </div>
+                  <ConfigProvider
+                    theme={{
+                      components: {
+                        Pagination: {
+                          itemActiveBg: "#FF6F1E",
+                          itemLinkBg: "#fff",
+                          itemInputBg: "#fff",
+                        },
+                      },
+                      token: {
+                        colorPrimary: "white",
+                      },
+                    }}
+                  >
+                    <Pagination
+                      type="primary"
+                      defaultCurrent={1}
+                      // total={logActivityData.count}
+                      showSizeChanger={false}
+                      style={{ color: "#FF6F1E" }}
+                      // hideOnSinglePage={true}
+                      // onChange={handlePageChange}
+                      // current={page}
+                    />
+                  </ConfigProvider>
+                </div>
               </section>
             </div>
           </div>
