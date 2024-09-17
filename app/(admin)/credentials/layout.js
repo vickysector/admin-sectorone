@@ -224,6 +224,9 @@ export default function DashboardLayout({ children }) {
   const [isConfirmAddDomainForUsers, setIsConfirmAddDomainForUsers] =
     useState(false);
   const [finalUrlAllDomain, setFinalUrlAllDomain] = useState([]);
+  const [errorMsgForAddUrlDomain, setErrorMsgForAddUrlDomain] = useState("");
+  const [isSuccessAddUrlDomain, setIsSuccessUrlDomain] = useState(false);
+  const [isErrorAddUrlDomain, setIsErrorUrlDomain] = useState(false);
 
   const addDomainPopUpStatus = useSelector(
     (state) => state.detailUserDeactivate.isAddDomainStatus
@@ -232,6 +235,15 @@ export default function DashboardLayout({ children }) {
   const idUsersForAddDomain = useSelector(
     (state) => state.detailUserDeactivate.idUsersForAddUrlDomain
   );
+
+  const handleErrorStatePopup = () => {
+    setIsErrorUrlDomain(false);
+    dispatch(setIsAddDomainStatus(true));
+  };
+
+  const handleSuccessStatePopup = () => {
+    setIsSuccessUrlDomain(false);
+  };
 
   const handleAddDomainUrl = () => {
     setUrlAllDomain([...urlAllDomain, { id: uuidv4(), value: "" }]);
@@ -262,6 +274,7 @@ export default function DashboardLayout({ children }) {
   };
 
   const handleAddDomainsUrlYesConfirmation = () => {
+    setIsConfirmAddDomainForUsers(false);
     PostAddDomainsToSpecificUsersWithRefreshToken();
   };
 
@@ -298,26 +311,31 @@ export default function DashboardLayout({ children }) {
       const data = await res.json();
 
       if (data.data === null) {
-        // setMessageErrorWhileAddData(data.message);
         throw res;
       }
 
       console.log("status adding domains to specific users: ", data);
 
       if (data.data) {
-        dispatch(setSuccessState(true));
+        setIsSuccessUrlDomain(true);
+        setFinalUrlAllDomain([]);
+        setUrlAllDomain([{ id: 1, value: "" }]);
+        setTimeout(() => {
+          setIsSuccessUrlDomain(false);
+        }, 5000);
         return res;
       }
     } catch (error) {
       console.log("error while adding domains to specific users: ", error);
-      // setIsErrorWhileAddData(true);
-      //   setMessageErrorWhileAddData(error.message);
+      setIsErrorUrlDomain(true);
+      setErrorMsgForAddUrlDomain(error.message);
+      setTimeout(() => {
+        setIsErrorUrlDomain(false);
+        dispatch(setIsAddDomainStatus(true));
+      }, 5000);
       return error;
     } finally {
       dispatch(setLoadingState(false));
-      setTimeout(() => {
-        // setIsErrorWhileAddData(false);
-      }, 5000);
     }
   };
 
@@ -1805,6 +1823,56 @@ export default function DashboardLayout({ children }) {
         </div>
       </div>
 
+      {/* Start of: Add Url Domain - Edit Users page */}
+      <div
+        className={clsx(
+          "fixed top-0 bottom-0 left-0 right-0 bg-[#000000B2] w-full z-50 flex items-center justify-center",
+          isSuccessAddUrlDomain ? "visible" : "hidden"
+        )}
+      >
+        <div className="bg-white p-[32px] rounded-lg text-center">
+          <CheckCircleIcon className={clsx("text-success-chart size-10")} />
+          <p className={clsx("text-text-description text-Base-normal mt-4")}>
+            Success Adding{" "}
+            <span className="text-Base-strong italic">
+              {finalUrlAllDomain.join(", ")}
+            </span>{" "}
+            domains to this user?
+          </p>
+          <button
+            className={clsx(
+              " bg-primary-base text-white py-[4px] px-4 border-[1px] border-primary-base text-Base-normal rounded-[6px] mt-8"
+            )}
+            onClick={handleSuccessStatePopup}
+          >
+            Close
+          </button>
+        </div>
+      </div>
+
+      <div
+        className={clsx(
+          "fixed top-0 bottom-0 left-0 right-0 bg-[#000000B2] w-full z-50 flex items-center justify-center",
+          isErrorAddUrlDomain ? "visible" : "hidden"
+        )}
+      >
+        <div className="bg-white p-[32px] rounded-lg text-center">
+          <ErrorIcon className={clsx("text-error size-10")} />
+          <p className={clsx("text-text-description text-Base-normal mt-4")}>
+            Opps.. Error has occured <br />
+            <span className="text-Base-strong">{errorMsgForAddUrlDomain}</span>
+          </p>
+          <button
+            className={clsx(
+              " bg-primary-base text-white py-[4px] px-4 border-[1px] border-primary-base text-Base-normal rounded-[6px] mt-8"
+            )}
+            onClick={handleErrorStatePopup}
+          >
+            Close
+          </button>
+        </div>
+      </div>
+
       <div
         className={clsx(
           "fixed top-0 bottom-0 left-0 right-0 bg-[#000000B2] w-full z-50 flex items-center justify-center",
@@ -1912,6 +1980,8 @@ export default function DashboardLayout({ children }) {
           </div>
         </div>
       </div>
+
+      {/* End of: Add Url Domain - Edit Users page */}
 
       <div
         className={clsx(
