@@ -1946,7 +1946,7 @@ export default function DashboardLayout({ children }) {
                     variant="filled"
                     size="large"
                     onChange={(e) => handleAddUrlDomain(e, item.id)}
-                    // value={item.value}
+                    value={item.value}
                     // defaultValue={item.value}
                   />
                 </Form.Item>
