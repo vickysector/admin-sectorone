@@ -28,6 +28,7 @@ import {
   setPostFunctionDeleteDomain,
   setPostFunctionEditDomain,
   setPostFunctionEditUsers,
+  setTriggerChangeAfterAddDomain,
   setVerifiedStatus,
 } from "@/app/_lib/store/features/Users/DetailUserSlice";
 import { CloseCircleOutlined, EditOutlined } from "@ant-design/icons";
@@ -56,6 +57,10 @@ export default function DetailRoleUsers({ params }) {
   const [protectionCredits, setProtectionCredits] = useState("");
   const [keywordCredits, setKeywordCredits] = useState("");
   const [triggerChange, setTriggerChange] = useState(false);
+
+  const triggerChangeAfterAddDomain = useSelector(
+    (state) => state.detailUserDeactivate.triggerChangeAfterAddDomain
+  );
 
   // End of: State
 
@@ -116,7 +121,7 @@ export default function DetailRoleUsers({ params }) {
     FetchDetailsDataDomainWithRefreshToken();
   };
 
-  console.log("domain edited: ", isDomainEdited);
+  console.log("domain edited: ", allDomain);
 
   const handleSetIsDomainEditedCancel = () => {
     setIsDomainEdited("");
@@ -1008,10 +1013,11 @@ export default function DetailRoleUsers({ params }) {
 
   useEffect(() => {
     setTriggerChange(false);
+    dispatch(setTriggerChangeAfterAddDomain(false));
     FetchAllRolesWithRefreshToken();
     FetchDetailsDataWithRefreshToken();
     FetchDetailsDataDomainWithRefreshToken();
-  }, [triggerChange]);
+  }, [triggerChange, triggerChangeAfterAddDomain]);
 
   // End of: API Intregations
 

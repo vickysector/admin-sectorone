@@ -84,6 +84,7 @@ import {
   setConfirmEditDomain,
   setConfirmEditUsers,
   setIsAddDomainStatus,
+  setTriggerChangeAfterAddDomain,
 } from "@/app/_lib/store/features/Users/DetailUserSlice";
 
 const { Dragger } = Upload;
@@ -291,6 +292,8 @@ export default function DashboardLayout({ children }) {
     try {
       dispatch(setLoadingState(true));
 
+      dispatch(setTriggerChangeAfterAddDomain(false));
+
       const res = await fetch(`${APIDATAV1}root/admin/domain`, {
         method: "POST",
         credentials: "include",
@@ -317,6 +320,7 @@ export default function DashboardLayout({ children }) {
       console.log("status adding domains to specific users: ", data);
 
       if (data.data) {
+        dispatch(setTriggerChangeAfterAddDomain(true));
         setIsSuccessUrlDomain(true);
         setFinalUrlAllDomain([]);
         setUrlAllDomain([{ id: 1, value: "" }]);
