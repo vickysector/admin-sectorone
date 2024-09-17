@@ -1399,7 +1399,7 @@ export default function DetailRoleUsers({ params }) {
                 </div>
               </section>
               <section className="bg-white rounded-md p-8 mt-4">
-                <div className={clsx("mb-8")}>
+                <div className={clsx("mb-8 flex items-center")}>
                   <ConfigProvider
                     theme={{
                       components: {
@@ -1421,8 +1421,33 @@ export default function DetailRoleUsers({ params }) {
                       // onChange={(e) => handleAddDomainSearch(e)}
                       // value={addDomainSearch}
                       size="large"
+                      disabled={true}
                     />
                   </ConfigProvider>
+                  <div className={clsx("ml-4")}>
+                    <ConfigProvider
+                      theme={{ token: { colorPrimary: "FF6F1E" } }}
+                    >
+                      <Select
+                        defaultValue={"Newest - Oldest"}
+                        options={[
+                          {
+                            label: "Newest - Oldest",
+                            key: 1,
+                          },
+                          {
+                            label: "Oldest - Newest",
+                            key: 2,
+                          },
+                        ]}
+                        size="large"
+                        value={"Newest - Oldest"}
+                        // onChange={handleRoleChange}
+                        disabled={true}
+                        style={{ width: 160 }}
+                      />
+                    </ConfigProvider>
+                  </div>
                 </div>
                 {allDomain &&
                   allDomain.data.map((data) => (
