@@ -218,10 +218,19 @@ export default function DashboardLayout({ children }) {
     (state) => state.domainSearch.countAllPageAddDomain
   );
 
+  // Start of: Add Url Domain (superadmin)
+
   const [urlAllDomain, setUrlAllDomain] = useState([{ id: 1, value: "" }]);
+  const [isConfirmAddDomainForUsers, setIsConfirmAddDomainForUsers] =
+    useState(false);
+  const [finalUrlAllDomain, setFinalUrlAllDomain] = useState([]);
 
   const addDomainPopUpStatus = useSelector(
     (state) => state.detailUserDeactivate.isAddDomainStatus
+  );
+
+  const idUsersForAddDomain = useSelector(
+    (state) => state.detailUserDeactivate.idUsersForAddUrlDomain
   );
 
   const handleAddDomainUrl = () => {
@@ -247,7 +256,80 @@ export default function DashboardLayout({ children }) {
     dispatch(setIsAddDomainStatus(false));
   };
 
-  const handleAddDomainYes = () => {};
+  const handleAddDomainsUrlCancelConfirmation = () => {
+    setIsConfirmAddDomainForUsers(false);
+    dispatch(setIsAddDomainStatus(true));
+  };
+
+  const handleAddDomainsUrlYesConfirmation = () => {
+    PostAddDomainsToSpecificUsersWithRefreshToken();
+  };
+
+  const handleAddDomainYes = () => {
+    setIsConfirmAddDomainForUsers(true);
+    dispatch(setIsAddDomainStatus(false));
+    const newFinalUrlAllDomain = urlAllDomain.map((item) => item.value);
+    setFinalUrlAllDomain(newFinalUrlAllDomain);
+  };
+
+  console.log("url all domain final:  ", finalUrlAllDomain);
+
+  const PostAddDomainsToSpecificUsers = async () => {
+    try {
+      dispatch(setLoadingState(true));
+
+      const res = await fetch(`${APIDATAV1}root/admin/domain`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          Authorization: `Bearer ${getCookie("access_token")}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id_user: idUsersForAddDomain,
+          name_domain: finalUrlAllDomain,
+        }),
+      });
+
+      if (res.status === 401 || res.status === 403) {
+        return res;
+      }
+
+      const data = await res.json();
+
+      if (data.data === null) {
+        // setMessageErrorWhileAddData(data.message);
+        throw res;
+      }
+
+      console.log("status adding domains to specific users: ", data);
+
+      if (data.data) {
+        dispatch(setSuccessState(true));
+        return res;
+      }
+    } catch (error) {
+      console.log("error while adding domains to specific users: ", error);
+      // setIsErrorWhileAddData(true);
+      //   setMessageErrorWhileAddData(error.message);
+      return error;
+    } finally {
+      dispatch(setLoadingState(false));
+      setTimeout(() => {
+        // setIsErrorWhileAddData(false);
+      }, 5000);
+    }
+  };
+
+  const PostAddDomainsToSpecificUsersWithRefreshToken = async () => {
+    await fetchWithRefreshToken(
+      PostAddDomainsToSpecificUsers,
+      router,
+      dispatch
+    );
+  };
+
+  // Start of: Add Url Domain (superadmin)
 
   const handleCloseDetailExecutivePopup = () => {
     dispatch(setDetailsIsOpen(false));
@@ -1726,6 +1808,44 @@ export default function DashboardLayout({ children }) {
       <div
         className={clsx(
           "fixed top-0 bottom-0 left-0 right-0 bg-[#000000B2] w-full z-50 flex items-center justify-center",
+          isConfirmAddDomainForUsers ? "visible" : "hidden"
+        )}
+      >
+        <div className="bg-white p-[32px] w-[400px] rounded-lg">
+          <h1 className="text-black text-LG-strong mb-2">
+            Add domains confirmation
+          </h1>
+          <p className="text-Base-normal text-text-description">
+            Are you sure you want to add this{" "}
+            <span className="text-Base-strong italic">
+              {finalUrlAllDomain.join(", ")}
+            </span>{" "}
+            domains to this user?
+          </p>
+          <div className="mt-[24px] ml-auto flex justify-end">
+            <button
+              className={clsx(
+                " bg-white text-primary-base py-[4px] px-4 border-[1px] border-[#D5D5D5] text-Base-normal rounded-[6px]"
+              )}
+              onClick={handleAddDomainsUrlCancelConfirmation}
+            >
+              Cancel
+            </button>
+            <button
+              className={clsx(
+                "ml-[8px] bg-primary-base text-white py-[4px] px-4 border-[1px] border-primary-base text-Base-normal rounded-[6px]"
+              )}
+              onClick={handleAddDomainsUrlYesConfirmation}
+            >
+              Yes, sure
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div
+        className={clsx(
+          "fixed top-0 bottom-0 left-0 right-0 bg-[#000000B2] w-full z-50 flex items-center justify-center",
           addDomainPopUpStatus ? "visible" : "hidden"
         )}
       >
@@ -1785,7 +1905,7 @@ export default function DashboardLayout({ children }) {
               className={clsx(
                 "ml-[8px] bg-primary-base text-white py-[4px] px-4 border-[1px] border-primary-base text-Base-normal rounded-[6px]"
               )}
-              // onClick={handleAddDomainConfirmationYes}
+              onClick={handleAddDomainYes}
             >
               Save
             </button>

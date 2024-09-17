@@ -23,6 +23,7 @@ import {
   setConfirmEditDomain,
   setConfirmEditUsers,
   setDetailUserDeactivateFunction,
+  setIdUsersForAddUrlDomain,
   setIsAddDomainStatus,
   setPostFunctionDeleteDomain,
   setPostFunctionEditDomain,
@@ -78,6 +79,7 @@ export default function DetailRoleUsers({ params }) {
     // }));
     console.log("handle add url");
     dispatch(setIsAddDomainStatus(true));
+    dispatch(setIdUsersForAddUrlDomain(params.id_users));
   };
 
   const handleEditDomainChange = (event, domainId) => {
