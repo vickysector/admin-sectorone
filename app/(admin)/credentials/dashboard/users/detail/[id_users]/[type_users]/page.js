@@ -1025,6 +1025,7 @@ export default function DetailRoleUsers({ params }) {
 
   useEffect(() => {
     setTriggerChange(false);
+    setAllDomain(allDomain);
     dispatch(setTriggerChangeAfterAddDomain(false));
     FetchAllRolesWithRefreshToken();
     FetchDetailsDataWithRefreshToken();
