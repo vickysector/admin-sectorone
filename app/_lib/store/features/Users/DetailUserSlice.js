@@ -14,6 +14,7 @@ const DetailsUsersSlices = createSlice({
     PostFunctionDeleteDomain: null,
     confirmEditDomain: false,
     PostFunctionEditDomain: null,
+    isAddDomainStatus: false,
   },
   reducers: {
     setConfirmDetailUserDeactivateState(state, action) {
@@ -49,6 +50,9 @@ const DetailsUsersSlices = createSlice({
     setPostFunctionEditDomain(state, action) {
       state.PostFunctionEditDomain = action.payload;
     },
+    setIsAddDomainStatus(state, action) {
+      state.isAddDomainStatus = action.payload;
+    },
   },
 });
 
@@ -64,6 +68,7 @@ export const {
   setPostFunctionDeleteDomain,
   setConfirmEditDomain,
   setPostFunctionEditDomain,
+  setIsAddDomainStatus,
 } = DetailsUsersSlices.actions;
 
 export default DetailsUsersSlices.reducer;

@@ -83,6 +83,7 @@ import {
   setConfirmDetailUserDeactivateState,
   setConfirmEditDomain,
   setConfirmEditUsers,
+  setIsAddDomainStatus,
 } from "@/app/_lib/store/features/Users/DetailUserSlice";
 
 const { Dragger } = Upload;
@@ -99,6 +100,8 @@ const { Search } = Input;
 import ErrorIcon from "@mui/icons-material/Error";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import EmailIcon from "@mui/icons-material/Email";
+import { v4 as uuidv4 } from "uuid";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 
 export default function DashboardLayout({ children }) {
   const [hide, setHide] = useState(false);
@@ -214,6 +217,37 @@ export default function DashboardLayout({ children }) {
   const allPageUsersAddDomain = useSelector(
     (state) => state.domainSearch.countAllPageAddDomain
   );
+
+  const [urlAllDomain, setUrlAllDomain] = useState([{ id: 1, value: "" }]);
+
+  const addDomainPopUpStatus = useSelector(
+    (state) => state.detailUserDeactivate.isAddDomainStatus
+  );
+
+  const handleAddDomainUrl = () => {
+    setUrlAllDomain([...urlAllDomain, { id: uuidv4(), value: "" }]);
+  };
+
+  const handleDeleteAddDomainUrl = (itemId) => {
+    console.log("clicked delete ", itemId);
+    const newUrlAllDomain = urlAllDomain.filter((item) => item.id !== itemId);
+    setUrlAllDomain(newUrlAllDomain);
+  };
+
+  const handleAddUrlDomain = (event, itemId) => {
+    const newInputAllDomain = urlAllDomain.map((input, i) =>
+      input.id === itemId ? { ...input, value: event.target.value } : input
+    );
+    setUrlAllDomain(newInputAllDomain);
+  };
+
+  console.log("url all domain: ", urlAllDomain);
+
+  const handleAddDomainCancel = () => {
+    dispatch(setIsAddDomainStatus(false));
+  };
+
+  const handleAddDomainYes = () => {};
 
   const handleCloseDetailExecutivePopup = () => {
     dispatch(setDetailsIsOpen(false));
@@ -1684,6 +1718,76 @@ export default function DashboardLayout({ children }) {
               onClick={handleAddDomainConfirmationYes}
             >
               Yes, sure
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div
+        className={clsx(
+          "fixed top-0 bottom-0 left-0 right-0 bg-[#000000B2] w-full z-50 flex items-center justify-center",
+          addDomainPopUpStatus ? "visible" : "hidden"
+        )}
+      >
+        <div className="bg-white p-[32px] w-[680px] rounded-lg">
+          <div className={clsx("flex justify-between")}>
+            <h1 className="text-black text-LG-strong mb-2">Add Domains</h1>
+            <CloseOutlined
+              style={{ color: "#676767" }}
+              onClick={handleAddDomainCancel}
+            />
+          </div>
+          <div className={clsx("mt-6  px-2 max-h-[390px] overflow-y-scroll")}>
+            {urlAllDomain.map((item, index) => (
+              <div
+                key={item.id}
+                className={clsx("flex justify-between items-center")}
+              >
+                <Form.Item
+                  label={"Url"}
+                  layout="vertical"
+                  rules={[
+                    {
+                      required: true,
+                    },
+                  ]}
+                  className={clsx("text-Base-normal text-[#000000E0] w-full")}
+                >
+                  <Input
+                    placeholder="John Smith"
+                    variant="filled"
+                    size="large"
+                    onChange={(e) => handleAddUrlDomain(e, item.id)}
+                    // value={item.value}
+                    // defaultValue={item.value}
+                  />
+                </Form.Item>
+                <DeleteOutlineIcon
+                  className={clsx(
+                    "ml-4 text-[#00000040] text-[20px] ",
+                    index === 0 ? "hidden" : "visible"
+                  )}
+                  onClick={() => handleDeleteAddDomainUrl(item.id)}
+                />
+              </div>
+            ))}
+          </div>
+          <div className="mt-6 ml-auto flex justify-end">
+            <button
+              className={clsx(
+                " bg-white text-primary-base py-[4px] px-4 border-[1px] border-[#D5D5D5] text-Base-normal rounded-[6px]"
+              )}
+              onClick={handleAddDomainUrl}
+            >
+              Add input
+            </button>
+            <button
+              className={clsx(
+                "ml-[8px] bg-primary-base text-white py-[4px] px-4 border-[1px] border-primary-base text-Base-normal rounded-[6px]"
+              )}
+              // onClick={handleAddDomainConfirmationYes}
+            >
+              Save
             </button>
           </div>
         </div>

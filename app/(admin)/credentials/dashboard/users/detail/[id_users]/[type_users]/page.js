@@ -23,6 +23,7 @@ import {
   setConfirmEditDomain,
   setConfirmEditUsers,
   setDetailUserDeactivateFunction,
+  setIsAddDomainStatus,
   setPostFunctionDeleteDomain,
   setPostFunctionEditDomain,
   setPostFunctionEditUsers,
@@ -71,10 +72,12 @@ export default function DetailRoleUsers({ params }) {
   };
 
   const handleAddUrlNewDomain = () => {
-    setAllDomain((prev) => ({
-      ...prev,
-      data: [...(prev?.data || []), { id: uuidv4(), domain: "" }],
-    }));
+    // setAllDomain((prev) => ({
+    //   ...prev,
+    //   data: [...(prev?.data || []), { id: uuidv4(), domain: "" }],
+    // }));
+    console.log("handle add url");
+    dispatch(setIsAddDomainStatus(true));
   };
 
   const handleEditDomainChange = (event, domainId) => {
@@ -1348,14 +1351,14 @@ export default function DetailRoleUsers({ params }) {
                 >
                   <h2 className="text-heading-4 text-black">URL list</h2>
                   <div>
-                    {/* <button
+                    <button
                       className={clsx(
                         `py-2 px-4 rounded-md text-primary-base text-Base-normal border-[1px] border-input-border hover:opacity-80 cursor-pointer `
                       )}
                       onClick={() => handleAddUrlNewDomain()}
                     >
                       Add URL
-                    </button> */}
+                    </button>
                     <button
                       className={clsx(
                         `py-2 px-4 rounded-md  text-Base-normal border-[1px] hover:opacity-80 cursor-pointer ml-4 `,
