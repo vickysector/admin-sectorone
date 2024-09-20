@@ -11,7 +11,15 @@ import {
   SUPERADMIN_SECTION_ROLE_SECTION,
   USERS_SECTION_ROLE_SECTION,
 } from "@/app/_lib/variables/Variables";
-import { ConfigProvider, Form, Input, Pagination, Select, Switch } from "antd";
+import {
+  ConfigProvider,
+  Form,
+  Input,
+  Pagination,
+  Select,
+  Spin,
+  Switch,
+} from "antd";
 import { useEffect, useState } from "react";
 import { fetchWithRefreshToken } from "@/app/_lib/token/fetchWithRefreshToken";
 import { APIDATAV1 } from "@/app/_lib/helpers/APIKEYS";
@@ -84,6 +92,7 @@ export default function DetailRoleUsers({ params }) {
   const [domain, setDomain] = useState([]);
   const [sortStatus, setSortStatus] = useState("new");
   const [keywordFilterDomain, setKeywordFilterDomain] = useState("");
+  const [loadingDataDomain, setLoadingDataDomain] = useState(false);
 
   const handleSetSortStatus = (value) => {
     console.log("sort: ", value);
@@ -875,7 +884,8 @@ export default function DetailRoleUsers({ params }) {
 
   const FetchDetailsDataDomain = async () => {
     try {
-      dispatch(setLoadingState(true));
+      // dispatch(setLoadingState(true));
+      setLoadingDataDomain(true);
 
       const res = await fetch(
         `${APIDATAV1}root/admin/domain?id_user=${params.id_users}&page=${allDomainPage}&size=5&time_frame=${sortStatus}&search=${keywordFilterDomain}`,
@@ -917,7 +927,8 @@ export default function DetailRoleUsers({ params }) {
       console.log("error domain status: ", error);
       return error;
     } finally {
-      dispatch(setLoadingState(false));
+      // dispatch(setLoadingState(false));
+      setLoadingDataDomain(false);
     }
   };
 
@@ -1463,96 +1474,127 @@ export default function DetailRoleUsers({ params }) {
                     </ConfigProvider>
                   </div>
                 </div>
-                {allDomain &&
-                  allDomain.data.map((data) => (
-                    <div
-                      className="flex items-center justify-between"
-                      key={data.id}
-                    >
-                      <Form.Item
-                        label={"URL"}
-                        name={data.domain}
-                        layout="vertical"
-                        rules={[
-                          {
-                            required: true,
-                          },
-                        ]}
+                <div
+                  className={clsx(!loadingDataDomain ? "visible" : "hidden")}
+                >
+                  {allDomain &&
+                    allDomain.data.map((data) => (
+                      <div
+                        className="flex items-center justify-between"
                         key={data.id}
+                      >
+                        <Form.Item
+                          label={"URL"}
+                          name={data.domain}
+                          layout="vertical"
+                          rules={[
+                            {
+                              required: true,
+                            },
+                          ]}
+                          key={data.id}
+                          className={clsx(
+                            "text-Base-normal text-[#000000E0] w-full"
+                          )}
+                        >
+                          <Input
+                            placeholder="gmail.com"
+                            variant="filled"
+                            size="large"
+                            onChange={(e) => handleEditDomainChange(e, data.id)}
+                            value={data.domain}
+                            defaultValue={data.domain}
+                            disabled={isDomainEdited !== data.id}
+                          />
+                        </Form.Item>
+                        <DeleteOutlineIcon
+                          className={clsx(
+                            "ml-4 text-[#00000040] text-[20px] ",
+                            isDomainEdited !== data.id ? "visible" : "hidden",
+                            allDomain && allDomain.size > 1
+                              ? "visible"
+                              : "hidden"
+                          )}
+                          onClick={() => handleDeleteDomainById(data.id)}
+                        />
+                        <EditOutlined
+                          className={clsx(
+                            "ml-4 text-[#00000040] text-[20px] ",
+                            isDomainEdited !== data.id ? "visible" : "hidden"
+                          )}
+                          onClick={() => handleSetIsDomainEdited(data.id)}
+                        />
+                        <CloseCircleOutlined
+                          className={clsx(
+                            "ml-4 text-[#00000040] text-[20px] ",
+                            isDomainEdited === data.id ? "visible" : "hidden"
+                          )}
+                          onClick={handleSetIsDomainEditedCancel}
+                        />
+                      </div>
+                    ))}
+
+                  <div
+                    className={clsx("flex justify-between items-center mt-8")}
+                  >
+                    <div>
+                      <h1
                         className={clsx(
-                          "text-Base-normal text-[#000000E0] w-full"
+                          "text-Base-normal text-text-description"
                         )}
                       >
-                        <Input
-                          placeholder="gmail.com"
-                          variant="filled"
-                          size="large"
-                          onChange={(e) => handleEditDomainChange(e, data.id)}
-                          value={data.domain}
-                          defaultValue={data.domain}
-                          disabled={isDomainEdited !== data.id}
-                        />
-                      </Form.Item>
-                      <DeleteOutlineIcon
-                        className={clsx(
-                          "ml-4 text-[#00000040] text-[20px] ",
-                          isDomainEdited !== data.id ? "visible" : "hidden",
-                          allDomain && allDomain.size > 1 ? "visible" : "hidden"
-                        )}
-                        onClick={() => handleDeleteDomainById(data.id)}
-                      />
-                      <EditOutlined
-                        className={clsx(
-                          "ml-4 text-[#00000040] text-[20px] ",
-                          isDomainEdited !== data.id ? "visible" : "hidden"
-                        )}
-                        onClick={() => handleSetIsDomainEdited(data.id)}
-                      />
-                      <CloseCircleOutlined
-                        className={clsx(
-                          "ml-4 text-[#00000040] text-[20px] ",
-                          isDomainEdited === data.id ? "visible" : "hidden"
-                        )}
-                        onClick={handleSetIsDomainEditedCancel}
-                      />
+                        Showing {allDomain.size} to {allDomain.count_data}{" "}
+                        entries
+                      </h1>
                     </div>
-                  ))}
-
-                <div className={clsx("flex justify-between items-center mt-8")}>
-                  <div>
-                    <h1
-                      className={clsx("text-Base-normal text-text-description")}
+                    <ConfigProvider
+                      theme={{
+                        components: {
+                          Pagination: {
+                            itemActiveBg: "#FF6F1E",
+                            itemLinkBg: "#fff",
+                            itemInputBg: "#fff",
+                          },
+                        },
+                        token: {
+                          colorPrimary: "white",
+                        },
+                      }}
                     >
-                      Showing {allDomain.size} to {allDomain.count_data} entries
-                    </h1>
+                      <Pagination
+                        type="primary"
+                        defaultCurrent={1}
+                        total={allDomain && allDomain.count_data}
+                        showSizeChanger={false}
+                        style={{ color: "#FF6F1E" }}
+                        // hideOnSinglePage={true}
+                        onChange={handleChangeAllDomainPage}
+                        current={allDomainPage}
+                        defaultPageSize={5}
+                      />
+                    </ConfigProvider>
                   </div>
+                </div>
+
+                {/* Url List - Loading state */}
+                <div
+                  className={clsx(
+                    loadingDataDomain ? "visible" : "hidden",
+                    "text-center mt-12"
+                  )}
+                >
                   <ConfigProvider
                     theme={{
-                      components: {
-                        Pagination: {
-                          itemActiveBg: "#FF6F1E",
-                          itemLinkBg: "#fff",
-                          itemInputBg: "#fff",
-                        },
-                      },
                       token: {
-                        colorPrimary: "white",
+                        colorPrimary: "#FF6F1E",
                       },
                     }}
                   >
-                    <Pagination
-                      type="primary"
-                      defaultCurrent={1}
-                      total={allDomain && allDomain.count_data}
-                      showSizeChanger={false}
-                      style={{ color: "#FF6F1E" }}
-                      // hideOnSinglePage={true}
-                      onChange={handleChangeAllDomainPage}
-                      current={allDomainPage}
-                      defaultPageSize={5}
-                    />
+                    <Spin size="large" />
                   </ConfigProvider>
                 </div>
+
+                {/* Url List - Null State */}
               </section>
             </div>
           </div>
