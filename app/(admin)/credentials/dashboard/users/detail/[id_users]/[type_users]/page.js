@@ -82,6 +82,14 @@ export default function DetailRoleUsers({ params }) {
   const [IsAvailableForSaveDomain, setIsAvailableForSaveDomain] =
     useState(false);
   const [domain, setDomain] = useState([]);
+  const [sortStatus, setSortStatus] = useState("new");
+
+  const handleSetSortStatus = (value) => {
+    console.log("sort: ", value);
+    setSortStatus(value);
+  };
+
+  console.log("select options: ", selectOptions);
 
   const handleSaveChangesDomain = () => {
     console.log("edited domain");
@@ -865,7 +873,7 @@ export default function DetailRoleUsers({ params }) {
       dispatch(setLoadingState(true));
 
       const res = await fetch(
-        `${APIDATAV1}root/admin/domain?id_user=${params.id_users}&page=${allDomainPage}&size=5`,
+        `${APIDATAV1}root/admin/domain?id_user=${params.id_users}&page=${allDomainPage}&size=5&time_frame=${sortStatus}&search=`,
         {
           method: "GET",
           credentials: "include",
@@ -1034,7 +1042,7 @@ export default function DetailRoleUsers({ params }) {
 
   useEffect(() => {
     FetchDetailsDataDomainWithRefreshToken();
-  }, [allDomainPage]);
+  }, [allDomainPage, sortStatus]);
 
   // End of: API Intregations
 
@@ -1422,7 +1430,7 @@ export default function DetailRoleUsers({ params }) {
                       // onChange={(e) => handleAddDomainSearch(e)}
                       // value={addDomainSearch}
                       size="large"
-                      disabled={true}
+                      // disabled={true}
                     />
                   </ConfigProvider>
                   <div className={clsx("ml-4")}>
@@ -1434,17 +1442,17 @@ export default function DetailRoleUsers({ params }) {
                         options={[
                           {
                             label: "Newest - Oldest",
-                            key: 1,
+                            value: "new",
                           },
                           {
                             label: "Oldest - Newest",
-                            key: 2,
+                            value: "old",
                           },
                         ]}
                         size="large"
-                        value={"Newest - Oldest"}
-                        // onChange={handleRoleChange}
-                        disabled={true}
+                        value={sortStatus}
+                        onChange={handleSetSortStatus}
+                        // disabled={true}
                         style={{ width: 160 }}
                       />
                     </ConfigProvider>
