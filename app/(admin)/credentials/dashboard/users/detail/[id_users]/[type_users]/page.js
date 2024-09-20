@@ -46,6 +46,7 @@ import {
 } from "@ant-design/icons";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { v4 as uuidv4 } from "uuid";
+import Image from "next/image";
 
 export default function DetailRoleUsers({ params }) {
   // Start of: Redux
@@ -914,6 +915,7 @@ export default function DetailRoleUsers({ params }) {
       console.log("details data domain: ", data);
 
       if (data.data === null) {
+        setAllDomain(null);
         throw res;
       }
 
@@ -1474,6 +1476,7 @@ export default function DetailRoleUsers({ params }) {
                     </ConfigProvider>
                   </div>
                 </div>
+                {/* Url List - Success state */}
                 <div
                   className={clsx(!loadingDataDomain ? "visible" : "hidden")}
                 >
@@ -1535,7 +1538,10 @@ export default function DetailRoleUsers({ params }) {
                     ))}
 
                   <div
-                    className={clsx("flex justify-between items-center mt-8")}
+                    className={clsx(
+                      "flex justify-between items-center mt-8",
+                      allDomain === null ? "hidden" : "visible"
+                    )}
                   >
                     <div>
                       <h1
@@ -1543,8 +1549,8 @@ export default function DetailRoleUsers({ params }) {
                           "text-Base-normal text-text-description"
                         )}
                       >
-                        Showing {allDomain.size} to {allDomain.count_data}{" "}
-                        entries
+                        Showing {allDomain && allDomain.size} to{" "}
+                        {allDomain && allDomain.count_data} entries
                       </h1>
                     </div>
                     <ConfigProvider
@@ -1595,6 +1601,31 @@ export default function DetailRoleUsers({ params }) {
                 </div>
 
                 {/* Url List - Null State */}
+                <div
+                  className={clsx(
+                    !loadingDataDomain && allDomain === null
+                      ? "visible"
+                      : "hidden",
+                    "mt-12"
+                  )}
+                >
+                  <div className="text-center flex flex-col justify-center items-center">
+                    <div>
+                      <Image
+                        src={"/images/no_result_found_compromised.svg"}
+                        alt="search icon"
+                        width={129}
+                        height={121}
+                      />
+                    </div>
+                    <div className="mt-5">
+                      <h1 className="text-heading-3">No results found</h1>
+                      <p className="text-text-description text-LG-normal mt-4">
+                        Nothing was found after the scan.
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </section>
             </div>
           </div>
