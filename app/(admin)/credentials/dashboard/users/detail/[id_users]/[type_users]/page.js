@@ -83,10 +83,15 @@ export default function DetailRoleUsers({ params }) {
     useState(false);
   const [domain, setDomain] = useState([]);
   const [sortStatus, setSortStatus] = useState("new");
+  const [keywordFilterDomain, setKeywordFilterDomain] = useState("");
 
   const handleSetSortStatus = (value) => {
     console.log("sort: ", value);
     setSortStatus(value);
+  };
+
+  const handleKeywordFilterDomain = (e) => {
+    setKeywordFilterDomain(e.target.value);
   };
 
   console.log("select options: ", selectOptions);
@@ -873,7 +878,7 @@ export default function DetailRoleUsers({ params }) {
       dispatch(setLoadingState(true));
 
       const res = await fetch(
-        `${APIDATAV1}root/admin/domain?id_user=${params.id_users}&page=${allDomainPage}&size=5&time_frame=${sortStatus}&search=`,
+        `${APIDATAV1}root/admin/domain?id_user=${params.id_users}&page=${allDomainPage}&size=5&time_frame=${sortStatus}&search=${keywordFilterDomain}`,
         {
           method: "GET",
           credentials: "include",
@@ -1042,7 +1047,7 @@ export default function DetailRoleUsers({ params }) {
 
   useEffect(() => {
     FetchDetailsDataDomainWithRefreshToken();
-  }, [allDomainPage, sortStatus]);
+  }, [allDomainPage, sortStatus, keywordFilterDomain]);
 
   // End of: API Intregations
 
@@ -1427,8 +1432,8 @@ export default function DetailRoleUsers({ params }) {
                       style={{ width: 500 }}
                       variant="filled"
                       addonAfter={<SearchOutlined />}
-                      // onChange={(e) => handleAddDomainSearch(e)}
-                      // value={addDomainSearch}
+                      onChange={(e) => handleKeywordFilterDomain(e)}
+                      value={keywordFilterDomain}
                       size="large"
                       // disabled={true}
                     />
