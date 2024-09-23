@@ -1674,12 +1674,18 @@ export default function DetailRoleUsers({ params }) {
           </div>
           <div>
             <div className="p-8 bg-white rounded-lg mt-8">
-              {/* <section className="flex items-center justify-between">
+              <section className="flex items-center justify-between">
                 <div>
                   <h2 className="text-heading-5 text-black mb-1">
                     Users is on {demo ? "Demo" : "Full Access"} Mode
                   </h2>
-              
+                  {/* <h2 className="text-text-description text-Base-normal mb-1">
+                   Users is on{" "}
+                   <span className={clsx("text-heading-5 text-black")}>
+                     {demo ? "Demo" : "Full Access"}
+                   </span>{" "}
+                   Mode
+                 </h2> */}
                   <p className="text-text-description text-Base-normal">
                     By activating this mode, users will be restricted from
                     accessing some features on the SectorOne dashboard.
@@ -1725,7 +1731,7 @@ export default function DetailRoleUsers({ params }) {
                     onClick={handleSetIsDemoEditedCancel}
                   />
                 </div>
-              </section> */}
+              </section>
               <section className="mt-8 grid grid-cols-2 gap-4   ">
                 <div className="flex items-center justify-between">
                   <Form.Item
@@ -1956,40 +1962,235 @@ export default function DetailRoleUsers({ params }) {
           <div>
             <div className="mt-8">
               <section className="flex items-center justify-between">
-                <div>
+                <div
+                  className={clsx("flex items-center justify-between w-full")}
+                >
                   <h2 className="text-heading-4 text-black">URL list</h2>
+                  <div>
+                    <button
+                      className={clsx(
+                        `py-2 px-4 rounded-md text-primary-base text-Base-normal border-[1px] border-input-border hover:opacity-80 cursor-pointer `
+                      )}
+                      onClick={() => handleAddUrlNewDomain()}
+                    >
+                      Add URL
+                    </button>
+                    <button
+                      className={clsx(
+                        `py-2 px-4 rounded-md  text-Base-normal border-[1px] hover:opacity-80 cursor-pointer ml-4 `,
+                        IsAvailableForSaveDomain
+                          ? "text-white bg-primary-base"
+                          : "bg-[#0000000A] border-[1px] border-[#D5D5D5] text-[#00000040]"
+                      )}
+                      disabled={!IsAvailableForSaveDomain}
+                      onClick={handleSaveChangesDomain}
+                    >
+                      Save
+                    </button>
+                  </div>
                 </div>
               </section>
               <section className="bg-white rounded-md p-8 mt-4">
-                {allDomain &&
-                  allDomain.data.map((data) => (
-                    <Form.Item
-                      label={"Url"}
-                      name={data.domain}
-                      layout="vertical"
-                      rules={[
-                        {
-                          required: true,
+                <div className={clsx("mb-8 flex items-center")}>
+                  <ConfigProvider
+                    theme={{
+                      components: {
+                        Input: {
+                          activeBorderColor: "#FF6F1E",
                         },
-                      ]}
-                      key={data.id}
+                      },
+                      token: {
+                        colorPrimary: "#FF6F1E",
+                      },
+                    }}
+                  >
+                    <Input
+                      placeholder="Search ID user/ Login/ Role"
+                      allowClear={false}
+                      style={{ width: 500 }}
+                      variant="filled"
+                      addonAfter={<SearchOutlined />}
+                      onChange={(e) => handleKeywordFilterDomain(e)}
+                      value={keywordFilterDomain}
+                      size="large"
+                      // disabled={true}
+                    />
+                  </ConfigProvider>
+                  <div className={clsx("ml-4")}>
+                    <ConfigProvider
+                      theme={{ token: { colorPrimary: "FF6F1E" } }}
                     >
-                      <Input
-                        placeholder="gmail.com"
-                        variant="filled"
+                      <Select
+                        defaultValue={"Newest - Oldest"}
+                        options={[
+                          {
+                            label: "Newest - Oldest",
+                            value: "new",
+                          },
+                          {
+                            label: "Oldest - Newest",
+                            value: "old",
+                          },
+                        ]}
                         size="large"
-                        // onChange={handleRequiredUrlChange}
-                        value={data.domain}
-                        defaultValue={data.domain}
-                        disabled
+                        value={sortStatus}
+                        onChange={handleSetSortStatus}
+                        // disabled={true}
+                        style={{ width: 160 }}
                       />
-                    </Form.Item>
-                  ))}
-                {!allDomain && (
-                  <p className="text-text-description italic text-Base-normal">
-                    No Url List yet
-                  </p>
-                )}
+                    </ConfigProvider>
+                  </div>
+                </div>
+                {/* Url List - Success state */}
+                <div
+                  className={clsx(!loadingDataDomain ? "visible" : "hidden")}
+                >
+                  {allDomain &&
+                    allDomain.data.map((data) => (
+                      <div
+                        className="flex items-center justify-between"
+                        key={data.id}
+                      >
+                        <Form.Item
+                          label={"URL"}
+                          name={data.domain}
+                          layout="vertical"
+                          rules={[
+                            {
+                              required: true,
+                            },
+                          ]}
+                          key={data.id}
+                          className={clsx(
+                            "text-Base-normal text-[#000000E0] w-full"
+                          )}
+                        >
+                          <Input
+                            placeholder="gmail.com"
+                            variant="filled"
+                            size="large"
+                            onChange={(e) => handleEditDomainChange(e, data.id)}
+                            value={data.domain}
+                            defaultValue={data.domain}
+                            disabled={isDomainEdited !== data.id}
+                          />
+                        </Form.Item>
+                        <DeleteOutlineIcon
+                          className={clsx(
+                            "ml-4 text-[#00000040] text-[20px] ",
+                            isDomainEdited !== data.id ? "visible" : "hidden",
+                            allDomain && allDomain.size > 1
+                              ? "visible"
+                              : "hidden"
+                          )}
+                          onClick={() => handleDeleteDomainById(data.id)}
+                        />
+                        <EditOutlined
+                          className={clsx(
+                            "ml-4 text-[#00000040] text-[20px] ",
+                            isDomainEdited !== data.id ? "visible" : "hidden"
+                          )}
+                          onClick={() => handleSetIsDomainEdited(data.id)}
+                        />
+                        <CloseCircleOutlined
+                          className={clsx(
+                            "ml-4 text-[#00000040] text-[20px] ",
+                            isDomainEdited === data.id ? "visible" : "hidden"
+                          )}
+                          onClick={handleSetIsDomainEditedCancel}
+                        />
+                      </div>
+                    ))}
+
+                  <div
+                    className={clsx(
+                      "flex justify-between items-center mt-8",
+                      allDomain === null ? "hidden" : "visible"
+                    )}
+                  >
+                    <div>
+                      <h1
+                        className={clsx(
+                          "text-Base-normal text-text-description"
+                        )}
+                      >
+                        Showing {allDomain && allDomain.size} to{" "}
+                        {allDomain && allDomain.count_data} entries
+                      </h1>
+                    </div>
+                    <ConfigProvider
+                      theme={{
+                        components: {
+                          Pagination: {
+                            itemActiveBg: "#FF6F1E",
+                            itemLinkBg: "#fff",
+                            itemInputBg: "#fff",
+                          },
+                        },
+                        token: {
+                          colorPrimary: "white",
+                        },
+                      }}
+                    >
+                      <Pagination
+                        type="primary"
+                        defaultCurrent={1}
+                        total={allDomain && allDomain.count_data}
+                        showSizeChanger={false}
+                        style={{ color: "#FF6F1E" }}
+                        // hideOnSinglePage={true}
+                        onChange={handleChangeAllDomainPage}
+                        current={allDomainPage}
+                        defaultPageSize={5}
+                      />
+                    </ConfigProvider>
+                  </div>
+                </div>
+
+                {/* Url List - Loading state */}
+                <div
+                  className={clsx(
+                    loadingDataDomain ? "visible" : "hidden",
+                    "text-center mt-12"
+                  )}
+                >
+                  <ConfigProvider
+                    theme={{
+                      token: {
+                        colorPrimary: "#FF6F1E",
+                      },
+                    }}
+                  >
+                    <Spin size="large" />
+                  </ConfigProvider>
+                </div>
+
+                {/* Url List - Null State */}
+                <div
+                  className={clsx(
+                    !loadingDataDomain && allDomain === null
+                      ? "visible"
+                      : "hidden",
+                    "mt-12"
+                  )}
+                >
+                  <div className="text-center flex flex-col justify-center items-center">
+                    <div>
+                      <Image
+                        src={"/images/no_result_found_compromised.svg"}
+                        alt="search icon"
+                        width={129}
+                        height={121}
+                      />
+                    </div>
+                    <div className="mt-5">
+                      <h1 className="text-heading-3">No results found</h1>
+                      <p className="text-text-description text-LG-normal mt-4">
+                        Nothing was found after the scan.
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </section>
             </div>
           </div>
